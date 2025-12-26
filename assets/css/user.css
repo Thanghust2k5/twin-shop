@@ -1,0 +1,732 @@
+/* =========================================================
+   FILE: assets/css/user.css
+   Mô tả: Style gộp cho trang User (Profile + My Orders)
+   ========================================================= */
+
+/* --- 1. LAYOUT CHUNG & SIDEBAR --- */
+.order-container {
+    background-color: #f5f5f5;
+    padding: 20px 0;
+    min-height: 600px;
+}
+
+/* Sidebar Box */
+.user-sidebar {
+    background: #fff;
+    padding: 15px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+}
+
+/* User Info Mini (Avatar + Tên) */
+.user-info {
+    display: flex;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+}
+
+.user-avatar-small {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    object-fit: cover;
+}
+
+.user-meta { margin-left: 10px; }
+
+.user-name {
+    font-weight: 600;
+    font-size: 1.4rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+    color: #333;
+}
+
+/* Menu Item chính */
+.user-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    color: #333;
+    text-decoration: none;
+    font-size: 1.4rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.user-menu-item:hover { color: #ee4d2d; }
+.user-menu-item.active { color: #ee4d2d; }
+
+.user-menu-icon {
+    width: 20px;
+    margin-right: 10px;
+    text-align: center;
+    font-size: 1.6rem;
+}
+
+/* Submenu (Menu con cho Profile) */
+.user-submenu {
+    display: none; /* JS sẽ bật cái này lên khi active */
+    list-style: none;
+    padding-left: 30px;
+    margin-top: -5px;
+    margin-bottom: 10px;
+}
+
+.user-submenu-item {
+    display: block;
+    text-decoration: none;
+    color: #555;
+    font-size: 1.4rem;
+    padding: 6px 0;
+    font-weight: 400;
+}
+
+.user-submenu-item:hover { color: #ee4d2d; }
+.user-submenu-item.active { color: #ee4d2d; font-weight: 500; }
+
+
+/* --- 2. PROFILE CONTENT (FORM HỒ SƠ) --- */
+.profile-content {
+    background-color: #fff;
+    padding: 30px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.13);
+    border-radius: 2px;
+    min-height: 500px;
+}
+
+.profile-header {
+    border-bottom: 1px solid #efefef;
+    padding-bottom: 18px;
+    margin-bottom: 30px;
+}
+
+.profile-header__title {
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: #333;
+    margin: 0 0 5px 0;
+}
+
+.profile-header__subtitle {
+    font-size: 1.4rem;
+    color: #555;
+}
+
+.profile-body {
+    display: flex;
+    align-items: flex-start;
+}
+
+.profile-form {
+    flex: 1;
+    padding-right: 50px;
+}
+
+/* Cột phải: Upload Avatar */
+.profile-avatar-upload {
+    width: 280px;
+    border-left: 1px solid #efefef;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    padding-left: 30px;
+}
+
+.profile-avatar-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    object-fit: cover;
+    border: 1px solid #e0e0e0;
+}
+
+.profile-avatar-desc {
+    margin-top: 15px;
+    font-size: 1.2rem;
+    color: #999;
+    line-height: 1.6rem;
+    text-align: center;
+}
+
+/* Form Inputs Group */
+.profile-form__group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    font-size: 1.4rem;
+}
+
+.profile-form__label {
+    width: 150px; /* Nhãn rộng hơn một chút */
+    text-align: right;
+    color: rgba(85, 85, 85, 0.8);
+    margin-right: 20px;
+    text-transform: capitalize;
+}
+
+/* Input text */
+.profile-form__input {
+    flex: 1;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    outline: none;
+    font-size: 1.4rem;
+    color: #333;
+    box-shadow: inset 0 2px 0 0 rgba(0,0,0,0.02);
+}
+.profile-form__input:focus { border-color: #777; }
+
+/* Text Display (Khi không phải input) */
+.profile-form__text-display {
+    color: #333;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+}
+
+/* Link Thay đổi */
+.profile-form__link {
+    text-decoration: underline;
+    color: #05a;
+    margin-left: 15px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+}
+.profile-form__link:hover { color: #ee4d2d; }
+
+/* Radio giới tính */
+.profile-form__radio-group { display: flex; align-items: center; }
+.profile-form__radio-group input { margin-right: 8px; cursor: pointer; }
+.profile-form__radio-group label { margin-right: 25px; cursor: pointer; color: #333; }
+
+.profile-btn-save {
+    margin-left: 170px;
+    height: 40px;
+    padding: 0 25px;
+    border-radius: 2px;
+    font-size: 1.4rem;
+    min-width: 80px;
+}
+
+
+/* --- 3. MY ORDERS (DANH SÁCH & CHI TIẾT) --- */
+
+/* Tab Navigation */
+.order-tabs {
+    display: flex;
+    background: #fff;
+    margin-bottom: 12px;
+    border-radius: 2px;
+    overflow: hidden;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.order-tab-item {
+    flex: 1;
+    text-align: center;
+    font-size: 1.6rem;
+    padding: 15px 0;
+    cursor: pointer;
+    color: #333;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.order-tab-item:hover { color: #ee4d2d; }
+.order-tab-item.active { 
+    color: #ee4d2d; 
+    border-bottom: 2px solid #ee4d2d; 
+    font-weight: 500; 
+}
+
+/* Order Card */
+.order-card {
+    background: #fff;
+    margin-bottom: 12px;
+    border-radius: 2px;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
+}
+
+.card-header {
+    padding: 12px 24px;
+    border-bottom: 1px solid #eaeaea;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.shop-info {
+    display: flex;
+    align-items: center;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.tag-mall {
+    background: #d0011b;
+    color: #fff;
+    padding: 0 4px;
+    border-radius: 2px;
+    font-size: 1rem;
+    margin-right: 5px;
+    font-weight: 400;
+    line-height: 1.4rem;
+}
+
+.btn-chat, .btn-view-shop {
+    background: #ee4d2d;
+    color: #fff;
+    border: none;
+    padding: 4px 8px;
+    font-size: 1.2rem;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-view-shop {
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #555;
+}
+
+.order-status {
+    color: #ee4d2d;
+    text-transform: uppercase;
+    font-size: 1.4rem;
+}
+
+.card-body {
+    padding: 0 24px;
+    cursor: pointer;
+}
+
+/* Product Row (List Item) */
+.product-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+.product-row:last-child { border-bottom: none; }
+
+.product-img {
+    width: 80px;
+    height: 80px;
+    border: 1px solid #e1e1e1;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.product-info { flex: 1; }
+
+.product-name {
+    font-size: 1.6rem;
+    color: #333;
+    margin-bottom: 5px;
+    line-height: 2rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.product-variant {
+    font-size: 1.4rem;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.product-qty { font-size: 1.4rem; color: #333; }
+
+.product-price {
+    font-size: 1.4rem;
+    color: #ee4d2d;
+    text-align: right;
+    min-width: 120px;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 1.3rem;
+    margin-right: 5px;
+}
+
+/* Card Footer */
+.card-footer {
+    padding: 24px;
+    background: #fffefb;
+    border-top: 1px solid #eaeaea;
+}
+
+.total-section {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.total-label {
+    font-size: 1.4rem;
+    color: #333;
+    margin-right: 10px;
+}
+
+.total-price {
+    font-size: 2.4rem;
+    color: #ee4d2d;
+    font-weight: 500;
+}
+
+.action-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.shipping-expected {
+    font-size: 1.2rem;
+    color: #777;
+}
+
+/* Buttons Action */
+.btn-action {
+    min-width: 150px;
+    height: 40px;
+    font-size: 1.6rem;
+    border-radius: 2px;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background: #ee4d2d;
+    color: #fff;
+    border-color: #ee4d2d;
+}
+.btn-primary:hover { background-color: #d73211; }
+
+.btn-outlined {
+    background: #fff;
+    border-color: #ddd;
+    color: #555;
+}
+.btn-outlined:hover { background: #fdfdfd; border-color: #ccc; color: #ee4d2d; }
+
+
+/* --- 4. DETAIL PAGE (STEPPER, ADDRESS...) --- */
+.detail-page {
+    background: #fff;
+    min-height: 500px;
+    border-radius: 2px;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
+}
+
+.detail-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.btn-back-link {
+    color: #777;
+    font-size: 1.4rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+.btn-back-link:hover { color: #ee4d2d; }
+
+.order-id-label {
+    font-size: 1.4rem;
+    color: #333;
+    margin-right: 10px;
+}
+
+.order-status-label {
+    color: #ee4d2d;
+    text-transform: uppercase;
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+
+/* Stepper (Thanh tiến trình) */
+.stepper-container {
+    padding: 40px 30px;
+    background: #fff;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.stepper {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 4px solid #e0e0e0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e0e0e0;
+    font-size: 2rem;
+    transition: all 0.3s;
+}
+
+.step-item.active .step-icon {
+    border-color: #26aa99;
+    color: #26aa99;
+}
+
+.step-label {
+    margin-top: 10px;
+    font-size: 1.4rem;
+    color: #bbb;
+    text-align: center;
+    max-width: 120px;
+}
+.step-item.active .step-label { color: #000; }
+
+.step-date {
+    font-size: 1.2rem;
+    color: #777;
+    margin-top: 5px;
+}
+
+.stepper-line-bg {
+    position: absolute;
+    top: 25px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: #e0e0e0;
+    z-index: 0;
+}
+
+.stepper-line-active {
+    position: absolute;
+    top: 25px;
+    left: 0;
+    height: 4px;
+    background: #26aa99;
+    z-index: 0;
+    transition: width 0.5s;
+}
+
+/* Address Box */
+.address-section { 
+    padding: 25px 30px;
+    background: #fff;
+    border-bottom: 1px solid #eaeaea;
+    background-image: repeating-linear-gradient(45deg,#6fa6d6,#6fa6d6 33px,transparent 0,transparent 41px,#f18d9b 0,#f18d9b 74px,transparent 0,transparent 82px);
+    background-position-x: -30px;
+    background-size: 116px 3px;
+    background-repeat: no-repeat;
+    background-position: top;
+    margin-top: 1px;
+}
+
+.section-title { font-size: 1.8rem; font-weight: 500; color: #333; margin-bottom: 15px; }
+.addr-name { font-size: 1.6rem; color: #333; font-weight: 500; margin-bottom: 8px; }
+.addr-phone { color: #777; font-size: 1.4rem; margin-left: 10px; }
+.addr-detail { font-size: 1.4rem; color: #555; line-height: 1.6; }
+
+/* Payment Table */
+.payment-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fffefb;
+}
+
+.payment-table td {
+    padding: 10px 30px;
+    text-align: right;
+    font-size: 1.4rem;
+    color: #777;
+}
+
+.payment-table td:first-child { color: #777; text-align: right; width: 70%; }
+.payment-table td:last-child { color: #333; width: 30%; }
+
+.payment-table .total-row td {
+    border-top: 1px dashed #ddd;
+    padding-top: 20px;
+}
+
+.payment-table .total-amount {
+    font-size: 2.4rem;
+    color: #ee4d2d;
+    font-weight: 500;
+}
+
+.detail-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px 30px;
+    gap: 10px;
+    border-top: 1px solid #f1f1f1;
+    background: #fff;
+}
+
+
+/* =========================================================
+   5. MODALS (CHANGE INFO) - Đã sửa lỗi hiển thị
+   ========================================================= */
+
+/* Class chung cho Modal container để căn giữa */
+.modal {
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+    display: none; /* JS sẽ đổi thành flex */
+    /* Căn giữa cả dọc và ngang */
+    align-items: center; 
+    justify-content: center;
+    z-index: 999; /* Luôn nổi trên cùng */
+}
+
+/* Lớp phủ đen mờ */
+.modal__overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1; /* Thấp hơn nội dung modal */
+}
+
+/* Khung nội dung Modal (Body) */
+.modal-change-body {
+    width: 400px; /* Thu nhỏ lại cho gọn */
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    position: relative; /* Để dùng z-index */
+    z-index: 2; /* QUAN TRỌNG: Cao hơn lớp phủ (1) */
+    animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Hiệu ứng nảy nhẹ */
+}
+
+/* Header Modal */
+.modal-change-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f1f1f1;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: #333;
+    background-color: #fff;
+}
+
+/* Content Modal */
+.modal-change-content {
+    padding: 25px 20px;
+}
+
+.modal-input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.modal-input-group input {
+    flex: 1;
+    height: 40px;
+    border: 1px solid #e0e0e0;
+    padding: 0 12px;
+    border-radius: 2px;
+    outline: none;
+    font-size: 1.4rem;
+    color: #333;
+}
+.modal-input-group input:focus {
+    border-color: #777;
+    background-color: #fff;
+}
+
+/* 3 Ô chọn Ngày Sinh (Birthday Selects) */
+.birthday-select-group {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px; /* Khoảng cách giữa các ô */
+}
+
+.birthday-select {
+    flex: 1; /* Chia đều 3 ô */
+    height: 40px;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    padding: 0 8px;
+    outline: none;
+    font-size: 1.4rem;
+    background: #fff;
+    cursor: pointer;
+    color: #333;
+}
+.birthday-select:hover {
+    background-color: #fafafa;
+    border-color: #ccc;
+}
+
+/* Footer Modal */
+.modal-change-footer {
+    padding: 15px 20px;
+    text-align: right;
+    border-top: 1px solid #f1f1f1;
+    background: #fbfbfb; /* Màu nền nhẹ cho footer */
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Hiệu ứng hiện Modal */
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Utilities hỗ trợ Tab (Giữ nguyên) */
+.tab-content { display: none; }
+.tab-content.active { display: block; }

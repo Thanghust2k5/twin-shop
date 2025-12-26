@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Twin Shop - Kênh Người Bán</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="./assets/css/admin.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <!-- Sidebar-wrapper -->
+    <div class="sidebar">
+      <div class="brand">
+        <i class="fa-solid fa-bag-shopping"></i> TWIN SHOP
+      </div>
+      <div class="menu-item active" onclick="switchTab('dashboard', this)">
+        <i class="fa-solid fa-gauge-high"></i> Tổng Quan
+      </div>
+      <div class="menu-item" onclick="switchTab('products', this)">
+        <i class="fa-solid fa-box"></i> Sản Phẩm
+      </div>
+      <div class="menu-item" onclick="switchTab('orders', this)">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Đơn Hàng
+      </div>
+      <div class="menu-item" onclick="switchTab('categories', this)">
+        <i class="fa-solid fa-layer-group"></i> Danh Mục
+      </div>
+      <div class="menu-item" onclick="switchTab('shipping', this)">
+        <i class="fa-solid fa-truck"></i> Vận Chuyển
+      </div>
+      <div class="menu-item" onclick="switchTab('payment', this)">
+        <i class="fa-solid fa-credit-card"></i> Thanh Toán
+      </div>
+      <div class="menu-item" onclick="switchTab('users', this)">
+        <i class="fa-solid fa-users"></i> Khách Hàng
+      </div>
+      <div class="menu-item" onclick="switchTab('reviews', this)">
+        <i class="fa-solid fa-comment-dots"></i> Đánh Giá
+      </div>
+    </div>
+
+    <div class="main">
+      <!-- Header -->
+      <div class="header">
+        <h3 id="page-title">Tổng Quan</h3>
+        <a href="index.html" target="_blank" style="text-decoration: none; color: #ee4d2d; font-weight: 500;">
+          <i class="fa-solid fa-share-from-square"></i> Xem Website
+        </a>
+      </div>
+      <!-- Content -->
+      <div class="content">
+        <!-- Sidebar Dashboard -->
+        <div id="tab-dashboard" class="section active">
+          <div class="cards-grid">
+            <div class="card-stat">
+              <div class="stat-info">
+                <h3 id="stat-revenue">0đ</h3>
+                <p>Doanh Thu</p>
+              </div>
+              <div class="stat-icon icon-revenue">
+                <i class="fa-solid fa-money-bill-wave"></i>
+              </div>
+            </div>
+            <div class="card-stat">
+              <div class="stat-info">
+                <h3 id="stat-orders">0</h3>
+                <p>Đơn Hàng</p>
+              </div>
+              <div class="stat-icon icon-orders">
+                <i class="fa-solid fa-cart-shopping"></i>
+              </div>
+            </div>
+            <div class="card-stat">
+              <div class="stat-info">
+                <h3 id="stat-products">0</h3>
+                <p>Sản Phẩm</p>
+              </div>
+              <div class="stat-icon icon-products">
+                <i class="fa-solid fa-box-open"></i>
+              </div>
+            </div>
+            <div class="card-stat">
+              <div class="stat-info">
+                <h3 id="stat-users">0</h3>
+                <p>Khách Hàng</p>
+              </div>
+              <div class="stat-icon icon-users">
+                <i class="fa-solid fa-user-group"></i>
+              </div>
+            </div>
+          </div>
+          <div class="charts-container">
+            <div class="chart-box">
+              <div class="chart-header">
+                <h4>Doanh Thu (7 Ngày)</h4>
+              </div>
+              <div style="height: 300px">
+                <canvas id="revenueChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-box">
+              <div class="chart-header">
+                <h4>Tỉ Lệ Đơn Hàng</h4>
+              </div>
+              <div style="height: 250px; display: flex; justify-content: center">
+                <canvas id="pieChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="dash-tables">
+            <div class="panel">
+              <h4>Đơn Hàng Mới Nhất</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Khách</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-orders"></tbody>
+              </table>
+            </div>
+            <div class="panel">
+              <h4>Sắp Hết Hàng (10)</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ảnh</th>
+                    <th>Tên</th>
+                    <th>Kho</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-low-stock"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- Sidebar Products -->
+        <div id="tab-products" class="section">
+          <div class="panel">
+            <div class="panel-header">
+              <h4>Quản Lý Sản Phẩm</h4>
+              <button class="btn btn-add" onclick="openProductModal('add')">+ Thêm Sản Phẩm</button>
+            </div>
+            <div class="toolbar">
+              <input type="text" id="prod-search" placeholder="Tìm tên sản phẩm..." style="width: 250px;" onkeyup="if(event.key==='Enter') loadProducts()">
+              <select id="prod-sort" onchange="loadProducts()">
+                <option value="newest">Mới nhất</option>
+                <option value="name_asc">Tên (A-Z)</option>
+                <option value="name_desc">Tên (Z-A)</option>
+                <option value="price_asc">Giá tăng dần</option>
+                <option value="price_desc">Giá giảm dần</option>
+                <option value="stock_asc">Tồn kho ít nhất</option>
+                <option value="stock_desc">Tồn kho nhiều nhất</option>
+                <option value="id_desc">ID giảm dần</option>
+                <option value="id_asc">ID tăng dần</option>
+              </select>
+              <button onclick="loadProducts()">
+                <i class="fa-solid fa-magnifying-glass"></i> Tìm
+              </button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Ảnh</th>
+                  <th>Tên sản phẩm</th>
+                  <th>Giá</th>
+                  <th>Kho</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="product-list"></tbody>
+            </table>
+            <div id="product-pagination" class="pagination"></div>
+          </div>
+        </div>
+        <!-- Sidebar Orders -->
+        <div id="tab-orders" class="section">
+          <div class="panel">
+            <h4>Danh Sách Đơn Hàng</h4>
+            <div class="toolbar">
+              <input type="text" id="order-search" placeholder="Tìm tên người nhận..." style="width: 250px;" onkeyup="if(event.key==='Enter') loadOrders()">
+              <select id="order-status" onchange="loadOrders()">
+                <option value="">Tất cả trạng thái</option>
+                <option value="pending">Chờ duyệt</option>
+                <option value="shipping">Đang giao</option>
+                <option value="completed">Hoàn thành</option>
+                <option value="cancelled">Đã hủy</option>
+              </select>
+              <button onclick="loadOrders()">
+                <i class="fa-solid fa-filter"></i> Lọc
+              </button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Khách hàng</th>
+                  <th>Ngày đặt</th>
+                  <th>Tổng tiền</th>
+                  <th>Trạng thái</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="order-list"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Sidebar Users -->
+        <div id="tab-users" class="section">
+          <div class="panel">
+            <h4>Danh Sách Khách Hàng</h4>
+            <div class="toolbar">
+              <input type="text" id="user-search" placeholder="Tìm tên, email, số điện thoại..." style="width: 300px;" onkeyup="if(event.key==='Enter') loadUsers()">
+              <button onclick="loadUsers()">
+                <i class="fa-solid fa-magnifying-glass"></i> Tìm
+              </button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Họ tên</th>
+                  <th>Email</th>
+                  <th>SĐT</th>
+                  <th>Vai trò</th>
+                </tr>
+              </thead>
+              <tbody id="user-list"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Sidebar Categories -->
+        <div id="tab-categories" class="section">
+          <div class="panel">
+            <div class="panel-header">
+              <h4>Danh Mục</h4>
+              <button class="btn btn-add" onclick="openSimpleModal('category', 'add')">+ Thêm</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tên</th>
+                  <th>Mô tả</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="category-list"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Sidebar Reviews -->
+        <div id="tab-reviews" class="section">
+          <div class="panel">
+            <h4>Đánh Giá Sản Phẩm</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Khách</th>
+                  <th>Sản phẩm</th>
+                  <th>Sao</th>
+                  <th>Nội dung</th>
+                  <th>Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="review-list"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Sidebar Shipping -->
+        <div id="tab-shipping" class="section">
+          <div class="panel">
+            <div class="panel-header">
+              <h4>Vận Chuyển</h4>
+              <button class="btn btn-add" onclick="openSimpleModal('shipping', 'add')">+ Thêm</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tên</th>
+                  <th>Giá</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="shipping-list"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Sidebar Payment -->
+        <div id="tab-payment" class="section">
+          <div class="panel">
+            <div class="panel-header">
+              <h4>Thanh Toán</h4>
+              <button class="btn btn-add" onclick="openSimpleModal('payment', 'add')">+ Thêm</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tên</th>
+                  <th>Code</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="payment-list"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal add/edit product -->
+    <div id="modal-product" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-product-title">Thêm Sản Phẩm</h3>
+          <i class="fa-solid fa-xmark" style="cursor: pointer" onclick="closeModal('modal-product')"></i>
+        </div>
+        <form id="form-product">
+          <input type="hidden" id="p-id" />
+          <div class="form-group">
+            <label>Tên sản phẩm</label>
+            <input type="text" id="p-name" required />
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px">
+            <div class="form-group">
+              <label>Giá tiền</label>
+              <input type="number" id="p-price" required />
+            </div>
+            <div class="form-group">
+              <label>Kho</label>
+              <input type="number" id="p-stock" value="100" />
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px">
+            <div class="form-group">
+              <label>Danh mục</label>
+              <select id="p-category"></select>
+            </div>
+            <div class="form-group">
+              <label>Ảnh đại diện</label>
+              <input type="file" id="p-thumbnail" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Ảnh phụ:</label>
+            <input type="file" id="p-images" multiple />
+          </div>
+          <div class="form-group">
+            <label>Mô tả</label>
+            <textarea id="p-desc" rows="3"></textarea>
+          </div>
+          <div style="text-align: right">
+            <button type="button" class="btn" style="background: #eee; color: #333" onclick="closeModal('modal-product')">Hủy</button>
+            <button type="submit" class="btn btn-add">Lưu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Modal add category -->
+    <div id="modal-simple" class="modal">
+      <div class="modal-content" style="width: 400px">
+        <div class="modal-header">
+          <h3 id="simple-title">Thêm Mới</h3>
+          <i class="fa-solid fa-xmark" onclick="closeModal('modal-simple')"></i>
+        </div>
+        <form id="form-simple">
+          <input type="hidden" id="simple-type" />
+          <input type="hidden" id="simple-id" />
+          <div class="form-group">
+            <label id="lbl-1">Tên</label>
+            <input type="text" id="inp-1" required />
+          </div>
+          <div class="form-group">
+            <label id="lbl-2">Mô tả</label>
+            <input type="text" id="inp-2" />
+          </div>
+          <div style="text-align: right">
+            <button type="submit" class="btn btn-add">Lưu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Modal detail -->
+    <div id="modal-detail" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="detail-title">Chi Tiết</h3>
+          <i class="fa-solid fa-xmark" onclick="closeModal('modal-detail')"></i>
+        </div>
+        <div id="detail-content"></div>
+      </div>
+    </div>
+
+    <script src="./assets/js/admin.js"></script>
+  </body>
+</html>

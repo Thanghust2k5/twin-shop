@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý tài khoản - T-Win Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+    <link rel="stylesheet" href="./assets/css/base.css" />
+    <link rel="stylesheet" href="./assets/css/main.css" />
+    <link rel="stylesheet" href="./assets/css/user.css" />
+    <link rel="stylesheet" href="./assets/fonts/fontawesome-free-7.1.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <style>
+        /* CSS hỗ trợ chuyển tab */
+        .tab-content { display: none; } /* Mặc định ẩn hết */
+        .tab-content.active { display: block; } /* Class active sẽ hiện lên */
+        .user-menu-item { cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div id="header-placeholder"></div>
+      
+      <div class="app__container order-container" style="background-color: #f5f5f5; padding-top: 20px">
+        <div class="grid">
+          <div class="grid__row">
+            
+            <div class="grid__column-2">
+              <div class="user-sidebar">
+                <div class="user-info">
+                  <img src="" alt="" class="user-avatar-small" id="sidebar-avatar" />
+                  <div class="user-meta">
+                    <div class="user-name" id="sidebar-name">...</div>
+                  </div>
+                </div>
+                
+                <div class="user-menu-item" id="menu-profile" onclick="switchTab('profile')">
+                    <i class="fa-regular fa-user user-menu-icon" style="color: #0055aa;"></i> 
+                    <span style="color: #333;">Tài Khoản Của Tôi</span>
+                </div>
+                <div class="user-submenu" id="submenu-profile">
+                    <a href="javascript:void(0)" class="user-submenu-item active" onclick="switchTab('profile')">Hồ Sơ</a>
+                    <a href="#" class="user-submenu-item">Ngân Hàng</a>
+                    <a href="#" class="user-submenu-item">Địa Chỉ</a>
+                    <a href="#" class="user-submenu-item">Đổi Mật Khẩu</a>
+                </div>
+                
+                <div class="user-menu-item" id="menu-orders" onclick="switchTab('orders')">
+                    <i class="fa-regular fa-file-lines user-menu-icon" style="color: #0055aa;"></i> 
+                    <span style="color: #333;">Đơn Mua</span>
+                </div>
+                
+                <div class="user-menu-item">
+                    <i class="fa-regular fa-bell user-menu-icon" style="color: #ee4d2d;"></i> 
+                    <span style="color: #333;">Thông Báo</span>
+                </div>
+                
+                <div class="user-menu-item">
+                    <i class="fa-solid fa-ticket user-menu-icon" style="color: #ee4d2d;"></i> 
+                    <span style="color: #333;">Kho Voucher</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid__column-10">    
+                <div id="view-profile" class="tab-content active">
+                    <div class="profile-content">
+                        <div class="profile-header">
+                            <h1 class="profile-header__title">Hồ Sơ Của Tôi</h1>
+                            <div class="profile-header__subtitle">Quản lý thông tin hồ sơ để bảo mật tài khoản</div>
+                        </div>
+                        
+                        <div class="profile-body">
+                            <div class="profile-form">
+                                <div class="profile-form__group">
+                                    <div class="profile-form__label">Tên đăng nhập</div>
+                                    <div class="profile-form__text-display" id="display-username">...</div>
+                                </div>
+
+                                <div class="profile-form__group">
+                                    <div class="profile-form__label">Tên</div>
+                                    <input type="text" class="profile-form__input" id="input-fullname" value=""/>
+                                </div>
+
+                                <div class="profile-form__group">
+                                    <div class="profile-form__label">Email</div>
+                                    <div class="profile-form__text-display">
+                                        <span id="display-email">...</span>
+                                        <a href="javascript:void(0)" class="profile-form__link" onclick="openProfileModal('email')">Thay Đổi</a>
+                                    </div>
+                                </div>
+
+                                <div class="profile-form__group">
+                                    <div class="profile-form__label">Số điện thoại</div>
+                                    <div class="profile-form__text-display">
+                                        <span id="display-phone">...</span>
+                                        <a href="javascript:void(0)" class="profile-form__link" onclick="openProfileModal('phone')">Thay Đổi</a>
+                                    </div>
+                                </div>
+
+                                <div class="profile-form__group">
+                                    <div class="profile-form__label">Giới tính</div>
+                                    <div class="profile-form__radio-group">
+                                        <input type="radio" name="gender" value="1" id="gender-male"/><label for="gender-male">Nam</label>
+                                        <input type="radio" name="gender" value="0" id="gender-female"/><label for="gender-female">Nữ</label>
+                                        <input type="radio" name="gender" value="2" id="gender-other"/><label for="gender-other">Khác</label>
+                                    </div>
+                                </div>
+
+                                <div class="profile-form__group">
+                                    <div class="profile-form__label">Ngày sinh</div>
+                                    <div class="profile-form__text-display">
+                                        <span id="display-birthday">...</span>
+                                        <a href="javascript:void(0)" class="profile-form__link" onclick="openProfileModal('birthday')">Thay Đổi</a>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn--primary profile-btn-save" onclick="saveMainProfile()">Lưu</button>
+                            </div>
+
+                           <div class="profile-avatar-upload">
+                                <img src="" alt="" class="profile-avatar-preview" id="preview-avatar"/>
+                                
+                                <input type="file" id="input-avatar-file" accept="image/*" hidden />
+                                
+                                <button class="btn btn--normal btn--sm" 
+                                        style="background:#fff; border:1px solid #ddd;"
+                                        onclick="document.getElementById('input-avatar-file').click()">
+                                    Chọn Ảnh
+                                </button>
+                                
+                                <div class="profile-avatar-desc">
+                                    Dụng lượng file tối đa 1 MB<br />Định dạng:.JPEG, .PNG
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-orders" class="tab-content">
+                  <div id="order-list-view">
+                      <div class="order-tabs">
+                        <div class="order-tab-item active" onclick="filterOrder('all', this)">Tất cả</div>
+                        <div class="order-tab-item" onclick="filterOrder('pending', this)">Chờ xác nhận</div>
+                        <div class="order-tab-item" onclick="filterOrder('shipping', this)">Vận chuyển</div>
+                        <div class="order-tab-item" onclick="filterOrder('completed', this)">Hoàn thành</div>
+                        <div class="order-tab-item" onclick="filterOrder('cancelled', this)">Đã hủy</div>
+                      </div>
+                      <div class="order-list-panel" id="my-order-list">
+                        <div style="text-align: center; padding: 50px; font-size: 1.6rem; color: #777;">
+                          <i class="fa-solid fa-spinner fa-spin"></i> Đang tải đơn hàng...
+                        </div>
+                      </div>
+                  </div>
+
+                  <div id="order-detail-view" class="detail-page" style="display: none;">
+                      <div class="detail-header-top">
+                          <div class="btn-back-link" onclick="backToOrderList()">
+                              <i class="fa-solid fa-chevron-left" style="margin-right: 5px;"></i> TRỞ LẠI
+                          </div>
+                          <div>
+                              <span class="order-id-label" id="detail-order-id">...</span>
+                              <span class="order-status-label" id="detail-order-status">...</span>
+                          </div>
+                      </div>
+                      <div class="stepper-container">
+                          <div class="stepper"> <div class="stepper-line-bg"></div> <div class="stepper-line-active" id="stepper-line" style="width: 0%"></div> <div class="step-item" id="step-1"> <div class="step-icon"><i class="fa-solid fa-file-invoice"></i></div> <div class="step-label">Đơn Hàng Đã Đặt</div> <div class="step-date" id="date-step-1">...</div> </div> <div class="step-item" id="step-2"> <div class="step-icon"><i class="fa-solid fa-money-bill-wave"></i></div> <div class="step-label">Đã Thanh Toán</div> <div class="step-date" id="date-step-2">...</div> </div> <div class="step-item" id="step-3"> <div class="step-icon"><i class="fa-solid fa-truck"></i></div> <div class="step-label">Đang Vận Chuyển</div> <div class="step-date" id="date-step-3">...</div> </div> <div class="step-item" id="step-4"> <div class="step-icon"><i class="fa-solid fa-box-open"></i></div> <div class="step-label">Đã Giao Hàng</div> <div class="step-date" id="date-step-4">...</div> </div> </div>
+                      </div>
+                      <div class="address-section">
+                          <div class="section-title">Địa Chỉ Nhận Hàng</div>
+                          <div><span class="addr-name" id="detail-name">...</span><span class="addr-phone" id="detail-phone">...</span></div>
+                          <div class="addr-detail" id="detail-address">...</div>
+                      </div>
+                      <div id="detail-product-list"></div>
+                      <table class="payment-table">
+                          <tr><td>Tổng tiền hàng</td><td id="detail-subtotal">0₫</td></tr>
+                          <tr><td>Phí vận chuyển</td><td id="detail-shipping">0₫</td></tr>
+                          <tr><td>Voucher từ Shopee</td><td>-0₫</td></tr>
+                          <tr class="total-row"><td>Thành tiền</td><td class="total-amount" id="detail-total">0₫</td></tr>
+                          <tr><td>Phương thức thanh toán</td><td id="detail-payment-method">...</td></tr>
+                      </table>
+                      <div class="detail-actions" id="detail-actions-buttons"></div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="footer-placeholder"></div>
+    </div>
+
+    
+        <div class="modal" id="modal-change-email">
+            <div class="modal__overlay" onclick="closeProfileModal('email')"></div>
+            <div class="modal-change-body">
+                <div class="modal-change-header">Thay đổi Email</div>
+                <div class="modal-change-content">
+                    <div class="modal-input-group">
+                        <input type="email" id="input-new-email" placeholder="Nhập địa chỉ Email mới" />
+                    </div>
+                </div>
+                <div class="modal-change-footer">
+                    <button class="btn btn--normal" onclick="closeProfileModal('email')">Hủy</button>
+                    <button class="btn btn--primary" onclick="confirmChange('email')">Lưu</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="modal-change-phone">
+            <div class="modal__overlay" onclick="closeProfileModal('phone')"></div>
+            <div class="modal-change-body">
+                <div class="modal-change-header">Thay đổi Số điện thoại</div>
+                <div class="modal-change-content">
+                    <div class="modal-input-group">
+                        <input type="text" id="input-new-phone" placeholder="Nhập số điện thoại mới" />
+                    </div>
+                </div>
+                <div class="modal-change-footer">
+                    <button class="btn btn--normal" onclick="closeProfileModal('phone')">Hủy</button>
+                    <button class="btn btn--primary" onclick="confirmChange('phone')">Lưu</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="modal-change-birthday">
+            <div class="modal__overlay" onclick="closeProfileModal('birthday')"></div>
+            <div class="modal-change-body">
+                <div class="modal-change-header">Thay đổi Ngày sinh</div>
+                <div class="modal-change-content">
+                    <div class="birthday-select-group">
+                        <select id="select-day" class="birthday-select"><option value="0">Ngày</option></select>
+                        <select id="select-month" class="birthday-select"><option value="0">Tháng</option></select>
+                        <select id="select-year" class="birthday-select"><option value="0">Năm</option></select>
+                    </div>
+                </div>
+                <div class="modal-change-footer">
+                    <button class="btn btn--normal" onclick="closeProfileModal('birthday')">Hủy</button>
+                    <button class="btn btn--primary" onclick="confirmChange('birthday')">Lưu</button>
+                </div>
+            </div>
+        </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/user.js"></script> 
+  </body>
+</html>

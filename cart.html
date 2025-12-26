@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giỏ hàng - T-Win Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+    <link rel="stylesheet" href="./assets/css/base.css" />
+    <link rel="stylesheet" href="./assets/css/main.css" />
+    <link rel="stylesheet" href="./assets/fonts/fontawesome-free-7.1.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+
+    <style>
+      /* ==============================================
+         1. CẤU TRÚC BẢNG GIỎ HÀNG (ĐÃ CHIA LẠI CỘT)
+      ============================================== */
+      .cart-header {
+        background: #fff;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        border-radius: 2px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+        font-size: 1.4rem;
+        color: #888;
+      }
+      .cart-list {
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+      }
+      .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #f1f1f1;
+      }
+      .cart-item:last-child {
+        border-bottom: none;
+      }
+
+      /* --- CHIA CỘT MỚI (CÓ CỘT PHÂN LOẠI) --- */
+      .cart-col-0 { width: 5%; text-align: center; } /* Checkbox */
+      .cart-col-1 { width: 30%; display: flex; align-items: center; } /* Sản phẩm (Ảnh + Tên) */
+      .cart-col-variant { width: 17%; color: #777; font-size: 1.4rem; display: flex; justify-content: flex-start; } /* Phân loại hàng (Mới) */
+      .cart-col-2 { width: 13%; text-align: center; font-size: 1.4rem; } /* Đơn giá */
+      .cart-col-3 { width: 13%; text-align: center; } /* Số lượng */
+      .cart-col-4 { width: 12%; text-align: center; color: #ee4d2d; font-weight: 500; font-size: 1.4rem; } /* Số tiền */
+      .cart-col-5 { width: 10%; text-align: center; font-size: 1.5rem; } /* Thao tác */
+
+      input[type="checkbox"] { transform: scale(1.3); cursor: pointer; }
+      .cart-img { width: 80px; height: 80px; object-fit: cover; border: 1px solid #e8e8e8; margin-right: 15px; }
+      .cart-name { 
+        font-size: 1.5rem;
+        color: #333; 
+        line-height: 1.8rem; 
+        overflow: hidden;
+        display: -webkit-box; 
+        -webkit-box-orient: vertical; 
+        -webkit-line-clamp: 2; 
+        line-clamp: 2; 
+        margin-right: 10px; 
+        text-decoration: none; 
+      }
+      
+      .btn-delete { cursor: pointer; color: #333; font-size: 1.4rem; }
+      .btn-delete:hover { color: #ee4d2d; }
+
+      /* ==============================================
+         2. CSS CHO FOOTER (STICKY BOTTOM - DÍNH ĐÁY)
+      ============================================== */
+      .cart-footer {
+        background: #fff;
+        margin: 15px 0;
+        border-radius: 2px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); 
+        
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+        
+        position: -webkit-sticky;
+        position: sticky;
+        bottom: 0;
+        z-index: 99;
+        border-top: 1px solid #f1f1f1;
+      }
+
+      .cart-footer-left {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          font-size: 1.4rem;
+          color: #333;
+      }
+
+      .cart-footer-right {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+      }
+
+      .link-delete-all { cursor: pointer; color: #333; }
+      .link-delete-all:hover { color: #ee4d2d; }
+      /* ==============================================
+         3. CSS PHÂN LOẠI HÀNG (VARIANTS) - Ở GIỮA
+      ============================================== */
+      .cart-variant-wrap {
+          position: relative;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          color: #777;
+          font-size: 1.4rem;
+          /* Xóa width fit-content để nó canh giữa cột */
+      }
+
+      .cart-variant-label { margin-right: 5px; }
+      .cart-variant-icon { font-size: 1rem; margin-left: 4px; }
+
+      /* Popup chọn biến thể */
+      .cart-variant-popup {
+          display: none;
+          position: absolute;
+          top: 30px; /* Đẩy xuống dưới chút */
+          left: -80px; /* Căn chỉnh cho popup nằm giữa */
+          width: 300px;
+          background: #fff;
+          border: 1px solid #e8e8e8;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+          z-index: 100;
+          padding: 15px;
+          border-radius: 2px;
+          text-align: left;
+      }
+      .cart-variant-popup.show { display: block; }
+      
+      /* Mũi tên chỉ lên của popup */
+      .cart-variant-popup::before {
+          content: ""; position: absolute; top: -8px; left: 140px; /* Căn mũi tên vào giữa */
+          border-left: 8px solid transparent;
+          border-right: 8px solid transparent;
+          border-bottom: 8px solid #fff;
+      }
+
+      .cart-popup-group { margin-bottom: 12px; }
+      .cart-popup-label { font-size: 1.2rem; color: #999; margin-bottom: 8px; display: block;}
+      
+      .cart-popup-btn {
+          border: 1px solid rgba(0,0,0,.09); padding: 6px 12px; margin-right: 8px; margin-bottom: 8px;
+          background: #fff; font-size: 1.2rem; cursor: pointer; border-radius: 2px;
+      }
+      .cart-popup-btn:hover { color: #ee4d2d; border-color: #ee4d2d; }
+      .cart-popup-btn.active { color: #ee4d2d; border-color: #ee4d2d; background: #fff5f1; }
+
+      .cart-popup-actions { display: flex; justify-content: flex-end; margin-top: 15px; }
+      .btn-popup-cancel { margin-right: 10px; background: transparent; border: none; cursor: pointer; color: #555; }
+      .btn-popup-confirm { background: #ee4d2d; color: #fff; border: none; padding: 6px 15px; border-radius: 2px; cursor: pointer; }
+
+      /* ==============================================
+         4. CSS Ô SỐ LƯỢNG (QUANTITY BOX)
+      ============================================== */
+      .cart-qnt-box {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid #e8e8e8;
+          border-radius: 2px;
+          width: fit-content;
+          margin: 0 auto;
+      }
+
+      .cart-btn-qnt {
+          width: 30px; height: 30px; border: none; background: #fff;
+          cursor: pointer; font-size: 1.6rem; color: #555;
+          border-right: 1px solid #e8e8e8;
+      }
+      .cart-btn-qnt:last-child { border-right: none; border-left: 1px solid #e8e8e8; }
+
+      .cart-qnt-input {
+          width: 40px; height: 30px; border: none; text-align: center;
+          font-size: 1.4rem; outline: none;
+      }
+      .cart-qnt-input::-webkit-outer-spin-button,
+      .cart-qnt-input::-webkit-inner-spin-button {
+          -webkit-appearance: none; margin: 0;
+      }
+
+      .qnt-box.disabled { border-color: #eee; background-color: #fff; }
+      .qnt-box.disabled .qnt-btn { color: #ccc; cursor: not-allowed; }
+      .qnt-box.disabled .qnt-input { color: #ccc; border-color: #eee; cursor: not-allowed; }
+
+      /* ==============================================
+         5. CSS LABEL MODAL
+      ============================================== */
+      .auth-form__label {
+          font-size: 1.2rem;
+          font-weight: 500;
+          margin-bottom: 5px;
+          display: block;
+          color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div id="header-placeholder"></div>
+
+      <div class="app__container">
+        <div class="grid">
+          <div class="cart-header">
+            <div class="cart-col-0">
+              <input type="checkbox" id="check-all" onclick="toggleCheckAll(this)"/>
+            </div>
+            <div class="cart-col-1">Sản phẩm</div>
+            <div class="cart-col-variant">Phân loại hàng</div>
+            <div class="cart-col-2">Đơn giá</div>
+            <div class="cart-col-3">Số lượng</div>
+            <div class="cart-col-4">Số tiền</div>
+            <div class="cart-col-5">Thao tác</div>
+          </div>
+
+          <div class="cart-list" id="cart-list-wrapper">
+            <div style="padding: 40px; text-align: center; font-size: 1.6rem; color: #777;">
+              Đang tải giỏ hàng...
+            </div>
+          </div>
+
+          <div class="cart-footer">
+            <div class="cart-footer-left">
+                <div style="display: flex; align-items: center;">
+                    <input type="checkbox" id="check-all-footer" onclick="toggleCheckAll(this)" style="transform: scale(1.3); margin-right: 10px; cursor: pointer;">
+                    <label for="check-all-footer" style="cursor: pointer;">Chọn Tất Cả</label>
+                </div>
+                
+                <div class="link-delete-all" onclick="deleteSelectedItems()">Xóa</div>
+            </div>
+
+            <div class="cart-footer-right">
+                <div style="display: flex; align-items: baseline;">
+                    <span id="selected-count" style="font-size: 1.4rem; margin-right: 5px;">Tổng thanh toán (0 sản phẩm):</span>
+                    <span id="cart-total-price" style="font-size: 2.2rem; color: #ee4d2d; font-weight: 500;">0đ</span>
+                </div>
+                <button class="btn btn--primary" style="min-width: 200px; height: 40px" onclick="processCheckout()">
+                  Mua Hàng
+                </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="footer-placeholder"></div>
+    </div>
+
+    <div class="modal" id="modal-checkout">
+      <div class="modal__overlay" onclick="closeCheckoutModal()"></div>
+      <div class="modal__body">
+        <div class="auth-form">
+          <div class="auth-form__header">
+            <h3 class="auth-form__heading">Thanh Toán</h3>
+            <span class="auth-form__switch-btn" onclick="closeCheckoutModal()">Hủy</span>
+          </div>
+
+          <div class="auth-form__form">
+            <div class="auth-form__group">
+              <label class="auth-form__label">Họ và tên:</label>
+              <input type="text" class="auth-form__input" id="customer-name" placeholder="Nhập họ tên của bạn"/>
+            </div>
+            <div class="auth-form__group">
+              <label class="auth-form__label">Số điện thoại:</label>
+              <input type="text" class="auth-form__input" id="customer-phone" placeholder="Nhập số điện thoại"/>
+            </div>
+            <div class="auth-form__group">
+              <label class="auth-form__label">Địa chỉ nhận hàng:</label>
+              <input type="text" class="auth-form__input" id="customer-address" placeholder="Nhập địa chỉ nhận hàng"/>
+            </div>
+            <div style="margin-top: 20px; font-size: 1.4rem">
+              Tổng tiền cần thanh toán:
+              <span id="checkout-total-money" style="color: #ee4d2d; font-weight: bold; font-size: 1.6rem">0đ</span>
+            </div>
+          </div>
+
+          <div class="auth-form__controls">
+            <button class="btn auth-form__controls-back" onclick="closeCheckoutModal()">TRỞ LẠI</button>
+            <button class="btn btn--primary" onclick="confirmCheckout()">XÁC NHẬN ĐẶT HÀNG</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/cart.js"></script>
+  </body>
+</html>

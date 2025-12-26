@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chi tiết sản phẩm</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+    <link rel="stylesheet" href="./assets/css/base.css" />
+    <link rel="stylesheet" href="./assets/css/main.css" />
+    <link rel="stylesheet" href="./assets/css/product-detail.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="./assets/fonts/fontawesome-free-7.1.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wdth,wght@75..100,100..900&display=swap" rel="stylesheet"/>
+
+  </head>
+  <body>
+    <div class="app">
+      <div id="header-placeholder"></div>
+
+      <div class="app__container pd-page-container">
+        <div class="grid">
+          <div class="grid__row app__content pd-main-content">
+            <div class="grid__column-5">
+              <div class="product-detail__img-wrapper">
+                <div class="product-detail__img-main-wrap pd-img-wrapper-main">
+                  <img src="" class="product-detail__img-main pd-img-main"/>
+                </div>
+                <div class="product-detail__list-img pd-list-img"></div>
+              </div>
+            </div>
+
+            <div class="grid__column-7 pd-col-right">
+              <h1 class="product-detail__name pd-name">
+                Đang tải tên sản phẩm...
+              </h1>
+
+              <div class="product-detail__meta pd-meta">
+                <div class="product-detail__rating pd-rating" onclick="scrollToReviews()">
+                  <u class="product-detail__rating-score pd-rating-score">5.0</u>
+                  <span class="product-detail__rating-stars">
+                    </span>
+                </div>
+                
+                <div class="product-detail__review-count pd-review-count" onclick="scrollToReviews()">
+                     <u class="pd-review-num">411</u> 
+                     <span style="color: #767676;">Đánh Giá</span>
+                </div>
+
+                <div class="product-detail__sold pd-sold">
+                  <span class="product-detail__sold-num">1.2k</span> Đã Bán
+                </div>
+              </div>
+
+              <div class="product-detail__price-wrap pd-price-wrap">
+                <span class="product-detail__price-old pd-price-old">300.000đ</span>
+                <span class="product-detail__price-current pd-price-current">150.000đ</span>
+                <span class="product-detail__discount-tag pd-discount-tag">GIẢM 50%</span>
+              </div>
+
+              <div class="product-detail__info-section pd-info-section">
+                <div class="pd-row align-baseline">
+                    <span class="pd-label">An tâm mua sắm cùng T-Win</span>
+                    
+                    <div class="twin-policy-container">
+                        <div class="twin-policy-trigger">
+                            <i class="fas fa-shield-halved" style="color: #ee4d2d; margin-right: 5px;"></i>
+                            <span style="color: #333;">Trả hàng miễn phí 15 ngày</span>
+                            <span style="margin: 0 4px;">·</span>
+                            <span style="color: #333;">Bảo hiểm Thời trang</span>
+                            <i class="fas fa-angle-down" style="font-size: 1.2rem; margin-left: 5px; color: #767676;"></i>
+                        </div>
+
+                        <div class="twin-policy-tooltip">
+                            <h4 style="margin: 0 0 10px 0; font-size: 1.5rem; color: #333;">An tâm mua sắm cùng T-Win </h4>
+                            
+                            <div style="display: flex; margin-bottom: 15px;">
+                                <i class="fas fa-rotate-left" style="color: #ee4d2d; font-size: 1.6rem; margin-top: 2px; margin-right: 10px;"></i>
+                                <div>
+                                    <div style="color: #333; font-weight: 500;">Trả hàng miễn phí 15 ngày</div>
+                                    <div style="color: #767676; font-size: 1.2rem; line-height: 1.4;">Miễn phí Trả hàng trong 15 ngày để đảm bảo bạn hoàn toàn có thể yên tâm khi mua hàng ở T-Win.</div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex;">
+                                <i class="fas fa-shield-halved" style="color: #ee4d2d; font-size: 1.6rem; margin-top: 2px; margin-right: 10px;"></i>
+                                <div>
+                                    <div style="color: #333; font-weight: 500;">Bảo hiểm Thời trang</div>
+                                    <a href="#" style="text-decoration: none;color: #0055aa; font-size: 1.2rem; cursor: pointer;">Tìm hiểu thêm</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pd-row">
+                  <span class="pd-label">Vận chuyển</span>
+                  <div style="color: #333">
+                    <i class="fas fa-truck-fast" style="margin-right: 5px"></i>
+                    Xử lý bởi Shopee
+                    <div style="color: #767676; margin-top: 5px; font-size: 1.2rem">Miễn phí vận chuyển</div>
+                  </div>
+                </div>
+
+                <div class="pd-row align-start">
+                  <span class="pd-label mt-8">Màu Sắc</span>
+                  <div id="variant-colors" style="flex: 1; display: flex; flex-wrap: wrap;"></div>
+                </div>
+
+                <div class="pd-row align-start">
+                  <span class="pd-label mt-8">Size</span>
+                  <div id="variant-sizes" style="flex: 1; display: flex; flex-wrap: wrap;"></div>
+                </div>
+
+                <div class="pd-row align-center">
+                  <span class="pd-label">Số Lượng</span>
+                  
+                  <div id="qnt-box-container" class="qnt-box disabled"> 
+                    <button class="qnt-btn" onclick="changeQuantity(-1)">-</button>
+                    <input type="number" value="1" id="qnt-input" class="qnt-input" readonly />
+                    <button class="qnt-btn" onclick="changeQuantity(1)">+</button>
+                  </div>
+
+                  <span style="margin-left: 15px; font-size: 1.2rem">
+                    (còn <span id="stock-display" class="product-detail__stock">...</span> sản phẩm)
+                  </span>
+                </div>
+              </div>
+
+              <div class="product-detail__actions pd-actions">
+                <button class="btn btn--primary-tint btn-add-cart" onclick="addToCart(false)">
+                  <i class="fas fa-cart-plus" style="margin-right: 10px"></i>
+                  Thêm Vào Giỏ Hàng
+                </button>
+                <button class="btn btn--primary btn-buy-now" onclick="addToCart(true)">
+                  Mua Ngay
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="grid__row product-content-box" style="padding: 25px;">
+          <div class="product-content-header">MÔ TẢ SẢN PHẨM</div>
+          <div id="product-description-content" class="product-content-body">
+              Đang tải mô tả...
+          </div>
+        </div>
+
+        <div id="product-reviews-section" class="grid__row product-content-box" style="padding: 15px;margin-bottom: 30px;">
+          <div class="product-content-header" style="background-color: white; padding-bottom: 20px;">ĐÁNH GIÁ SẢN PHẨM</div>
+          
+          <div class="review-list">
+              <div class="rating-overview">
+                  <div class="rating-overview__score-wrapper">
+                      <span id="avg-rating-score" class="rating-overview__score" style="margin-right: 5px;">5.0</span>
+                      <span class="rating-overview__score-out-of">trên 5</span>
+                      <div id="avg-rating-stars" class="rating-overview__stars">
+                          </div>
+                  </div>
+                  <div id="rating-filters" class="rating-overview__filters"></div>
+              </div>
+
+              <div id="review-list-container">
+                  <div style="text-align:center; padding: 20px; color: #777;">Đang tải đánh giá...</div>
+              </div>
+
+              <div id="review-pagination" class="home-product__pagination" style="display: flex; justify-content: center; padding-top: 20px; margin: 0;"></div>
+
+          </div>
+        </div>
+        </div>
+      </div>
+      <div id="footer-placeholder"></div>
+    </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/product-detail.js"></script>
+  </body>
+</html>

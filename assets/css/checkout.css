@@ -1,0 +1,452 @@
+/* =========================================================
+   1. CẤU TRÚC CHUNG (LAYOUT)
+========================================================= */
+body { 
+    background: #f5f5f5; 
+}
+.app__container { 
+    margin-top: 0 !important; 
+}
+.checkout-section {
+    background: #fff;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+.checkout-header { 
+    font-size: 1.8rem; 
+    color: #ee4d2d; 
+    margin-bottom: 20px; 
+    display: flex; 
+    align-items: center; 
+}
+.checkout-header i { 
+    margin-right: 10px; 
+}
+.btn {
+  box-shadow: none;
+}
+
+/* =========================================================
+   2. PHẦN ĐỊA CHỈ (ADDRESS SECTION)
+========================================================= */
+.checkout-address-line {
+    height: 3px; 
+    width: 100%; 
+    background-position-x: -30px; 
+    background-size: 116px 3px;
+    background-image: repeating-linear-gradient(45deg,#6fa6d6,#6fa6d6 33px,transparent 0,transparent 41px,#f18d9b 0,#f18d9b 74px,transparent 0,transparent 82px);
+}
+.checkout-address-content { 
+    padding: 28px 30px 24px; 
+}
+
+/* =========================================================
+   3. PHẦN SẢN PHẨM (PRODUCT SECTION)
+========================================================= */
+.product-header { 
+    display: flex; 
+    align-items: center; 
+    color: #bbb; 
+    font-size: 1.4rem; 
+    padding: 24px 30px 0; 
+    margin-bottom: 20px; 
+}
+.product-list { 
+    padding: 0 30px 20px; 
+}
+.product-item { 
+    display: flex; 
+    align-items: center; 
+    padding: 15px 0; 
+    border-bottom: 1px dashed #ddd; 
+    font-size: 1.4rem; 
+    color: #333; 
+}
+.product-item:last-child { 
+    border-bottom: none; 
+}
+
+/* Các cột trong bảng sản phẩm */
+.co-col-product { width: 40%; display: flex; align-items: center; }
+.co-col-variant { width: 20%; color: #777; font-size: 1.3rem; }
+.co-col-price   { width: 15%; text-align: center; }
+.co-col-qnt     { width: 10%; text-align: center; }
+.co-col-total   { width: 15%; text-align: right; color: #ee4d2d; font-weight: 500; }
+
+.co-img { 
+    width: 50px; 
+    height: 50px; 
+    object-fit: cover; 
+    border: 1px solid #e8e8e8; 
+    margin-right: 15px; 
+}
+.co-name { 
+    flex: 1; 
+    overflow: hidden; 
+    display: -webkit-box; 
+    -webkit-box-orient: vertical; 
+    -webkit-line-clamp: 2; 
+    line-clamp: 2; 
+    margin-right: 10px; 
+    line-height: 1.8rem; 
+}
+
+/* =========================================================
+   4. LỜI NHẮN & VẬN CHUYỂN
+========================================================= */
+.checkout-message-row {
+    display: flex;
+    align-items: center;
+    padding: 20px 30px;
+    border-top: 1px dashed #ddd;
+    border-bottom: 1px dashed #ddd;
+    background: #fdfdfd;
+}
+.message-label {
+    font-size: 1.4rem;
+    color: #333;
+    margin-right: 15px;
+    min-width: 60px;
+}
+.message-input {
+    flex: 1;
+    height: 40px;
+    border: 1px solid #e8e8e8;
+    padding: 0 15px;
+    font-size: 1.4rem;
+    outline: none;
+    border-radius: 2px;
+}
+.message-input:focus {
+    border-color: #777;
+}
+.shipping-info {
+    margin-left: 40px;
+    font-size: 1.4rem;
+    flex: 1; 
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; 
+}
+
+/* =========================================================
+   5. PHƯƠNG THỨC THANH TOÁN
+========================================================= */
+.payment-method { 
+    padding: 30px; 
+    border-top: 1px solid #f1f1f1; 
+}
+.payment-group { 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
+    margin-top: 15px; 
+}
+.payment-btn { 
+    padding: 10px 20px; 
+    border: 1px solid #ddd; 
+    background: #fff; 
+    cursor: pointer; 
+    color: #333; 
+    min-width: 150px;
+}
+.payment-btn.active { 
+    border-color: #ee4d2d; 
+    color: #ee4d2d; 
+    background: #fffaf9; 
+    position: relative; 
+}
+.payment-btn.active::after { 
+    content: "✓"; 
+    position: absolute; 
+    top: 0; right: 0; 
+    background: #ee4d2d; 
+    color: #fff; 
+    font-size: 1rem; 
+    padding: 0 4px; 
+}
+
+/* Nội dung mô tả thanh toán */
+.payment-content-box { 
+    margin-top: 20px; 
+    padding-top: 20px; 
+    border-top: 1px solid #f1f1f1; 
+    font-size: 1.4rem; 
+    color: #333; 
+    display: none; 
+    animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+.payment-content-label { 
+    font-weight: 500; 
+    margin-right: 15px; 
+    color: #333; 
+}
+
+/* Ví T-WinPay */
+.twinpay-option {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    cursor: pointer;
+    border: 1px solid #e8e8e8;
+    padding: 15px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    position: relative;
+}
+.twinpay-option:hover {
+    background-color: #f8f8f8;
+    border-color: #ee4d2d;
+}
+.twinpay-option.active {
+    border: 1px solid #ee4d2d;
+    background-color: #fffaf9; 
+}
+.twinpay-option.insufficient {
+    opacity: 0.6;
+    background-color: #f9f9f9;
+    border-color: #ddd !important;
+    cursor: not-allowed;
+}
+
+.twinpay-radio {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border: 1px solid #dcdcdc;
+    border-radius: 50%;
+    margin-right: 15px;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.twinpay-radio:checked {
+    border-color: #ee4d2d;
+}
+.twinpay-radio:checked::after {
+    content: '';
+    width: 10px; height: 10px;
+    background: #ee4d2d;
+    border-radius: 50%;
+}
+
+/* =========================================================
+   6. FOOTER THANH TOÁN
+========================================================= */
+.checkout-footer {
+    background-color: #fffefb;
+    border-top: 1px dashed #ddd;  
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; 
+    padding: 20px 30px;
+}
+
+/* Khối chứa thông tin tiền */
+.bill-section {
+    display: grid;
+    grid-template-columns: auto auto; 
+    column-gap: 40px;
+    row-gap: 10px;
+    margin-bottom: 20px;
+    min-width: 250px;
+}
+
+.bill-label {
+    text-align: left; 
+    color: #757575;
+    font-size: 1.4rem;
+    line-height: 2.4;
+}
+
+.bill-value {
+    text-align: right; 
+    color: #333;
+    font-size: 1.4rem;
+    line-height: 2.4;
+}
+
+.bill-total-label {
+    text-align: left;
+    font-size: 1.4rem;
+    color: #333;
+    padding-top: 10px;
+}
+
+.bill-total-value {
+    text-align: right;
+    font-size: 2.6rem;
+    color: #ee4d2d;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+/* Khu vực nút Đặt Hàng */
+.order-action-section {
+    border-top: 1px dashed #dbdbdb;
+    padding-top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.terms-text {
+    font-size: 1.4rem;
+    color: #777;
+    margin-right: 30px;
+}
+.terms-link {
+    color: #05a;
+    text-decoration: none;
+}
+
+.btn-order {
+    background-color: #ee4d2d;
+    color: #fff;
+    border: none;
+    width: 210px;
+    height: 48px;
+    font-size: 1.6rem;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: 400;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.09);
+}
+.btn-order:hover {
+    opacity: 0.9;
+}
+
+.btn.btn--text {
+  color: #05a; 
+  font-weight: 500; 
+  text-transform: uppercase;         
+}
+
+/* =========================================================
+   7. CÁC LOẠI MODAL
+========================================================= */
+#modal-address     { z-index: 10; }
+#modal-add-address { z-index: 20; }
+#modal-shipping    { z-index: 30; }
+#modal-warning     { z-index: 40; }
+
+/* Modal Vận chuyển */
+.shipping-list {
+    padding: 0 20px;
+}
+.shipping-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #f1f1f1;
+    cursor: pointer;
+}
+.shipping-item:last-child { 
+    border-bottom: none; 
+}
+.shipping-item-left { 
+    display: flex; 
+    align-items: center; 
+}
+.shipping-radio { 
+    width: 18px; height: 18px; 
+    accent-color: #ee4d2d; 
+    margin-right: 15px; 
+    cursor: pointer;
+}
+.shipping-name { font-size: 1.6rem; color: #333; font-weight: 500; }
+.shipping-price { font-size: 1.4rem; color: #ee4d2d; }
+
+/* =========================================================
+   8. FORM NHẬP LIỆU (AUTH FORM)
+========================================================= */
+.auth-form {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.auth-form__header {
+    padding: 20px 30px;
+    border-bottom: 1px solid #e8e8e8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.auth-form__heading {
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: #222;
+    margin: 0;
+}
+.auth-form__form {
+    padding: 30px;
+}
+.auth-form__group {
+    margin-bottom: 15px;
+}
+.auth-form__input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 1.4rem;
+    border: 1px solid #dbdbdb;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.auth-form__input:focus {
+    border-color: #777;
+    background-color: #fff;
+}
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    font-size: 1.4rem;
+    color: #555;
+    cursor: pointer;
+}
+.checkbox-wrapper input {
+    margin-right: 10px;
+    transform: scale(1.2);
+    cursor: pointer;
+}
+.auth-form__controls {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 30px 20px;
+    background-color: #fdfdfd;
+    border-top: 1px solid #eaeaea;
+    gap: 10px;
+}
+.btn-back {
+    min-width: 100px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    font-size: 1.4rem;
+    color: #555;
+    cursor: pointer;
+}
+.btn-back:hover { background-color: #f0f0f0; border-radius: 2px; }
+.btn-save {
+    min-width: 120px;
+    height: 36px;
+    border: none;
+    background-color: #ee4d2d;
+    color: #fff;
+    font-size: 1.4rem;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.btn-save:hover { background-color: #d73211; }

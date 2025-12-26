@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thanh toán - T-Win Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+    <link rel="stylesheet" href="./assets/css/base.css" />
+    <link rel="stylesheet" href="./assets/css/main.css" />
+    <link rel="stylesheet" href="./assets/css/checkout.css" />
+    <link rel="stylesheet" href="./assets/fonts/fontawesome-free-7.1.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+
+  </head>
+  <body>
+    <div class="app">
+      <header class="header" style="height: 100px; background-image: none; background-color: #fff; border-bottom: 1px solid #e0e0e0; position: static;">
+        <div class="grid" style="height: 100%; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center">
+            <a href="index.html" style="text-decoration: none; display: flex; align-items: center">
+              <i class="fa-solid fa-bag-shopping" style="font-size: 40px; color: #ee4d2d; margin-right: 15px"></i>
+              <span style="font-size: 28px; color: #ee4d2d; font-weight: 500; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">Twin Shop</span>
+            </a>
+            <div style="margin-left: 20px; border-left: 1px solid #ee4d2d; height: 30px;"></div>
+            <span style="margin-left: 20px; font-size: 22px; color: #ee4d2d">Thanh Toán</span>
+          </div>
+          <a href="#" style="text-decoration: none; color: #ee4d2d; font-size: 1.4rem">Cần trợ giúp?</a>
+        </div>
+      </header>
+
+      <div class="app__container" style="padding-top: 20px">
+        <div class="grid">
+          <div class="checkout-section">
+            <div class="checkout-address-line"></div>
+            <div class="checkout-address-content">
+              <div class="checkout-header" style="color: #ee4d2d; font-size: 1.8rem; margin-bottom: 15px">
+                <i class="fa-solid fa-location-dot"></i> Địa Chỉ Nhận Hàng
+              </div>
+              <div id="selected-address-box" style="display: flex; align-items: center; justify-content: space-between; font-size: 1.6rem;">
+                <div style="font-weight: bold; margin-right: 10px" id="addr-name-phone">Đang tải...</div>
+                <div style="flex: 1; margin-left: 20px; color: #333" id="addr-detail">...</div>
+                <div style="margin-left: 20px; color: #ee4d2d; border: 1px solid #ee4d2d; padding: 2px 5px; font-size: 1.2rem; display: none;" id="addr-default-badge">Mặc định</div>
+                <button class="btn btn--text" onclick="openAddressModal()">Thay Đổi</button>
+              </div>
+              <div id="no-address-box" style="display: none; text-align: center">
+                <p>Bạn chưa có địa chỉ nhận hàng.</p>
+                <button class="btn btn--primary" onclick="openAddressModal()">+ Thêm Địa Chỉ</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="checkout-section">
+            <div class="product-header">
+              <div class="co-col-product">Sản phẩm</div>
+              <div class="co-col-variant">Phân loại hàng</div>
+              <div class="co-col-price">Đơn giá</div>
+              <div class="co-col-qnt">Số lượng</div>
+              <div class="co-col-total">Thành tiền</div>
+            </div>
+            <div class="product-list" id="checkout-list-wrapper"></div>
+            
+            <div class="checkout-message-row">
+                <div style="flex: 1; display: flex; align-items: center;">
+                    <span class="message-label">Lời nhắn:</span>
+                    <input type="text" id="order-note" class="message-input" placeholder="Lưu ý cho Người bán...">
+                </div>
+                
+                <div class="shipping-info">
+                    <span style="color: #00bfa5; margin-right: 15px; font-weight: 500;">Đơn vị vận chuyển:</span>
+                    <div style="display: flex; align-items: center; justify-content:flex-end;">
+                        <div>
+                            <span id="shipping-method-name" style="font-weight: bold; color: #333; margin: 0 25px;">Nhanh</span>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <span class="btn btn--text" onclick="openShippingModal()">Thay Đổi</span>
+                            <span id="shipping-method-price" style="color: #333; font-weight: 400;">30.000₫</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+
+          <div class="checkout-section">
+            <div class="payment-method">
+              <div class="checkout-header" style="color: #333; margin-bottom: 10px">Phương thức thanh toán</div>
+              
+              <div class="payment-group">
+                <button class="payment-btn" onclick="selectPayment(this, 'TWINPAY')">Ví T-WinPay</button>
+                <button class="payment-btn active" onclick="selectPayment(this, 'COD')">Thanh toán khi nhận hàng</button>
+              </div>
+
+              <div id="payment-cod-content" class="payment-content-box" style="display: block;">
+                  <div style="display: flex; align-items: baseline;">
+                      <span class="payment-content-label">Thanh toán khi nhận hàng</span>
+                      <span class="payment-content-text">Phí thu hộ: 0₫ VNĐ. Ưu đãi về phí vận chuyển (nếu có) áp dụng cả với phí thu hộ.</span>
+                  </div>
+              </div>
+              <div id="payment-twinpay-content" class="payment-content-box">
+                  <label class="twinpay-option" id="twinpay-option-box" onclick="handleTwinPayClick(event)">
+                       <input type="radio" name="payment_method_sub" class="twinpay-radio" id="twinpay-check"> 
+                       <i class="fas fa-wallet" style="font-size: 30px; color: #ee4d2d; margin-right: 15px;"></i>
+                       <div>
+                           <div style="font-weight: 500; font-size: 1.4rem;">Số dư Ví T-WinPay</div>
+                           <div style="color: #777; font-size: 1.3rem; margin-top: 4px;">
+                              Số dư khả dụng: <span id="wallet-balance-display" style="color: #ee4d2d; font-weight: bold;">Đang tải...</span>
+                           </div>
+                       </div>
+                  </label>
+              </div>
+            </div>
+
+            <div class="checkout-footer">
+              <div class="bill-section">
+                  <div class="bill-label">Tổng tiền hàng</div>
+                  <div class="bill-value" id="sub-total">0₫</div>
+
+                  <div class="bill-label">Tổng tiền phí vận chuyển</div>
+                  <div class="bill-value" id="shipping-total">0₫</div>
+
+                  <div class="bill-total-label">Tổng thanh toán</div>
+                  <div class="bill-total-value" id="final-total">0₫</div>
+              </div>
+
+              <div class="order-action-section">
+                  <div class="terms-text">
+                      Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo <a href="#" class="terms-link">Điều khoản Shopee</a>
+                  </div>
+                  <button class="btn-order" onclick="confirmOrder()">Đặt hàng</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="footer-placeholder"></div>
+    </div>
+    <!-- Modal Address -->
+    <div class="modal" id="modal-address">
+      <div class="modal__overlay" onclick="closeAddressModal()"></div>
+      <div class="modal__body" style="width: 600px; border-radius: 3px; overflow: hidden">
+        <div style="padding: 20px; border-bottom: 1px solid #eee; font-size: 1.8rem; font-weight: 500;">Địa Chỉ Của Tôi</div>
+        <div class="address-list" id="address-list-container" style="max-height: 400px; overflow-y: auto; padding: 0 20px"></div>
+        <div style="padding: 20px; border-top: 1px solid #eee; background: #fdfdfd">
+          <button class="btn btn--normal" style="border: 1px solid #ddd; width: 100%; display: flex; align-items: center; justify-content: center;" onclick="showAddAddressForm()">
+            <i class="fa-solid fa-plus" style="margin-right: 8px; color: #888"></i>Thêm Địa Chỉ Mới
+          </button>
+        </div>
+        <div style="padding: 20px; text-align: right">
+          <button class="btn btn--normal" onclick="closeAddressModal()" style="margin-right: 10px">Hủy</button>
+          <button class="btn btn--primary" onclick="confirmSelectAddress()">Xác nhận</button>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Add Address -->
+    <div class="modal" id="modal-add-address">
+      <div class="modal__overlay" onclick="backToAddressList()"></div>
+      <div class="modal__body" style="width: 500px">
+        <div class="auth-form">
+          <div class="auth-form__header">
+              <h3 class="auth-form__heading">Địa Chỉ Mới</h3>
+          </div>
+          
+          <div class="auth-form__form">
+            <div style="display: flex; gap: 15px;">
+                <div class="auth-form__group" style="flex: 1;">
+                    <input type="text" id="new-name" class="auth-form__input" placeholder="Họ và tên" />
+                </div>
+                <div class="auth-form__group" style="flex: 1;">
+                    <input type="text" id="new-phone" class="auth-form__input" placeholder="Số điện thoại" />
+                </div>
+            </div>
+
+            <div class="auth-form__group">
+                <input type="text" id="new-addr" class="auth-form__input" placeholder="Phường/Xã, Quận/Huyện, Tỉnh/Thành phố" />
+            </div>
+            
+            <div class="auth-form__group">
+                <input type="text" id="new-specific" class="auth-form__input" placeholder="Địa chỉ cụ thể (Số nhà, tên đường...)" />
+            </div>
+
+            <label class="checkbox-wrapper">
+              <input type="checkbox" id="new-default" />
+              Đặt làm địa chỉ mặc định
+            </label>
+          </div>
+
+          <div class="auth-form__controls">
+            <button class="btn-back" onclick="backToAddressList()">TRỞ LẠI</button>
+            <button class="btn-save" onclick="saveNewAddress()">HOÀN THÀNH</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Shipping -->
+    <div class="modal" id="modal-shipping">
+      <div class="modal__overlay" onclick="document.getElementById('modal-shipping').style.display='none'"></div>
+      <div class="modal__body" style="width: 500px; border-radius: 3px;">
+        <div style="padding: 20px; border-bottom: 1px solid #eaeaea;">
+            <span style="font-size: 1.8rem; font-weight: 500; color: #333;">Chọn Đơn Vị Vận Chuyển</span>
+        </div>
+        
+        <div class="shipping-list" id="shipping-list-container">
+            </div>
+
+        <div style="padding: 20px; text-align: right; border-top: 1px solid #eaeaea; background: #fdfdfd;">
+          <button class="btn btn--normal" onclick="document.getElementById('modal-shipping').style.display='none'" style="margin-right: 8px; min-width: 120px;">Hủy</button>
+          <button class="btn btn--primary" onclick="confirmSelectShipping()" style="min-width: 120px;">Xác nhận</button>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Warning -->
+    <div class="modal" id="modal-warning">
+      <div class="modal__overlay" onclick="closeWarningModal()"></div>
+      <div class="modal__body" style="width: 500px; padding: 20px; text-align: center; border-radius: 3px;">
+         <p id="warning-msg" style="font-size: 1.5rem; color: #333; line-height: 1.6; margin-bottom: 20px;">
+         </p>
+         <button class="btn btn--primary" onclick="closeWarningModal()" style="min-width: 100px;">OK</button>
+      </div>
+    </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/checkout.js"></script>
+  </body>
+</html>

@@ -1,0 +1,134 @@
+<header class="header">
+  <div class="grid">
+    <nav class="header__navbar">
+      <ul class="header__navbar-list">
+        <li
+          class="header__navbar-item header__navbar-item-has-qr header__navbar-item--separate"
+        >
+          Chào mừng đến T-Win Shop
+          <!-- Header QR code -->
+          <div class="header__qr">
+            <img
+              src="./assets/img/qr_code.png"
+              alt="QR"
+              class="header__qr-img"
+            />
+            <div class="header__qr-app">
+              <a href="" class="header__qr-link"
+                ><img
+                  src="./assets/img/app_store.png"
+                  alt="App Store"
+                  class="header__qr-download-img"
+              /></a>
+              <a href="" class="header__qr-link"
+                ><img
+                  src="./assets/img/gg_play.png"
+                  alt="Google Play"
+                  class="header__qr-download-img"
+              /></a>
+            </div>
+          </div>
+        </li>
+        <li
+          class="header__navbar-item header__navbar-item--separate"
+          id="seller-channel-btn"
+          style="cursor: pointer"
+        >
+          Kênh Người Bán
+        </li>
+        <li class="header__navbar-item">
+          <span class="header__navbar-title--no-pointer">Kết nối</span>
+          <a
+            href="https://www.facebook.com/trinhthang2207"
+            class="header__navbar-icon-link"
+            ><i
+              class="header__navbar-icon fa-brands fa-facebook"
+              style="margin-left: 6px"
+            ></i
+          ></a>
+          <a
+            href="https://www.instagram.com/thang__lowkey/"
+            class="header__navbar-icon-link"
+            ><i class="header__navbar-icon fa-brands fa-instagram"></i
+          ></a>
+        </li>
+      </ul>
+
+      <ul class="header__navbar-list">
+        <li class="header__navbar-item">
+          <a href="" class="header__navbar-icon-link">
+            <i class="header__navbar-icon fa-regular fa-bell"></i>
+            Thông báo
+          </a>
+        </li>
+        <li class="header__navbar-item">
+          <a
+            href="https://help.shopee.vn/portal/4/vn/s"
+            class="header__navbar-icon-link"
+          >
+            <i class="header__navbar-icon fa-regular fa-circle-question"></i>
+            Trợ giúp
+          </a>
+        </li>
+        <li
+          id="register-btn"
+          class="header__navbar-item header__navbar-item--strong header__navbar-item--separate"
+        >
+          Đăng ký
+        </li>
+        <li
+          id="login-btn"
+          class="header__navbar-item header__navbar-item--strong"
+        >
+          Đăng nhập
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Header with search -->
+    <div class="header-with-search">
+      <div class="header__logo">
+        <a href="index.html" class="header__logo-link">
+          <img
+            class="header__logo-img"
+            src="./assets/img/logo_shop.png"
+            alt="LOGO"
+          />
+        </a>
+      </div>
+      <div class="header__search">
+        <div class="header__search-input-wrap">
+          <input
+            type="text"
+            class="header__search-input"
+            id="search-input"
+            placeholder="Nhập để tìm kiếm"
+          />
+          <!-- Search history -->
+          <div class="header__search-history"></div>
+        </div>
+        <button class="header__search-btn" id="search-btn">
+          <i class="header__search-btn-icon fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
+      <!-- Header cart -->
+      <div class="header__cart">
+        <a href="cart.html" class="header__cart-wrap">
+          <i class="header__cart-icon fa-solid fa-cart-shopping"></i>
+
+          <span class="header__cart-notice"></span>
+          <div class="header__cart-list header__cart-list--no-cart">
+            <img
+              src="./assets/img/no_cart.png"
+              alt=""
+              class="header__cart-no-cart-img"
+            />
+            <span class="header__cart-list--no-cart-msg"
+              >Chưa có sản phẩm trong giỏ hàng</span
+            >
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
