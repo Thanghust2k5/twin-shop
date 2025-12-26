@@ -19,8 +19,7 @@ app.use(express.urlencoded({
 }));
 
 // Cấu hình Static Files
-app.use("/assets", express.static(path.join(__dirname, "../assets")));
-
+app.use(express.static(path.join(__dirname, "../")));
 // ==========================================
 // 2. CẤU HÌNH UPLOAD ẢNH
 // ==========================================
