@@ -117,7 +117,7 @@ function initHeaderFooterEvents() {
     const sellerBtn = document.getElementById("seller-channel-btn");
     if (sellerBtn) {
         sellerBtn.onclick = function () {
-            const user = JSON.parse(localStorage.getItem('user_login'));
+            const user = safeJSONParse(localStorage.getItem('user_login'));
             if (!user) openModal("admin");
             else if (user.role === 1) window.location.href = "admin.html";
             else alert("Chỉ dành cho Admin!");
@@ -334,7 +334,7 @@ function handleSearch() {
 }
 
 function renderSearchHistory() {
-    const historyList = JSON.parse(localStorage.getItem("search_history")) || [];
+    const historyList = safeJSONParse(localStorage.getItem("search_history")) || [];
     const historyContainer = document.querySelector(".header__search-history"); 
     if (!historyContainer) return;
 
@@ -357,7 +357,7 @@ function renderSearchHistory() {
 
 function addToHistory(keyword) {
     if(!keyword) return;
-    let history = JSON.parse(localStorage.getItem("search_history")) || [];
+    let history = safeJSONParse(localStorage.getItem("search_history")) || [];
     history = history.filter(k => k !== keyword);
     history.unshift(keyword);
     if(history.length > 5) history.pop(); 
@@ -373,7 +373,7 @@ window.applySearch = function(kw) {
 
 window.deleteFromHistory = function(keyword, event) {
     event.stopPropagation(); event.preventDefault();
-    let history = JSON.parse(localStorage.getItem("search_history")) || [];
+    let history = safeJSONParse(localStorage.getItem("search_history")) || [];
     history = history.filter(k => k !== keyword);
     localStorage.setItem("search_history", JSON.stringify(history));
     renderSearchHistory();
@@ -395,7 +395,7 @@ window.deleteAllHistory = function(event) {
 // [QUAN TRỌNG] XỬ LÝ HEADER USER (Avatar & Tên)
 // ---------------------------------------------------------
 function checkLoginStatus() {
-    const user = JSON.parse(localStorage.getItem('user_login'));
+    const user = safeJSONParse(localStorage.getItem('user_login'));
     
     // Tìm thẻ ul user-menu trong header
     // Lưu ý: class header__navbar-list:last-child là nơi chứa menu user
@@ -438,9 +438,45 @@ window.logout = function() {
 
 function handleRegister() {
     const inputs = document.querySelectorAll('#register-form .auth-form__input');
-    const email = inputs[0].value.trim(); const password = inputs[1].value.trim(); const rePass = inputs[2].value.trim();
-    if (!email || !password || !rePass) return alert("Thiếu thông tin!");
-    if (password !== rePass) return alert("Mật khẩu không khớp!");
+    const emailInput = inputs[0];
+    const passwordInput = inputs[1];
+    const rePassInput = inputs[2];
+    
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    const rePass = rePassInput.value.trim();
+    
+    // Validate với Validator
+    let isValid = true;
+    
+    // Validate Email
+    const emailResult = Validator.validateEmail(email);
+    if (!emailResult.isValid) {
+        Validator.showError(emailInput, emailResult.message);
+        isValid = false;
+    } else {
+        Validator.clearError(emailInput);
+    }
+    
+    // Validate Password
+    const passResult = Validator.validatePassword(password);
+    if (!passResult.isValid) {
+        Validator.showError(passwordInput, passResult.message);
+        isValid = false;
+    } else {
+        Validator.clearError(passwordInput);
+    }
+    
+    // Validate Confirm Password
+    const confirmResult = Validator.validateConfirmPassword(password, rePass);
+    if (!confirmResult.isValid) {
+        Validator.showError(rePassInput, confirmResult.message);
+        isValid = false;
+    } else {
+        Validator.clearError(rePassInput);
+    }
+    
+    if (!isValid) return;
     
     fetch(`${apiUrl}/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ full_name: email.split('@')[0], email, password }) })
     .then(r => r.json()).then(d => { alert(d.message); if(d.message.includes("thành công")) openModal("login"); })
@@ -449,7 +485,35 @@ function handleRegister() {
 
 function handleLogin() {
     const inputs = document.querySelectorAll('#login-form .auth-form__input');
-    fetch(`${apiUrl}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: inputs[0].value.trim(), password: inputs[1].value.trim() }) })
+    const emailInput = inputs[0];
+    const passwordInput = inputs[1];
+    
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    
+    // Validate
+    let isValid = true;
+    
+    // Validate Email
+    const emailResult = Validator.validateEmail(email);
+    if (!emailResult.isValid) {
+        Validator.showError(emailInput, emailResult.message);
+        isValid = false;
+    } else {
+        Validator.clearError(emailInput);
+    }
+    
+    // Validate Password (chỉ check không rỗng)
+    if (!password) {
+        Validator.showError(passwordInput, 'Vui lòng nhập mật khẩu!');
+        isValid = false;
+    } else {
+        Validator.clearError(passwordInput);
+    }
+    
+    if (!isValid) return;
+    
+    fetch(`${apiUrl}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) })
     .then(r => r.json()).then(d => {
         if(d.user) {
             alert("Đăng nhập thành công!"); 
@@ -489,7 +553,7 @@ function closeModal() {
 }
 
 function renderCartHeader() {
-    const user = JSON.parse(localStorage.getItem('user_login'));
+    const user = safeJSONParse(localStorage.getItem('user_login'));
     const cartList = document.querySelector(".header__cart-list");
     const cartNotice = document.querySelector(".header__cart-notice");
     if (!user) { if (cartNotice) cartNotice.innerText = "0"; return; }
@@ -516,6 +580,9 @@ function renderCartHeader() {
         }
     }).catch(e => console.log(e));
 }
+
+// Alias để các file khác có thể gọi
+const updateCartCount = renderCartHeader;
 
 function formatCurrency(amount) {
     return new Intl.NumberFormat("vi-VN", {style: 'currency', currency: 'VND'}).format(amount);

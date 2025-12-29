@@ -2,7 +2,7 @@
 // FILE: assets/js/cart.js (FINAL FIX LAYOUT & CHECKBOX)
 // =========================================================
 
-const userCartLogin = JSON.parse(localStorage.getItem("user_login"));
+const userCartLogin = safeJSONParse(localStorage.getItem("user_login"));
 const userIdCart = userCartLogin ? userCartLogin.id : null;
 let myCartData = [];
 

@@ -3,7 +3,7 @@
 // Mô tả: Quản lý Profile (Upload ảnh, Modal) và Đơn hàng (SPA)
 // =========================================================
 
-const userLog = JSON.parse(localStorage.getItem("user_login"));
+const userLog = safeJSONParse(localStorage.getItem("user_login"));
 
 if (!userLog) {
   alert("Bạn chưa đăng nhập!");
@@ -192,18 +192,41 @@ function closeProfileModal(type) {
 
 function confirmChange(type) {
     if (type === 'email') {
-        const val = document.getElementById('input-new-email').value.trim();
-        if(!val) return alert("Vui lòng nhập Email!");
+        const inputEl = document.getElementById('input-new-email');
+        const val = inputEl.value.trim();
+        
+        // Validate email
+        const result = Validator.validateEmail(val);
+        if (!result.isValid) {
+            Validator.showError(inputEl, result.message);
+            return;
+        }
+        Validator.clearError(inputEl);
         callUpdateAPI_JSON({ email: val });
+        
     } else if (type === 'phone') {
-        const val = document.getElementById('input-new-phone').value.trim();
-        if(!val) return alert("Vui lòng nhập SĐT!");
+        const inputEl = document.getElementById('input-new-phone');
+        const val = inputEl.value.trim();
+        
+        // Validate phone
+        const result = Validator.validatePhone(val);
+        if (!result.isValid) {
+            Validator.showError(inputEl, result.message);
+            return;
+        }
+        Validator.clearError(inputEl);
         callUpdateAPI_JSON({ phone: val });
+        
     } else if (type === 'birthday') {
         const d = document.getElementById('select-day').value;
         const m = document.getElementById('select-month').value;
         const y = document.getElementById('select-year').value;
-        if(d == 0 || m == 0 || y == 0) return alert("Vui lòng chọn ngày tháng năm!");
+        
+        // Validate birthday
+        const result = Validator.validateBirthday(d, m, y);
+        if (!result.isValid) {
+            return alert(result.message);
+        }
         
         const dateStr = `${y}-${m}-${d}`;
         callUpdateAPI_JSON({ birthday: dateStr });
@@ -299,10 +322,8 @@ function renderOrderList(orders) {
         <div class="order-card">
             <div class="card-header">
                 <div class="shop-info">
-                    <span class="tag-mall">Yêu thích</span>
                     <span style="font-weight: bold; margin-left: 5px;">Twin Shop</span>
                     <button class="btn-chat"><i class="fa-regular fa-comment-dots"></i> Chat</button>
-                    <button class="btn-view-shop"><i class="fa-solid fa-store"></i> Xem Shop</button>
                 </div>
                 <div class="order-status">${statusText}</div>
             </div>
@@ -418,24 +439,81 @@ function getStatusText(status) {
 function getButtonsHtml(status, orderId) {
     let html = `<button class="btn-action btn-primary" style="background:#ee4d2d; border:none; color:white;">Liên Hệ Người Bán</button>`;
     if (status === "pending") {
-        html += `<button class="btn-action btn-outlined" onclick="cancelOrder(${orderId})">Hủy Đơn Hàng</button>`;
+        html += `<button class="btn-action btn-outlined" onclick="openCancelModal(${orderId})">Hủy Đơn Hàng</button>`;
     } else if (status === "completed" || status === "cancelled") {
         html += `<button class="btn-action btn-outlined">Mua Lại</button>`;
     }
     return html;
 }
 
-function cancelOrder(orderId) {
-  if (confirm("Xác nhận hủy đơn hàng này?")) {
-    fetch(`${apiUrl}/orders/${orderId}/cancel`, { method: "PATCH" })
-      .then((res) => res.json())
-      .then((data) => {
-        alert(data.message);
+// ========== MODAL HỦY ĐƠN HÀNG ==========
+
+function openCancelModal(orderId) {
+    document.getElementById('cancel-order-id').value = orderId;
+    document.getElementById('modal-cancel-order').style.display = 'flex';
+    
+    // Reset form
+    const radioButtons = document.querySelectorAll('input[name="cancel-reason"]');
+    radioButtons.forEach(rb => rb.checked = false);
+    document.getElementById('cancel-reason-other').style.display = 'none';
+    document.getElementById('cancel-reason-other').value = '';
+}
+
+function closeCancelModal() {
+    document.getElementById('modal-cancel-order').style.display = 'none';
+}
+
+// Xử lý hiển thị textarea khi chọn "Khác"
+document.addEventListener('DOMContentLoaded', function() {
+    const radioButtons = document.querySelectorAll('input[name="cancel-reason"]');
+    const otherTextarea = document.getElementById('cancel-reason-other');
+    
+    if (radioButtons && otherTextarea) {
+        radioButtons.forEach(rb => {
+            rb.addEventListener('change', function() {
+                if (this.value === 'other') {
+                    otherTextarea.style.display = 'block';
+                    otherTextarea.focus();
+                } else {
+                    otherTextarea.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+
+function confirmCancelOrder() {
+    const orderId = document.getElementById('cancel-order-id').value;
+    const selectedReason = document.querySelector('input[name="cancel-reason"]:checked');
+    
+    if (!selectedReason) {
+        showToast("Vui lòng chọn lý do hủy đơn hàng!", "warning");
+        return;
+    }
+    
+    let reason = selectedReason.value;
+    if (reason === 'other') {
+        reason = document.getElementById('cancel-reason-other').value.trim();
+        if (!reason) {
+            showToast("Vui lòng nhập lý do hủy đơn hàng!", "warning");
+            return;
+        }
+    }
+    
+    // Gọi API hủy đơn
+    fetch(`${apiUrl}/orders/${orderId}/cancel`, { 
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: reason })
+    })
+    .then((res) => res.json())
+    .then((data) => {
+        closeCancelModal();
+        showToast(data.message, "success");
         fetchOrders();
         backToOrderList();
-      })
-      .catch((err) => alert("Lỗi khi hủy đơn!"));
-  }
+    })
+    .catch((err) => showToast("Lỗi khi hủy đơn!", "error"));
 }
 
 function formatMoney(amount) {

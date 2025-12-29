@@ -4,7 +4,7 @@
 // =========================================================
 
 // --- 1. KHỞI TẠO & STATE ---
-const userLogin = JSON.parse(localStorage.getItem("user_login"));
+const userLogin = safeJSONParse(localStorage.getItem("user_login"));
 const currentUserId = userLogin ? userLogin.id : null;
 
 // State quản lý toàn bộ dữ liệu trang
@@ -43,7 +43,7 @@ window.onload = function () {
 // 2. LOGIC SẢN PHẨM & TÍNH TIỀN
 // =========================================================
 function renderCheckoutItems() {
-    const cart = JSON.parse(localStorage.getItem("checkout_items")) || [];
+    const cart = safeJSONParse(localStorage.getItem("checkout_items")) || [];
     const listWrapper = document.getElementById("checkout-list-wrapper");
 
     if (!listWrapper || cart.length === 0) {
@@ -276,13 +276,47 @@ function backToAddressList() {
 }
 
 function saveNewAddress() {
-    const name = document.getElementById("new-name").value.trim();
-    const phone = document.getElementById("new-phone").value.trim();
-    const city = document.getElementById("new-addr").value.trim();
-    const specific = document.getElementById("new-specific").value.trim();
+    const nameInput = document.getElementById("new-name");
+    const phoneInput = document.getElementById("new-phone");
+    const cityInput = document.getElementById("new-addr");
+    const specificInput = document.getElementById("new-specific");
     const isDefault = document.getElementById("new-default").checked;
+    
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const city = cityInput.value.trim();
+    const specific = specificInput.value.trim();
 
-    if (!name || !phone || !city) return alert("Vui lòng nhập đủ thông tin!");
+    // Validate với Validator
+    let isValid = true;
+    
+    // Validate tên người nhận
+    const nameResult = Validator.validateFullName(name);
+    if (!nameResult.isValid) {
+        Validator.showError(nameInput, nameResult.message);
+        isValid = false;
+    } else {
+        Validator.clearError(nameInput);
+    }
+    
+    // Validate số điện thoại
+    const phoneResult = Validator.validatePhone(phone);
+    if (!phoneResult.isValid) {
+        Validator.showError(phoneInput, phoneResult.message);
+        isValid = false;
+    } else {
+        Validator.clearError(phoneInput);
+    }
+    
+    // Validate địa chỉ (thành phố/quận/huyện)
+    if (!city) {
+        Validator.showError(cityInput, 'Vui lòng nhập Tỉnh/Thành phố, Quận/Huyện!');
+        isValid = false;
+    } else {
+        Validator.clearError(cityInput);
+    }
+    
+    if (!isValid) return;
 
     const finalAddr = specific ? `${specific}, ${city}` : city;
     const method = state.editingAddressId ? "PUT" : "POST";
@@ -409,7 +443,7 @@ function confirmOrder() {
         return;
     }
 
-    const items = JSON.parse(localStorage.getItem("checkout_items")) || [];
+    const items = safeJSONParse(localStorage.getItem("checkout_items")) || [];
     const note = document.getElementById("order-note") ? document.getElementById("order-note").value.trim() : "";
 
     const orderData = {

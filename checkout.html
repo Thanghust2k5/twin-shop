@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Thanh toán - T-Win Shop</title>
+    <link rel="icon" type="image/png" href="./assets/img/logo_favicon.png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
     <link rel="stylesheet" href="./assets/css/base.css" />
     <link rel="stylesheet" href="./assets/css/main.css" />
@@ -163,19 +164,27 @@
           <div class="auth-form__form">
             <div style="display: flex; gap: 15px;">
                 <div class="auth-form__group" style="flex: 1;">
-                    <input type="text" id="new-name" class="auth-form__input" placeholder="Họ và tên" />
+                    <div class="auth-form__input-wrap">
+                        <input type="text" id="new-name" class="auth-form__input" placeholder="Họ và tên" />
+                    </div>
                 </div>
                 <div class="auth-form__group" style="flex: 1;">
-                    <input type="text" id="new-phone" class="auth-form__input" placeholder="Số điện thoại" />
+                    <div class="auth-form__input-wrap">
+                        <input type="text" id="new-phone" class="auth-form__input" placeholder="Số điện thoại" />
+                    </div>
                 </div>
             </div>
 
             <div class="auth-form__group">
-                <input type="text" id="new-addr" class="auth-form__input" placeholder="Phường/Xã, Quận/Huyện, Tỉnh/Thành phố" />
+                <div class="auth-form__input-wrap">
+                    <input type="text" id="new-addr" class="auth-form__input" placeholder="Phường/Xã, Quận/Huyện, Tỉnh/Thành phố" />
+                </div>
             </div>
             
             <div class="auth-form__group">
-                <input type="text" id="new-specific" class="auth-form__input" placeholder="Địa chỉ cụ thể (Số nhà, tên đường...)" />
+                <div class="auth-form__input-wrap">
+                    <input type="text" id="new-specific" class="auth-form__input" placeholder="Địa chỉ cụ thể (Số nhà, tên đường...)" />
+                </div>
             </div>
 
             <label class="checkbox-wrapper">
@@ -218,6 +227,7 @@
       </div>
     </div>
 
+    <script src="./assets/js/validation.js"></script>
     <script src="./assets/js/main.js"></script>
     <script src="./assets/js/checkout.js"></script>
   </body>

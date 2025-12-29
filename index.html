@@ -4,9 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>T-Win Shop</title>
+    <link rel="icon" type="image/png" href="./assets/img/logo_favicon.png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
     <link rel="stylesheet" href="./assets/css/base.css" />
     <link rel="stylesheet" href="./assets/css/main.css" />
+    <link rel="stylesheet" href="./assets/css/chat.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="./assets/fonts/fontawesome-free-7.1.0/css/all.min.css" />
@@ -75,6 +77,10 @@
         <!-- Footer -->
         <div id="footer-placeholder"></div>
     </div>
+    <script src="./assets/js/validation.js"></script>
     <script src="./assets/js/main.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="./assets/js/chat.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', () => ChatWidget.init());</script>
 </body>
 </html>

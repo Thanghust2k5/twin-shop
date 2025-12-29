@@ -5,8 +5,17 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const bcrypt = require("bcryptjs");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 const port = process.env.PORT || 3000;
 
 // ==========================================
@@ -71,9 +80,7 @@ const db = mysql.createConnection({
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_NAME || "twin_shop",
   port: process.env.DB_PORT || 3306,
-  ssl: {
-        rejectUnauthorized: false
-    }
+  ssl: (process.env.DB_HOST || '').includes('aivencloud') ? { rejectUnauthorized: false } : undefined
 });
 
 db.connect((err) => {
@@ -133,7 +140,6 @@ app.post("/api/login", (req, res) => {
                 full_name: user.full_name,
                 email: user.email,
                 role: user.role,
-                address: user.address,
                 avatar: user.avatar,
                 phone: user.phone
             },
@@ -146,7 +152,7 @@ app.post("/api/login", (req, res) => {
 // ==========================================
 
 app.get("/api/users/:id", (req, res) => {
-    db.query("SELECT id, full_name, email, phone, gender, birthday, avatar, address, role, wallet_balance FROM users WHERE id = ?", [req.params.id], (err, results) => {
+    db.query("SELECT id, full_name, email, phone, gender, birthday, avatar, role, wallet_balance FROM users WHERE id = ?", [req.params.id], (err, results) => {
         if (err) return res.status(500).json({
             error: "Lỗi Server"
         });
@@ -159,7 +165,7 @@ app.get("/api/users/:id", (req, res) => {
 
 app.get("/api/users", (req, res) => {
     const search = req.query.search || "";
-    let sql = "SELECT id, full_name, email, phone, role, address FROM users";
+    let sql = "SELECT id, full_name, email, phone, role FROM users";
     let params = [];
     if (search) {
         sql += " WHERE full_name LIKE ? OR email LIKE ? OR phone LIKE ?";
@@ -558,14 +564,15 @@ app.get("/api/orders/:id/details", (req, res) => {
 });
 
 app.patch("/api/orders/:id/cancel", (req, res) => {
+    const { reason } = req.body;
     db.query("SELECT status FROM orders WHERE id = ?", [req.params.id], (err, r) => {
         if (r[0].status === "pending") {
-            db.query("UPDATE orders SET status = 'cancelled' WHERE id = ?", [req.params.id], () => res.json({
-                message: "Đã hủy"
+            db.query("UPDATE orders SET status = 'cancelled', cancel_reason = ? WHERE id = ?", [reason || null, req.params.id], () => res.json({
+                message: "Đã hủy đơn hàng thành công!"
             }));
         } else {
             res.status(400).json({
-                message: "Không thể hủy"
+                message: "Không thể hủy đơn hàng này!"
             });
         }
     });
@@ -586,6 +593,17 @@ app.get("/api/admin/orders", (req, res) => {
     }
     sql += " ORDER BY order_date DESC";
     db.query(sql, params, (e, r) => res.json(r));
+});
+
+// GET thông tin chi tiết 1 đơn hàng (cho admin xem hóa đơn)
+app.get("/api/admin/orders/:id", (req, res) => {
+    db.query("SELECT * FROM orders WHERE id = ?", [req.params.id], (e, r) => {
+        if (r && r.length > 0) {
+            res.json(r[0]);
+        } else {
+            res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+        }
+    });
 });
 
 app.patch("/api/admin/orders/:id", (req, res) => {
@@ -761,6 +779,239 @@ app.get("/api/admin/stats", (req, res) => {
     }));
 });
 
-app.listen(port, () => {
+// ==========================================
+// SOCKET.IO - REALTIME CHAT
+// ==========================================
+
+// Lưu trữ các phiên chat
+const chatSessions = new Map(); // sessionId -> { user, messages, status }
+const adminSockets = new Set(); // Danh sách socket admin đang online
+
+// Chatbot FAQ - Trả lời tự động
+const chatbotFAQ = [
+    { keywords: ["xin chào", "hello", "hi", "chào"], response: "Xin chào! Tôi là trợ lý ảo của Twin Shop. Tôi có thể giúp gì cho bạn?" },
+    { keywords: ["ship", "vận chuyển", "giao hàng", "phí ship"], response: "Phí vận chuyển của Twin Shop:\n- Giao hàng nhanh: 30.000₫\n- Giao hàng hỏa tốc: 50.000₫\nMiễn phí ship cho đơn hàng từ 500.000₫!" },
+    { keywords: ["đổi trả", "hoàn tiền", "đổi hàng", "trả hàng"], response: "Chính sách đổi trả:\n- Đổi trả trong 7 ngày kể từ khi nhận hàng\n- Sản phẩm còn nguyên tem, nhãn\n- Liên hệ hotline: 1900 1234 để được hỗ trợ" },
+    { keywords: ["voucher", "mã giảm", "khuyến mãi", "giảm giá"], response: "Để nhận voucher, bạn có thể:\n- Theo dõi fanpage Twin Shop\n- Đăng ký nhận email khuyến mãi\n- Check mục 'Kho Voucher' trong tài khoản của bạn" },
+    { keywords: ["thanh toán", "trả tiền", "cod", "chuyển khoản"], response: "Các hình thức thanh toán:\n- COD: Thanh toán khi nhận hàng\n- Ví T-WinPay: Thanh toán qua ví điện tử\n- Chuyển khoản ngân hàng" },
+    { keywords: ["liên hệ", "hotline", "điện thoại", "email"], response: "Thông tin liên hệ:\n📞 Hotline: 1900 1234\n📧 Email: support@twinshop.vn\n🏠 Địa chỉ: 123 Nguyễn Huệ, Q.1, TP.HCM" },
+    { keywords: ["giờ", "thời gian", "mở cửa", "làm việc"], response: "Thời gian làm việc:\n- Thứ 2 - Thứ 6: 8:00 - 21:00\n- Thứ 7 - Chủ nhật: 9:00 - 18:00\nHỗ trợ online 24/7!" },
+    { keywords: ["size", "kích thước", "cỡ", "bảng size"], response: "Bảng size giày:\n- Size 38: 24cm\n- Size 39: 24.5cm\n- Size 40: 25cm\n- Size 41: 25.5cm\n- Size 42: 26cm\nLiên hệ shop để được tư vấn chi tiết!" },
+    { keywords: ["cảm ơn", "thanks", "thank you"], response: "Không có gì! Rất vui được hỗ trợ bạn. Chúc bạn mua sắm vui vẻ! 🛍️" },
+    { keywords: ["tư vấn", "nhân viên", "admin", "hỗ trợ"], response: "Bạn muốn được tư vấn trực tiếp? Vui lòng đợi trong giây lát, nhân viên sẽ hỗ trợ bạn ngay!" }
+];
+
+function getBotResponse(message) {
+    const lowerMsg = message.toLowerCase();
+    for (const faq of chatbotFAQ) {
+        for (const keyword of faq.keywords) {
+            if (lowerMsg.includes(keyword)) {
+                return faq.response;
+            }
+        }
+    }
+    return null;
+}
+
+io.on("connection", (socket) => {
+    console.log("📱 Kết nối mới:", socket.id);
+
+    // === KHÁCH HÀNG ===
+    
+    // Khách bắt đầu chat
+    socket.on("customer:start", (data) => {
+        const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        chatSessions.set(sessionId, {
+            id: sessionId,
+            socketId: socket.id,
+            user: data.user || { name: "Khách", id: null },
+            messages: [],
+            status: "bot", // bot hoặc admin
+            createdAt: new Date(),
+            unread: 0
+        });
+        
+        socket.sessionId = sessionId;
+        socket.join(sessionId);
+        
+        // Gửi tin chào mừng
+        const welcomeMsg = {
+            id: Date.now(),
+            sender: "bot",
+            text: "Xin chào! Tôi là trợ lý ảo của Twin Shop 🛍️\n\nBạn có thể hỏi tôi về:\n- Phí vận chuyển\n- Chính sách đổi trả\n- Voucher khuyến mãi\n- Thanh toán\n\nHoặc gõ 'tư vấn' để được nhân viên hỗ trợ trực tiếp!",
+            time: new Date()
+        };
+        
+        socket.emit("chat:message", welcomeMsg);
+        chatSessions.get(sessionId).messages.push(welcomeMsg);
+        
+        // Thông báo cho admin
+        io.to("admin-room").emit("admin:newSession", {
+            ...chatSessions.get(sessionId),
+            messages: chatSessions.get(sessionId).messages
+        });
+    });
+
+    // Khách gửi tin nhắn
+    socket.on("customer:message", (data) => {
+        const sessionId = socket.sessionId;
+        if (!sessionId || !chatSessions.has(sessionId)) return;
+        
+        const session = chatSessions.get(sessionId);
+        
+        const customerMsg = {
+            id: Date.now(),
+            sender: "customer",
+            text: data.text,
+            time: new Date()
+        };
+        session.messages.push(customerMsg);
+        
+        // Gửi lại cho chính khách (xác nhận)
+        socket.emit("chat:message", customerMsg);
+        
+        // Gửi cho admin
+        io.to("admin-room").emit("admin:message", {
+            sessionId,
+            message: customerMsg
+        });
+        session.unread++;
+        
+        // Nếu đang ở chế độ bot, thử trả lời tự động
+        if (session.status === "bot") {
+            const botResponse = getBotResponse(data.text);
+            
+            if (botResponse) {
+                // Nếu yêu cầu tư vấn, chuyển sang admin
+                if (data.text.toLowerCase().includes("tư vấn") || 
+                    data.text.toLowerCase().includes("nhân viên") ||
+                    data.text.toLowerCase().includes("admin")) {
+                    session.status = "waiting"; // Chờ admin
+                    
+                    const waitingMsg = {
+                        id: Date.now() + 1,
+                        sender: "bot",
+                        text: "Đang kết nối với nhân viên tư vấn... Vui lòng đợi trong giây lát! ⏳",
+                        time: new Date()
+                    };
+                    socket.emit("chat:message", waitingMsg);
+                    session.messages.push(waitingMsg);
+                    
+                    // Thông báo admin có khách cần hỗ trợ
+                    io.to("admin-room").emit("admin:needSupport", {
+                        sessionId,
+                        user: session.user
+                    });
+                } else {
+                    // Trả lời bot bình thường
+                    setTimeout(() => {
+                        const botMsg = {
+                            id: Date.now() + 1,
+                            sender: "bot",
+                            text: botResponse,
+                            time: new Date()
+                        };
+                        socket.emit("chat:message", botMsg);
+                        session.messages.push(botMsg);
+                        
+                        io.to("admin-room").emit("admin:message", {
+                            sessionId,
+                            message: botMsg
+                        });
+                    }, 500);
+                }
+            } else {
+                // Không hiểu, chuyển cho admin
+                session.status = "waiting";
+                
+                setTimeout(() => {
+                    const fallbackMsg = {
+                        id: Date.now() + 1,
+                        sender: "bot",
+                        text: "Xin lỗi, tôi chưa hiểu câu hỏi của bạn. Đang chuyển cho nhân viên hỗ trợ...",
+                        time: new Date()
+                    };
+                    socket.emit("chat:message", fallbackMsg);
+                    session.messages.push(fallbackMsg);
+                    
+                    io.to("admin-room").emit("admin:needSupport", {
+                        sessionId,
+                        user: session.user
+                    });
+                }, 500);
+            }
+        }
+    });
+
+    // === ADMIN ===
+    
+    // Admin tham gia phòng
+    socket.on("admin:join", () => {
+        socket.join("admin-room");
+        adminSockets.add(socket.id);
+        console.log("👨‍💼 Admin online:", socket.id);
+        
+        // Gửi danh sách phiên chat hiện tại
+        const sessions = Array.from(chatSessions.values()).map(s => ({
+            ...s,
+            messages: s.messages
+        }));
+        socket.emit("admin:sessions", sessions);
+    });
+
+    // Admin gửi tin nhắn
+    socket.on("admin:message", (data) => {
+        const { sessionId, text } = data;
+        if (!chatSessions.has(sessionId)) return;
+        
+        const session = chatSessions.get(sessionId);
+        session.status = "admin"; // Admin đã tiếp nhận
+        session.unread = 0;
+        
+        const adminMsg = {
+            id: Date.now(),
+            sender: "admin",
+            text: text,
+            time: new Date()
+        };
+        session.messages.push(adminMsg);
+        
+        // Gửi cho khách
+        io.to(sessionId).emit("chat:message", adminMsg);
+        
+        // Broadcast cho các admin khác
+        socket.to("admin-room").emit("admin:message", {
+            sessionId,
+            message: adminMsg
+        });
+    });
+
+    // Admin đọc tin nhắn
+    socket.on("admin:read", (sessionId) => {
+        if (chatSessions.has(sessionId)) {
+            chatSessions.get(sessionId).unread = 0;
+        }
+    });
+
+    // Ngắt kết nối
+    socket.on("disconnect", () => {
+        console.log("❌ Ngắt kết nối:", socket.id);
+        adminSockets.delete(socket.id);
+        
+        // Nếu là khách, đánh dấu phiên chat đã kết thúc
+        if (socket.sessionId && chatSessions.has(socket.sessionId)) {
+            const session = chatSessions.get(socket.sessionId);
+            session.status = "disconnected";
+            io.to("admin-room").emit("admin:sessionUpdate", {
+                sessionId: socket.sessionId,
+                status: "disconnected"
+            });
+        }
+    });
+});
+
+// Thay đổi app.listen thành server.listen
+server.listen(port, () => {
     console.log(`🚀 Server đang chạy tại http://localhost:${port}`);
+    console.log(`💬 Socket.io đã sẵn sàng cho chat realtime!`);
 });

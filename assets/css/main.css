@@ -537,19 +537,38 @@
   margin-top: 16px;
 }
 
+.auth-form__input-wrap {
+  margin-bottom: 8px;
+}
+
 .auth-form__input {
   width: 100%;
   height: 40px;
-  margin-top: 16px;
+  margin-top: 8px;
   padding: 0 12px;
   font-size: 1.4rem;
   border: 1px solid #dbdbdb;
   border-radius: 2px;
   outline: none;
+  box-sizing: border-box;
 }
 
 .auth-form__input:focus {
   border-color: #777;
+}
+
+/* Validation Error Styles */
+.validation-error {
+  color: #ee4d2d;
+  font-size: 1.2rem;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.input-error {
+  border-color: #ee4d2d !important;
 }
 
 .auth-form__aside {
@@ -1554,4 +1573,92 @@
 }
 .review-action-btn:hover {
     color: #333;
+}
+
+/* =========================================================
+   TOAST NOTIFICATION
+   ========================================================= */
+#toast-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    min-width: 200px;
+    max-width: 350px;
+    text-align: center;
+    flex-direction: column;
+}
+
+.toast--show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.toast--hide {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.toast__icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+.toast--success .toast__icon {
+    color: #4caf50;
+}
+
+.toast--error .toast__icon {
+    color: #f44336;
+}
+
+.toast--warning .toast__icon {
+    color: #ff9800;
+}
+
+.toast--info .toast__icon {
+    color: #2196f3;
+}
+
+.toast__content {
+    flex: 1;
+}
+
+.toast__message {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.toast__close {
+    display: none;
+    cursor: pointer;
+    opacity: 0.7;
+    font-size: 1.4rem;
+    padding: 5px;
+}
+
+.toast__close:hover {
+    opacity: 1;
 }

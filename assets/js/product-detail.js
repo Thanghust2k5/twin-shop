@@ -2,7 +2,7 @@
 // FILE: assets/js/product-detail.js (DATABASE REAL TIME)
 // =========================================================
 
-const userLogin = JSON.parse(localStorage.getItem("user_login"));
+const userLogin = safeJSONParse(localStorage.getItem("user_login"));
 const currentUserId = userLogin ? userLogin.id : null;
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -241,11 +241,14 @@ function addToCart(isBuyNow) {
             localStorage.setItem("checkout_items", JSON.stringify([checkoutItem]));
             window.location.href = "checkout.html";
         } else {
-            alert("✅ Đã thêm vào giỏ hàng!");
-            location.reload(); 
+            showToast("Sản phẩm đã được thêm vào Giỏ hàng", "success", 2000);
+            // Cập nhật số lượng giỏ hàng trên header sau 500ms
+            setTimeout(() => {
+                if (typeof updateCartCount === 'function') updateCartCount();
+            }, 500);
         }
     })
-    .catch(err => alert("Lỗi hệ thống!"));
+    .catch(err => showToast("Lỗi hệ thống!", "error", 3000));
 }
 
 // --- CÁC HÀM TIỆN ÍCH ---

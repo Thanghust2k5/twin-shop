@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quản lý tài khoản - T-Win Shop</title>
+    <link rel="icon" type="image/png" href="./assets/img/logo_favicon.png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
     <link rel="stylesheet" href="./assets/css/base.css" />
     <link rel="stylesheet" href="./assets/css/main.css" />
@@ -195,8 +196,8 @@
             <div class="modal-change-body">
                 <div class="modal-change-header">Thay đổi Email</div>
                 <div class="modal-change-content">
-                    <div class="modal-input-group">
-                        <input type="email" id="input-new-email" placeholder="Nhập địa chỉ Email mới" />
+                    <div class="modal-input-group auth-form__input-wrap">
+                        <input type="email" id="input-new-email" class="auth-form__input" placeholder="Nhập địa chỉ Email mới" />
                     </div>
                 </div>
                 <div class="modal-change-footer">
@@ -211,8 +212,8 @@
             <div class="modal-change-body">
                 <div class="modal-change-header">Thay đổi Số điện thoại</div>
                 <div class="modal-change-content">
-                    <div class="modal-input-group">
-                        <input type="text" id="input-new-phone" placeholder="Nhập số điện thoại mới" />
+                    <div class="modal-input-group auth-form__input-wrap">
+                        <input type="text" id="input-new-phone" class="auth-form__input" placeholder="Nhập số điện thoại mới" />
                     </div>
                 </div>
                 <div class="modal-change-footer">
@@ -240,6 +241,55 @@
             </div>
         </div>
 
+        <!-- Modal Lý Do Hủy Đơn Hàng -->
+        <div class="modal" id="modal-cancel-order">
+            <div class="modal__overlay" onclick="closeCancelModal()"></div>
+            <div class="modal-cancel-body">
+                <div class="modal-cancel-header">Chọn Lý Do Hủy</div>
+                <div class="modal-cancel-warning">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>Vui lòng chọn lí do hủy đơn hàng. Lưu ý: Thao tác này sẽ hủy tất cả các sản phẩm có trong đơn hàng và không thể hoàn tác.</span>
+                </div>
+                <div class="modal-cancel-options">
+                    <label class="cancel-option">
+                        <input type="radio" name="cancel-reason" value="Muốn thay đổi địa chỉ giao hàng" />
+                        <span>Muốn thay đổi địa chỉ giao hàng</span>
+                    </label>
+                    <label class="cancel-option">
+                        <input type="radio" name="cancel-reason" value="Muốn nhập/thay đổi mã Voucher" />
+                        <span>Muốn nhập/thay đổi mã Voucher</span>
+                    </label>
+                    <label class="cancel-option">
+                        <input type="radio" name="cancel-reason" value="Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc, số lượng,...)" />
+                        <span>Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc, số lượng,...)</span>
+                    </label>
+                    <label class="cancel-option">
+                        <input type="radio" name="cancel-reason" value="Thủ tục thanh toán quá rắc rối" />
+                        <span>Thủ tục thanh toán quá rắc rối</span>
+                    </label>
+                    <label class="cancel-option">
+                        <input type="radio" name="cancel-reason" value="Tìm thấy giá rẻ hơn ở chỗ khác" />
+                        <span>Tìm thấy giá rẻ hơn ở chỗ khác</span>
+                    </label>
+                    <label class="cancel-option">
+                        <input type="radio" name="cancel-reason" value="Đổi ý, không muốn mua nữa" />
+                        <span>Đổi ý, không muốn mua nữa</span>
+                    </label>
+                    <label class="cancel-option">
+                        <input type="radio" name="cancel-reason" value="other" />
+                        <span>Khác</span>
+                    </label>
+                    <textarea id="cancel-reason-other" class="cancel-reason-textarea" placeholder="Nhập lý do khác..." style="display: none;"></textarea>
+                </div>
+                <input type="hidden" id="cancel-order-id" value="" />
+                <div class="modal-cancel-footer">
+                    <button class="btn btn--normal" onclick="closeCancelModal()">KHÔNG PHẢI BÂY GIỜ</button>
+                    <button class="btn btn--primary btn-cancel-confirm" onclick="confirmCancelOrder()">HỦY ĐƠN HÀNG</button>
+                </div>
+            </div>
+        </div>
+
+    <script src="./assets/js/validation.js"></script>
     <script src="./assets/js/main.js"></script>
     <script src="./assets/js/user.js"></script> 
   </body>

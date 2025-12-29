@@ -12,6 +12,13 @@ const config = {
     port: process.env.DB_PORT || 3306,
     ssl: (process.env.DB_HOST || '').includes('aivencloud') ? { rejectUnauthorized: false } : undefined
 };
+db.connect((err) => {
+    if (err) {
+        console.error("❌ Lỗi kết nối MySQL:", err.message);
+    } else {
+        console.log("✅ Đã kết nối thành công với MySQL!");
+    }
+});
 
 const NUM_PRODUCTS = 1000;
 
@@ -107,6 +114,7 @@ const tables = [
         total_money DECIMAL(12, 0) NOT NULL,
         payment_method VARCHAR(50) DEFAULT 'COD',
         status ENUM('pending', 'shipping', 'completed', 'cancelled') DEFAULT 'pending',
+        cancel_reason TEXT NULL,
         order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
         FOREIGN KEY (shipping_id) REFERENCES shipping_methods(id),

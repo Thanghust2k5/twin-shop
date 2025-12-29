@@ -43,6 +43,7 @@ function switchTab(tab, el) {
         case "categories": loadCategories(); break;
         case "shipping": loadShipping(); break;
         case "payment": loadPayment(); break;
+        case "chat": /* AdminChat handles this */ break;
     }
 }
 // =========================================================
@@ -138,11 +139,48 @@ function openProductModal(mode, id) {
 
 document.getElementById("form-product").addEventListener("submit", function(e) {
     e.preventDefault();
+    
+    const nameInput = document.getElementById("p-name");
+    const priceInput = document.getElementById("p-price");
+    const stockInput = document.getElementById("p-stock");
+    
+    // Validate với Validator
+    let isValid = true;
+    
+    // Validate tên sản phẩm
+    const nameResult = Validator.validateProductName(nameInput.value);
+    if (!nameResult.isValid) {
+        Validator.showError(nameInput, nameResult.message);
+        isValid = false;
+    } else {
+        Validator.clearError(nameInput);
+    }
+    
+    // Validate giá
+    const priceResult = Validator.validatePrice(priceInput.value);
+    if (!priceResult.isValid) {
+        Validator.showError(priceInput, priceResult.message);
+        isValid = false;
+    } else {
+        Validator.clearError(priceInput);
+    }
+    
+    // Validate số lượng
+    const stockResult = Validator.validateQuantity(stockInput.value);
+    if (!stockResult.isValid) {
+        Validator.showError(stockInput, stockResult.message);
+        isValid = false;
+    } else {
+        Validator.clearError(stockInput);
+    }
+    
+    if (!isValid) return;
+    
     const id = document.getElementById("p-id").value;
     const formData = new FormData();
-    formData.append("name", document.getElementById("p-name").value);
-    formData.append("price", document.getElementById("p-price").value);
-    formData.append("stock", document.getElementById("p-stock").value);
+    formData.append("name", nameInput.value);
+    formData.append("price", priceInput.value);
+    formData.append("stock", stockInput.value);
     formData.append("category_id", document.getElementById("p-category").value);
     formData.append("description", document.getElementById("p-desc").value);
 
@@ -480,12 +518,98 @@ function viewDetail(type, id) {
             modal.style.display = "flex";
         });
     } else if (type === "order") {
-        title.innerText = "Chi Tiết Đơn Hàng #" + id;
-        fetch(`${apiUrl}/orders/${id}/details`).then(r => r.json()).then(items => {
-            content.innerHTML = `<table style="width:100%"><thead><tr><th>Món</th><th>SL</th><th>Giá</th></tr></thead><tbody>${items.map(i => `<tr><td>${i.name}</td><td>x${i.quantity}</td><td>${formatMoney(i.price_at_time)}</td></tr>`).join("")}</tbody></table>`;
-            modal.style.display = "flex";
-        });
+        // Mở modal hóa đơn mới
+        viewOrderInvoice(id);
     }
+}
+
+// =========================================================
+// XEM CHI TIẾT ĐƠN HÀNG (HÓA ĐƠN)
+// =========================================================
+async function viewOrderInvoice(orderId) {
+    try {
+        // Fetch thông tin đơn hàng
+        const orderRes = await fetch(`${apiUrl}/admin/orders/${orderId}`);
+        const order = await orderRes.json();
+        
+        // Fetch chi tiết sản phẩm
+        const detailsRes = await fetch(`${apiUrl}/orders/${orderId}/details`);
+        const items = await detailsRes.json();
+        
+        // Điền thông tin vào modal
+        document.getElementById("invoice-number").innerText = `Số: #${orderId}`;
+        document.getElementById("inv-customer-name").innerText = order.recipient_name || "---";
+        document.getElementById("inv-customer-phone").innerText = order.recipient_phone || "---";
+        document.getElementById("inv-customer-address").innerText = order.recipient_address || "---";
+        
+        document.getElementById("inv-order-date").innerText = new Date(order.order_date).toLocaleString("vi-VN");
+        document.getElementById("inv-order-status").innerHTML = `<span class="badge bg-${order.status}">${getStatusText(order.status)}</span>`;
+        document.getElementById("inv-payment-method").innerText = order.payment_method || "COD";
+        
+        // Render bảng sản phẩm
+        let subtotal = 0;
+        const itemsHtml = items.map((item, index) => {
+            const itemTotal = item.price_at_time * item.quantity;
+            subtotal += itemTotal;
+            return `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        <div class="product-info">
+                            <img src="${item.thumbnail || '/assets/img/products/sp1.jpg'}" class="product-thumb" />
+                            <span class="product-name">${item.name}</span>
+                        </div>
+                    </td>
+                    <td>${item.color || 'Mặc định'}${item.size ? ', ' + item.size : ''}</td>
+                    <td>${item.quantity}</td>
+                    <td>${formatMoney(item.price_at_time)}</td>
+                    <td>${formatMoney(itemTotal)}</td>
+                </tr>
+            `;
+        }).join("");
+        
+        document.getElementById("inv-items-body").innerHTML = itemsHtml;
+        
+        // Tổng kết
+        const shippingFee = 30000; // Phí ship mặc định
+        document.getElementById("inv-subtotal").innerText = formatMoney(subtotal);
+        document.getElementById("inv-shipping").innerText = formatMoney(shippingFee);
+        document.getElementById("inv-discount").innerText = "-0₫";
+        document.getElementById("inv-total").innerText = formatMoney(order.total_money);
+        
+        // Ghi chú
+        document.getElementById("inv-note").innerText = order.note || "Không có ghi chú";
+        
+        // Lý do hủy (nếu có)
+        const cancelReasonWrap = document.getElementById("inv-cancel-reason-wrap");
+        if (order.status === "cancelled" && order.cancel_reason) {
+            cancelReasonWrap.style.display = "block";
+            document.getElementById("inv-cancel-reason").innerText = order.cancel_reason;
+        } else {
+            cancelReasonWrap.style.display = "none";
+        }
+        
+        // Hiển thị modal
+        document.getElementById("modal-order-invoice").style.display = "flex";
+        
+    } catch (error) {
+        console.error("Lỗi khi tải chi tiết đơn hàng:", error);
+        alert("Không thể tải chi tiết đơn hàng!");
+    }
+}
+
+function getStatusText(status) {
+    const statusMap = {
+        "pending": "Chờ xác nhận",
+        "shipping": "Đang vận chuyển",
+        "completed": "Hoàn thành",
+        "cancelled": "Đã hủy"
+    };
+    return statusMap[status] || status;
+}
+
+function printInvoice() {
+    window.print();
 }
 
 // =========================================================
