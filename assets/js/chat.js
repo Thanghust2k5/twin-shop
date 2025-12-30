@@ -26,7 +26,11 @@ const ChatWidget = {
         const userStr = localStorage.getItem("user_login");
         if (userStr && userStr !== "undefined") {
             try {
-                this.user = JSON.parse(userStr);
+                const parsed = JSON.parse(userStr);
+                this.user = {
+                    id: parsed.id,
+                    name: parsed.full_name || parsed.name || "Khách"
+                };
             } catch (e) {
                 this.user = { name: "Khách", id: null };
             }
