@@ -820,36 +820,70 @@ io.on("connection", (socket) => {
     
     // Khách bắt đầu chat
     socket.on("customer:start", (data) => {
-        const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        chatSessions.set(sessionId, {
-            id: sessionId,
-            socketId: socket.id,
-            user: data.user || { name: "Khách", id: null },
-            messages: [],
-            status: "bot", // bot hoặc admin
-            createdAt: new Date(),
-            unread: 0
-        });
+        const user = data.user || { name: "Khách", id: null };
         
-        socket.sessionId = sessionId;
-        socket.join(sessionId);
+        // Nếu user đã đăng nhập, tìm session cũ
+        let existingSessionId = null;
+        if (user.id) {
+            for (const [sid, session] of chatSessions) {
+                if (session.user.id === user.id && session.status !== "closed") {
+                    existingSessionId = sid;
+                    break;
+                }
+            }
+        }
         
-        // Gửi tin chào mừng
-        const welcomeMsg = {
-            id: Date.now(),
-            sender: "bot",
-            text: "Xin chào! Tôi là trợ lý ảo của Twin Shop 🛍️\n\nBạn có thể hỏi tôi về:\n- Phí vận chuyển\n- Chính sách đổi trả\n- Voucher khuyến mãi\n- Thanh toán\n\nHoặc gõ 'tư vấn' để được nhân viên hỗ trợ trực tiếp!",
-            time: new Date()
-        };
-        
-        socket.emit("chat:message", welcomeMsg);
-        chatSessions.get(sessionId).messages.push(welcomeMsg);
-        
-        // Thông báo cho admin
-        io.to("admin-room").emit("admin:newSession", {
-            ...chatSessions.get(sessionId),
-            messages: chatSessions.get(sessionId).messages
-        });
+        let sessionId;
+        if (existingSessionId) {
+            // Dùng lại session cũ
+            sessionId = existingSessionId;
+            const session = chatSessions.get(sessionId);
+            session.socketId = socket.id; // Cập nhật socket mới
+            session.status = session.status === "closed" ? "bot" : session.status;
+            
+            socket.sessionId = sessionId;
+            socket.join(sessionId);
+            
+            // Gửi lại lịch sử chat
+            session.messages.forEach(msg => {
+                socket.emit("chat:message", msg);
+            });
+            
+            // Thông báo admin cập nhật
+            io.to("admin-room").emit("admin:sessionUpdate", session);
+        } else {
+            // Tạo session mới
+            sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            chatSessions.set(sessionId, {
+                id: sessionId,
+                socketId: socket.id,
+                user: user,
+                messages: [],
+                status: "bot",
+                createdAt: new Date(),
+                unread: 0
+            });
+            
+            socket.sessionId = sessionId;
+            socket.join(sessionId);
+            
+            // Gửi tin chào mừng
+            const welcomeMsg = {
+                id: Date.now(),
+                sender: "bot",
+                text: "Xin chào! Tôi là trợ lý ảo của Twin Shop 🛍️\n\nBạn có thể hỏi tôi về:\n- Phí vận chuyển\n- Chính sách đổi trả\n- Voucher khuyến mãi\n- Thanh toán\n\nHoặc gõ 'tư vấn' để được nhân viên hỗ trợ trực tiếp!",
+                time: new Date()
+            };
+            
+            socket.emit("chat:message", welcomeMsg);
+            chatSessions.get(sessionId).messages.push(welcomeMsg);
+            
+            // Thông báo cho admin
+            io.to("admin-room").emit("admin:newSession", {
+                ...chatSessions.get(sessionId),
+                messages: chatSessions.get(sessionId).messages
+            });
+        }
     });
 
     // Khách gửi tin nhắn
