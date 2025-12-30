@@ -518,7 +518,7 @@ function handleLogin() {
         if(d.user) {
             alert("Đăng nhập thành công!"); 
             localStorage.setItem('user_login', JSON.stringify(d.user));
-            d.user.role === 1 ? window.location.href = 'admin.html' : window.location.reload();
+            Number(d.user.role) === 1 ? window.location.href = 'admin.html' : window.location.reload();
         } else alert(d.message);
     }).catch(() => alert("Lỗi server"));
 }
@@ -526,7 +526,7 @@ function handleLogin() {
 function handleAdminLogin() {
     fetch(`${apiUrl}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: document.getElementById("admin-email").value.trim(), password: document.getElementById("admin-password").value.trim() }) })
     .then(r => r.json()).then(d => {
-        if(d.user && d.user.role === 1) { localStorage.setItem('user_login', JSON.stringify(d.user)); window.location.href = 'admin.html'; }
+        if(d.user && Number(d.user.role) === 1) { localStorage.setItem('user_login', JSON.stringify(d.user)); window.location.href = 'admin.html'; }
         else alert("Không có quyền truy cập!");
     });
 }
