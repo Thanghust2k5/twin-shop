@@ -587,3 +587,74 @@ const updateCartCount = renderCartHeader;
 function formatCurrency(amount) {
     return new Intl.NumberFormat("vi-VN", {style: 'currency', currency: 'VND'}).format(amount);
 }
+
+// =========================================================
+// MOBILE NAVIGATION
+// =========================================================
+function toggleMobileNav() {
+    const nav = document.getElementById("mobile-nav");
+    const overlay = document.querySelector(".mobile-menu-overlay");
+    if (nav && overlay) {
+        nav.classList.toggle("active");
+        overlay.classList.toggle("active");
+        document.body.style.overflow = nav.classList.contains("active") ? "hidden" : "";
+    }
+}
+
+function updateMobileNav() {
+    const userStr = localStorage.getItem("user_login");
+    const mobileNavName = document.getElementById("mobile-nav-name");
+    const mobileNavEmail = document.getElementById("mobile-nav-email");
+    const mobileNavAvatar = document.getElementById("mobile-nav-avatar");
+    const loginBtn = document.getElementById("mobile-login-btn");
+    const registerBtn = document.getElementById("mobile-register-btn");
+    const userMenuItems = document.querySelectorAll(".mobile-nav__user-menu");
+
+    if (userStr && userStr !== "undefined") {
+        try {
+            const user = JSON.parse(userStr);
+            if (mobileNavName) mobileNavName.textContent = user.full_name || "Người dùng";
+            if (mobileNavEmail) mobileNavEmail.textContent = user.email || "";
+            if (mobileNavAvatar) {
+                if (user.avatar) {
+                    mobileNavAvatar.innerHTML = `<img src="${user.avatar}" alt="Avatar" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-user\\'></i>'" />`;
+                }
+            }
+            if (loginBtn) loginBtn.style.display = "none";
+            if (registerBtn) registerBtn.style.display = "none";
+            userMenuItems.forEach(item => item.style.display = "block");
+        } catch (e) {
+            console.log("Parse user error", e);
+        }
+    } else {
+        if (loginBtn) loginBtn.style.display = "block";
+        if (registerBtn) registerBtn.style.display = "block";
+        userMenuItems.forEach(item => item.style.display = "none");
+    }
+}
+
+function loadMobileCategories() {
+    const container = document.getElementById("mobile-category-list");
+    if (!container) return;
+
+    fetch(`${apiUrl}/categories`)
+        .then(r => r.json())
+        .then(categories => {
+            container.innerHTML = categories.map(cat => `
+                <li class="mobile-nav__category-item">
+                    <a href="index.html?category=${cat.id}" class="mobile-nav__category-link" onclick="toggleMobileNav()">
+                        ${cat.name}
+                    </a>
+                </li>
+            `).join("");
+        })
+        .catch(e => console.log("Load mobile categories error", e));
+}
+
+// Gọi khi load xong components
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        updateMobileNav();
+        loadMobileCategories();
+    }, 500);
+});

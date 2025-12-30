@@ -87,6 +87,11 @@
 
     <!-- Header with search -->
     <div class="header-with-search">
+      <!-- Mobile menu button -->
+      <button class="mobile-menu-toggle" onclick="toggleMobileNav()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
       <div class="header__logo">
         <a href="index.html" class="header__logo-link">
           <img
@@ -132,3 +137,69 @@
     </div>
   </div>
 </header>
+
+<!-- Mobile Navigation Drawer -->
+<div class="mobile-menu-overlay" onclick="toggleMobileNav()"></div>
+<nav class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav__close" onclick="toggleMobileNav()">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+  <div class="mobile-nav__header">
+    <div class="mobile-nav__user">
+      <div class="mobile-nav__avatar" id="mobile-nav-avatar">
+        <i class="fa-solid fa-user"></i>
+      </div>
+      <div>
+        <div class="mobile-nav__name" id="mobile-nav-name">Chào bạn!</div>
+        <div class="mobile-nav__email" id="mobile-nav-email">Đăng nhập để mua sắm</div>
+      </div>
+    </div>
+  </div>
+  <ul class="mobile-nav__menu">
+    <li class="mobile-nav__item">
+      <a href="index.html" class="mobile-nav__link">
+        <i class="fa-solid fa-house"></i> Trang chủ
+      </a>
+    </li>
+    <li class="mobile-nav__item" id="mobile-login-btn" onclick="openModal('login'); toggleMobileNav();">
+      <a href="javascript:void(0)" class="mobile-nav__link">
+        <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
+      </a>
+    </li>
+    <li class="mobile-nav__item" id="mobile-register-btn" onclick="openModal('register'); toggleMobileNav();">
+      <a href="javascript:void(0)" class="mobile-nav__link">
+        <i class="fa-solid fa-user-plus"></i> Đăng ký
+      </a>
+    </li>
+    <li class="mobile-nav__item mobile-nav__user-menu" style="display:none;">
+      <a href="user.html" class="mobile-nav__link">
+        <i class="fa-solid fa-user"></i> Tài khoản của tôi
+      </a>
+    </li>
+    <li class="mobile-nav__item mobile-nav__user-menu" style="display:none;">
+      <a href="user.html#orders" class="mobile-nav__link">
+        <i class="fa-solid fa-box"></i> Đơn hàng
+      </a>
+    </li>
+    <li class="mobile-nav__item">
+      <a href="cart.html" class="mobile-nav__link">
+        <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+      </a>
+    </li>
+  </ul>
+  <div class="mobile-nav__divider"></div>
+  <div class="mobile-nav__categories">
+    <div class="mobile-nav__categories-title">Danh mục</div>
+    <ul class="mobile-nav__category-list" id="mobile-category-list">
+      <!-- Categories will be loaded here -->
+    </ul>
+  </div>
+  <div class="mobile-nav__divider"></div>
+  <ul class="mobile-nav__menu">
+    <li class="mobile-nav__item mobile-nav__user-menu" style="display:none;">
+      <a href="javascript:void(0)" class="mobile-nav__link" onclick="handleLogout(); toggleMobileNav();">
+        <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+      </a>
+    </li>
+  </ul>
+</nav>
