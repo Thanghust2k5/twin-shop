@@ -33,6 +33,7 @@ const AdminChat = {
 
         // Nhận danh sách phiên chat
         this.socket.on("admin:sessions", (sessions) => {
+            this.sessions.clear(); // Clear trước khi thêm mới
             sessions.forEach(s => {
                 this.sessions.set(s.id, s);
             });
@@ -41,10 +42,13 @@ const AdminChat = {
 
         // Có phiên chat mới
         this.socket.on("admin:newSession", (session) => {
-            this.sessions.set(session.id, session);
-            this.renderSessionsList();
-            this.showNotification("Có khách hàng mới cần hỗ trợ!");
-            this.playSound();
+            // Kiểm tra nếu session đã tồn tại thì không thêm mới
+            if (!this.sessions.has(session.id)) {
+                this.sessions.set(session.id, session);
+                this.renderSessionsList();
+                this.showNotification("Có khách hàng mới cần hỗ trợ!");
+                this.playSound();
+            }
         });
 
         // Có khách cần hỗ trợ trực tiếp
@@ -79,14 +83,17 @@ const AdminChat = {
 
         // Cập nhật trạng thái session
         this.socket.on("admin:sessionUpdate", (data) => {
-            const session = this.sessions.get(data.sessionId);
-            if (session) {
-                session.status = data.status;
-                this.renderSessionsList();
-                
-                if (this.currentSessionId === data.sessionId) {
-                    this.updateChatHeader(session);
-                }
+            // Cập nhật hoặc thêm mới session
+            if (this.sessions.has(data.id)) {
+                const session = this.sessions.get(data.id);
+                Object.assign(session, data);
+            } else {
+                this.sessions.set(data.id, data);
+            }
+            this.renderSessionsList();
+            
+            if (this.currentSessionId === data.id) {
+                this.updateChatHeader(this.sessions.get(data.id));
             }
         });
     },
