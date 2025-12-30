@@ -73,31 +73,27 @@
 
     .header {
         height: auto;
-        padding: 10px 0;
+        padding: 8px 0;
     }
 
     .header-with-search {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         height: auto;
-        padding: 0;
+        padding: 0 8px;
+        align-items: center;
     }
 
-    /* Logo nhỏ hơn */
+    /* Ẩn logo trên mobile */
     .header__logo {
-        width: auto;
-        margin-right: 10px;
+        display: none;
     }
 
-    .header__logo-img {
-        width: 100px;
-        height: auto;
-    }
-
-    /* Search bar */
+    /* Search bar chiếm toàn bộ */
     .header__search {
         flex: 1;
-        height: 40px;
+        height: 38px;
         max-width: none;
+        margin: 0 10px;
     }
 
     .header__search-input {
@@ -106,7 +102,7 @@
 
     /* Cart icon */
     .header__cart {
-        margin-left: 10px;
+        margin-left: 0;
     }
 
     .header__cart-list {
@@ -114,10 +110,12 @@
         right: -80px;
     }
 
-    /* Mobile menu toggle */
+    /* Mobile menu toggle - sát mép trái */
     .mobile-menu-toggle {
         display: block;
         order: -1;
+        padding: 8px 12px 8px 0;
+        margin-left: 0;
     }
 
     /* === CONTENT === */
@@ -137,24 +135,54 @@
 
     /* Home filter */
     .home-filter {
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 10px;
+        flex-wrap: nowrap;
+        gap: 6px;
+        padding: 10px 8px;
+        align-items: center;
     }
 
+    /* Ẩn label "Sắp xếp theo" */
     .home-filter__label {
-        width: 100%;
-        margin-bottom: 5px;
+        display: none;
     }
 
+    /* Filter buttons nhỏ gọn */
     .home-filter__btn {
-        flex: 1;
-        min-width: 70px;
+        flex: 0 0 auto;
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: auto;
+        white-space: nowrap;
     }
 
-    /* Pagination */
+    /* Select Giá */
+    .select-input {
+        flex: 0 0 auto;
+        min-width: auto;
+        padding: 0 10px;
+        height: 30px;
+    }
+
+    .select-input__label {
+        font-size: 12px;
+    }
+
+    /* Ẩn pagination trong filter (chỉ giữ pagination ở dưới) */
+    .home-filter__page {
+        display: none;
+    }
+
+    /* Pagination bottom */
     .pagination {
         justify-content: center;
+        padding: 15px 10px;
+        margin-bottom: 20px;
+    }
+
+    .pagination-item {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
     }
 
     /* === PRODUCT DETAIL === */
@@ -197,23 +225,56 @@
 
     /* === HEADER === */
     .header-with-search {
-        padding: 0 10px;
+        padding: 0 6px;
     }
 
-    .header__logo-img {
-        width: 80px;
+    /* Logo vẫn ẩn ở mobile nhỏ */
+    .header__logo {
+        display: none;
     }
 
     .header__search {
-        height: 36px;
+        height: 34px;
+        margin: 0 8px;
+    }
+
+    .header__search-input {
+        font-size: 13px;
+        padding-left: 10px;
     }
 
     .header__search-btn {
-        width: 50px;
+        width: 45px;
     }
 
     .header__cart-icon {
         font-size: 20px;
+    }
+
+    /* Mobile menu toggle nhỏ hơn */
+    .mobile-menu-toggle {
+        font-size: 22px;
+        padding: 6px 10px 6px 0;
+    }
+
+    /* === FILTER === */
+    .home-filter {
+        padding: 8px 5px;
+        gap: 4px;
+    }
+
+    .home-filter__btn {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+
+    .select-input {
+        padding: 0 8px;
+        height: 28px;
+    }
+
+    .select-input__label {
+        font-size: 11px;
     }
 
     /* === PRODUCTS === */
@@ -224,6 +285,7 @@
     .home-product-item__name {
         font-size: 1.3rem;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
     }
 
     .home-product-item__price-current {
