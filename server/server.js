@@ -178,8 +178,27 @@ const db = mysql.createConnection({
 
 // Kết nối và log kết quả
 db.connect((err) => {
-    if (err) console.error("❌ Lỗi kết nối MySQL:", err);
-    else console.log("✅ Đã kết nối thành công với MySQL!");
+    if (err) {
+        console.error("❌ Lỗi kết nối MySQL:", err);
+    } else {
+        console.log("✅ Đã kết nối thành công với MySQL!");
+        
+        // Tự động thêm cột cancel_reason nếu chưa có (migration)
+        db.query(`
+            SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders' AND COLUMN_NAME = 'cancel_reason'
+        `, (err, results) => {
+            if (!err && results.length === 0) {
+                db.query("ALTER TABLE orders ADD COLUMN cancel_reason TEXT NULL", (alterErr) => {
+                    if (alterErr) {
+                        console.log("⚠️ Không thể thêm cột cancel_reason:", alterErr.message);
+                    } else {
+                        console.log("✅ Đã thêm cột cancel_reason vào bảng orders");
+                    }
+                });
+            }
+        });
+    }
 });
 
 // ==========================================
@@ -883,31 +902,41 @@ app.get("/api/orders/:id/details", (req, res) => {
  */
 app.patch("/api/orders/:id/cancel", (req, res) => {
     const { reason } = req.body; // Lý do hủy (optional)
+    const orderId = req.params.id;
+    
+    console.log(`[CANCEL ORDER] Đang hủy đơn #${orderId}, lý do: ${reason}`);
     
     // Kiểm tra status hiện tại
-    db.query("SELECT status FROM orders WHERE id = ?", [req.params.id], (err, r) => {
+    db.query("SELECT status FROM orders WHERE id = ?", [orderId], (err, r) => {
         // Kiểm tra lỗi database
         if (err) {
+            console.log(`[CANCEL ORDER] Lỗi DB:`, err);
             return res.status(500).json({ message: "Lỗi server!" });
         }
         
         // Kiểm tra đơn hàng có tồn tại không
         if (!r || r.length === 0) {
+            console.log(`[CANCEL ORDER] Không tìm thấy đơn #${orderId}`);
             return res.status(404).json({ message: "Không tìm thấy đơn hàng!" });
         }
+        
+        console.log(`[CANCEL ORDER] Đơn #${orderId} có status: ${r[0].status}`);
         
         if (r[0].status === "pending") {
             // Chỉ pending mới được hủy
             db.query("UPDATE orders SET status = 'cancelled', cancel_reason = ? WHERE id = ?", 
-                [reason || null, req.params.id], (updateErr) => {
+                [reason || null, orderId], (updateErr) => {
                     if (updateErr) {
+                        console.log(`[CANCEL ORDER] Lỗi update:`, updateErr);
                         return res.status(500).json({ message: "Lỗi khi hủy đơn hàng!" });
                     }
+                    console.log(`[CANCEL ORDER] Đã hủy thành công đơn #${orderId}`);
                     res.json({ message: "Đã hủy đơn hàng thành công!" });
                 });
         } else {
             // Đã xử lý rồi -> không được hủy
-            res.status(400).json({ message: "Không thể hủy đơn hàng này!" });
+            console.log(`[CANCEL ORDER] Không thể hủy - đơn đã ${r[0].status}`);
+            res.status(400).json({ message: `Không thể hủy đơn hàng đã "${r[0].status}"!` });
         }
     });
 });
