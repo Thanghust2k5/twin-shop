@@ -1,3 +1,29 @@
+<!--
+=========================================================================
+CART.HTML - TRANG GIỎ HÀNG (SHOPPING CART)
+=========================================================================
+
+Trang này hiển thị danh sách sản phẩm người dùng đã thêm vào giỏ hàng.
+Người dùng có thể:
+- Xem danh sách sản phẩm trong giỏ
+- Thay đổi số lượng sản phẩm
+- Thay đổi biến thể (màu sắc, size)
+- Xóa sản phẩm khỏi giỏ
+- Chọn sản phẩm để thanh toán
+- Tiến hành checkout
+
+Cấu trúc trang:
+1. Header (include từ components/header.html)
+2. Bảng giỏ hàng (header + list items)
+3. Footer thanh toán (sticky bottom)
+4. Modal xác nhận checkout
+5. Footer (include từ components/footer.html)
+
+JavaScript liên quan: cart.js (xử lý logic giỏ hàng)
+API sử dụng: GET /api/cart/:userId, PUT /api/cart/update/:id, etc.
+
+=========================================================================
+-->
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -5,17 +31,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Giỏ hàng - T-Win Shop</title>
     <link rel="icon" type="image/png" href="./assets/img/logo_favicon.png" />
+    
+    <!-- CSS Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+    
+    <!-- Project CSS -->
     <link rel="stylesheet" href="./assets/css/base.css" />
     <link rel="stylesheet" href="./assets/css/main.css" />
     <link rel="stylesheet" href="./assets/css/responsive.css" />
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="./assets/fonts/fontawesome-free-7.1.0/css/all.min.css"/>
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 
+    <!-- 
+      =========================================
+      CSS RIÊNG CHO TRANG GIỎ HÀNG
+      =========================================
+      Styles inline vì chỉ dùng cho trang này.
+      Nếu muốn tách riêng có thể tạo file cart.css
+    -->
     <style>
       /* ==============================================
-         1. CẤU TRÚC BẢNG GIỎ HÀNG (ĐÃ CHIA LẠI CỘT)
+         1. CẤU TRÚC BẢNG GIỎ HÀNG (CHIA CỘT)
+         ==============================================
+         Bảng giỏ hàng gồm 7 cột:
+         - Checkbox (5%)
+         - Sản phẩm (30%)
+         - Phân loại (17%)
+         - Đơn giá (13%)
+         - Số lượng (13%)
+         - Số tiền (12%)
+         - Thao tác (10%)
       ============================================== */
+      
+      /* Header bảng giỏ hàng */
       .cart-header {
         background: #fff;
         padding: 20px;
@@ -27,32 +79,42 @@
         font-size: 1.4rem;
         color: #888;
       }
+      
+      /* Container danh sách items */
       .cart-list {
         background: #fff;
         border-radius: 2px;
         box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
       }
+      
+      /* Mỗi item trong giỏ */
       .cart-item {
         display: flex;
         align-items: center;
         padding: 20px;
         border-bottom: 1px solid #f1f1f1;
       }
+      
       .cart-item:last-child {
         border-bottom: none;
       }
 
-      /* --- CHIA CỘT MỚI (CÓ CỘT PHÂN LOẠI) --- */
+      /* --- ĐỊNH NGHĨA CHIỀU RỘNG CÁC CỘT --- */
       .cart-col-0 { width: 5%; text-align: center; } /* Checkbox */
       .cart-col-1 { width: 30%; display: flex; align-items: center; } /* Sản phẩm (Ảnh + Tên) */
-      .cart-col-variant { width: 17%; color: #777; font-size: 1.4rem; display: flex; justify-content: flex-start; } /* Phân loại hàng (Mới) */
+      .cart-col-variant { width: 17%; color: #777; font-size: 1.4rem; display: flex; justify-content: flex-start; } /* Phân loại hàng */
       .cart-col-2 { width: 13%; text-align: center; font-size: 1.4rem; } /* Đơn giá */
       .cart-col-3 { width: 13%; text-align: center; } /* Số lượng */
       .cart-col-4 { width: 12%; text-align: center; color: #ee4d2d; font-weight: 500; font-size: 1.4rem; } /* Số tiền */
       .cart-col-5 { width: 10%; text-align: center; font-size: 1.5rem; } /* Thao tác */
 
+      /* Checkbox styling */
       input[type="checkbox"] { transform: scale(1.3); cursor: pointer; }
+      
+      /* Ảnh sản phẩm thumbnail */
       .cart-img { width: 80px; height: 80px; object-fit: cover; border: 1px solid #e8e8e8; margin-right: 15px; }
+      
+      /* Tên sản phẩm (max 2 dòng) */
       .cart-name { 
         font-size: 1.5rem;
         color: #333; 
@@ -60,17 +122,21 @@
         overflow: hidden;
         display: -webkit-box; 
         -webkit-box-orient: vertical; 
-        -webkit-line-clamp: 2; 
+        -webkit-line-clamp: 2;  /* Cắt ở 2 dòng */
         line-clamp: 2; 
         margin-right: 10px; 
         text-decoration: none; 
       }
       
+      /* Nút xóa item */
       .btn-delete { cursor: pointer; color: #333; font-size: 1.4rem; }
       .btn-delete:hover { color: #ee4d2d; }
 
       /* ==============================================
-         2. CSS CHO FOOTER (STICKY BOTTOM - DÍNH ĐÁY)
+         2. CSS CHO FOOTER (STICKY BOTTOM)
+         ==============================================
+         Footer giỏ hàng cố định ở dưới cùng màn hình
+         Chứa: Checkbox all, Tổng tiền, Nút Mua hàng
       ============================================== */
       .cart-footer {
         background: #fff;
@@ -83,6 +149,7 @@
         justify-content: space-between;
         padding: 12px 20px;
         
+        /* Sticky positioning - dính đáy màn hình */
         position: -webkit-sticky;
         position: sticky;
         bottom: 0;
@@ -90,6 +157,7 @@
         border-top: 1px solid #f1f1f1;
       }
 
+      /* Phần bên trái footer */
       .cart-footer-left {
           display: flex;
           align-items: center;
@@ -98,25 +166,33 @@
           color: #333;
       }
 
+      /* Phần bên phải footer */
       .cart-footer-right {
           display: flex;
           align-items: center;
           gap: 15px;
       }
 
+      /* Link xóa tất cả */
       .link-delete-all { cursor: pointer; color: #333; }
       .link-delete-all:hover { color: #ee4d2d; }
+      
+      
       /* ==============================================
-         3. CSS PHÂN LOẠI HÀNG (VARIANTS) - Ở GIỮA
+         3. CSS POPUP CHỌN BIẾN THỂ (VARIANTS)
+         ==============================================
+         Popup hiện khi click vào "Phân loại hàng"
+         Cho phép thay đổi màu sắc và size của sản phẩm
       ============================================== */
+      
+      /* Container cho phần variant */
       .cart-variant-wrap {
-          position: relative;
+          position: relative;  /* Anchor cho popup */
           cursor: pointer;
           display: flex;
           align-items: center;
           color: #777;
           font-size: 1.4rem;
-          /* Xóa width fit-content để nó canh giữa cột */
       }
 
       .cart-variant-label { margin-right: 5px; }
@@ -124,10 +200,10 @@
 
       /* Popup chọn biến thể */
       .cart-variant-popup {
-          display: none;
+          display: none;           /* Mặc định ẩn */
           position: absolute;
-          top: 30px; /* Đẩy xuống dưới chút */
-          left: -80px; /* Căn chỉnh cho popup nằm giữa */
+          top: 30px;
+          left: -80px;
           width: 300px;
           background: #fff;
           border: 1px solid #e8e8e8;
@@ -137,33 +213,52 @@
           border-radius: 2px;
           text-align: left;
       }
+      
+      /* Hiển thị popup khi có class .show */
       .cart-variant-popup.show { display: block; }
       
       /* Mũi tên chỉ lên của popup */
       .cart-variant-popup::before {
-          content: ""; position: absolute; top: -8px; left: 140px; /* Căn mũi tên vào giữa */
+          content: ""; 
+          position: absolute; 
+          top: -8px; 
+          left: 140px;  /* Căn giữa mũi tên */
           border-left: 8px solid transparent;
           border-right: 8px solid transparent;
           border-bottom: 8px solid #fff;
       }
 
+      /* Group options trong popup */
       .cart-popup-group { margin-bottom: 12px; }
       .cart-popup-label { font-size: 1.2rem; color: #999; margin-bottom: 8px; display: block;}
       
+      /* Nút chọn option (size, màu) */
       .cart-popup-btn {
-          border: 1px solid rgba(0,0,0,.09); padding: 6px 12px; margin-right: 8px; margin-bottom: 8px;
-          background: #fff; font-size: 1.2rem; cursor: pointer; border-radius: 2px;
+          border: 1px solid rgba(0,0,0,.09); 
+          padding: 6px 12px; 
+          margin-right: 8px; 
+          margin-bottom: 8px;
+          background: #fff; 
+          font-size: 1.2rem; 
+          cursor: pointer; 
+          border-radius: 2px;
       }
       .cart-popup-btn:hover { color: #ee4d2d; border-color: #ee4d2d; }
       .cart-popup-btn.active { color: #ee4d2d; border-color: #ee4d2d; background: #fff5f1; }
 
+      /* Nút hành động trong popup */
       .cart-popup-actions { display: flex; justify-content: flex-end; margin-top: 15px; }
       .btn-popup-cancel { margin-right: 10px; background: transparent; border: none; cursor: pointer; color: #555; }
       .btn-popup-confirm { background: #ee4d2d; color: #fff; border: none; padding: 6px 15px; border-radius: 2px; cursor: pointer; }
 
+
       /* ==============================================
          4. CSS Ô SỐ LƯỢNG (QUANTITY BOX)
+         ==============================================
+         Bộ điều khiển số lượng: [-] [5] [+]
       ============================================== */
+      
+      /* Container quantity box */
       .cart-qnt-box {
           display: flex;
           align-items: center;
@@ -174,28 +269,45 @@
           margin: 0 auto;
       }
 
+      /* Nút +/- */
       .cart-btn-qnt {
-          width: 30px; height: 30px; border: none; background: #fff;
-          cursor: pointer; font-size: 1.6rem; color: #555;
+          width: 30px; 
+          height: 30px; 
+          border: none; 
+          background: #fff;
+          cursor: pointer; 
+          font-size: 1.6rem; 
+          color: #555;
           border-right: 1px solid #e8e8e8;
       }
       .cart-btn-qnt:last-child { border-right: none; border-left: 1px solid #e8e8e8; }
 
+      /* Input số lượng */
       .cart-qnt-input {
-          width: 40px; height: 30px; border: none; text-align: center;
-          font-size: 1.4rem; outline: none;
+          width: 40px; 
+          height: 30px; 
+          border: none; 
+          text-align: center;
+          font-size: 1.4rem; 
+          outline: none;
       }
+      
+      /* Ẩn mũi tên input number */
       .cart-qnt-input::-webkit-outer-spin-button,
       .cart-qnt-input::-webkit-inner-spin-button {
-          -webkit-appearance: none; margin: 0;
+          -webkit-appearance: none; 
+          margin: 0;
       }
 
+      /* Trạng thái disabled */
       .qnt-box.disabled { border-color: #eee; background-color: #fff; }
       .qnt-box.disabled .qnt-btn { color: #ccc; cursor: not-allowed; }
       .qnt-box.disabled .qnt-input { color: #ccc; border-color: #eee; cursor: not-allowed; }
 
+
       /* ==============================================
-         5. CSS LABEL MODAL
+         5. CSS LABEL TRONG MODAL
+         ==============================================
       ============================================== */
       .auth-form__label {
           font-size: 1.2rem;
@@ -206,45 +318,115 @@
       }
     </style>
   </head>
+  
+  <!-- ==============================================
+       PHẦN 2: BODY - NỘI DUNG TRANG GIỎ HÀNG
+       ==============================================
+       Cấu trúc trang:
+       1. Header (load từ header.html)
+       2. Cart Header - Tiêu đề các cột
+       3. Cart List - Danh sách sản phẩm trong giỏ
+       4. Cart Footer - Tổng tiền và nút mua hàng
+       5. Footer (load từ footer.html)
+       6. Modal Checkout - Popup điền thông tin đặt hàng
+  ============================================== -->
   <body>
+    <!-- Container chính của ứng dụng -->
     <div class="app">
+      <!-- 
+        Placeholder để load header.html vào
+        JavaScript sẽ fetch và inject HTML vào đây
+      -->
       <div id="header-placeholder"></div>
 
+      <!-- 
+        Container nội dung chính của trang giỏ hàng
+        grid: Hệ thống lưới để căn chỉnh layout
+      -->
       <div class="app__container">
         <div class="grid">
+          
+          <!-- ==============================================
+               CART HEADER - TIÊU ĐỀ CÁC CỘT
+               ==============================================
+               Thanh tiêu đề hiển thị tên các cột trong bảng
+               7 cột: checkbox | sản phẩm | phân loại | giá | sl | tổng | thao tác
+          ============================================== -->
           <div class="cart-header">
+            <!-- Cột 0: Checkbox chọn tất cả -->
             <div class="cart-col-0">
               <input type="checkbox" id="check-all" onclick="toggleCheckAll(this)"/>
             </div>
+            <!-- Cột 1: Tên sản phẩm -->
             <div class="cart-col-1">Sản phẩm</div>
+            <!-- Cột 2: Biến thể (size, màu) -->
             <div class="cart-col-variant">Phân loại hàng</div>
+            <!-- Cột 3: Giá gốc của sản phẩm -->
             <div class="cart-col-2">Đơn giá</div>
+            <!-- Cột 4: Số lượng với nút +/- -->
             <div class="cart-col-3">Số lượng</div>
+            <!-- Cột 5: Thành tiền (giá × số lượng) -->
             <div class="cart-col-4">Số tiền</div>
+            <!-- Cột 6: Nút xóa sản phẩm -->
             <div class="cart-col-5">Thao tác</div>
           </div>
 
+          <!-- ==============================================
+               CART LIST - DANH SÁCH SẢN PHẨM
+               ==============================================
+               Container chứa các sản phẩm trong giỏ hàng
+               JavaScript (cart.js) sẽ render nội dung vào đây
+               
+               Mỗi sản phẩm sẽ có cấu trúc:
+               - cart-item: Row chứa 1 sản phẩm
+                 - checkbox: Chọn để thanh toán
+                 - Ảnh + tên sản phẩm
+                 - Biến thể (có thể click để đổi)
+                 - Đơn giá
+                 - Quantity box: [-] [số] [+]
+                 - Thành tiền
+                 - Nút xóa
+          ============================================== -->
           <div class="cart-list" id="cart-list-wrapper">
+            <!-- Loading placeholder - hiển thị khi đang tải dữ liệu -->
             <div style="padding: 40px; text-align: center; font-size: 1.6rem; color: #777;">
               Đang tải giỏ hàng...
             </div>
           </div>
 
+          <!-- ==============================================
+               CART FOOTER - THANH TỔNG KẾT
+               ==============================================
+               Thanh sticky ở cuối trang hiển thị:
+               - Bên trái: Checkbox chọn tất cả + nút xóa
+               - Bên phải: Tổng tiền + nút mua hàng
+          ============================================== -->
           <div class="cart-footer">
+            <!-- Phần bên trái footer -->
             <div class="cart-footer-left">
+                <!-- Checkbox chọn tất cả (sync với checkbox header) -->
                 <div style="display: flex; align-items: center;">
                     <input type="checkbox" id="check-all-footer" onclick="toggleCheckAll(this)" style="transform: scale(1.3); margin-right: 10px; cursor: pointer;">
                     <label for="check-all-footer" style="cursor: pointer;">Chọn Tất Cả</label>
                 </div>
                 
+                <!-- Nút xóa các sản phẩm đã chọn -->
                 <div class="link-delete-all" onclick="deleteSelectedItems()">Xóa</div>
             </div>
 
+            <!-- Phần bên phải footer -->
             <div class="cart-footer-right">
+                <!-- Hiển thị tổng tiền -->
                 <div style="display: flex; align-items: baseline;">
+                    <!-- Đếm số sản phẩm đã chọn -->
                     <span id="selected-count" style="font-size: 1.4rem; margin-right: 5px;">Tổng thanh toán (0 sản phẩm):</span>
+                    <!-- Tổng số tiền cần thanh toán -->
                     <span id="cart-total-price" style="font-size: 2.2rem; color: #ee4d2d; font-weight: 500;">0đ</span>
                 </div>
+                <!-- 
+                  Nút mua hàng - click sẽ gọi processCheckout()
+                  Mở modal để nhập thông tin giao hàng
+                -->
                 <button class="btn btn--primary" style="min-width: 200px; height: 40px" onclick="processCheckout()">
                   Mua Hàng
                 </button>
@@ -253,45 +435,80 @@
         </div>
       </div>
 
+      <!-- Placeholder để load footer.html vào -->
       <div id="footer-placeholder"></div>
     </div>
 
+    <!-- ==============================================
+         MODAL CHECKOUT - POPUP ĐẶT HÀNG
+         ==============================================
+         Modal hiện khi click "Mua Hàng"
+         Người dùng điền:
+         - Họ tên
+         - Số điện thoại
+         - Địa chỉ nhận hàng
+         Sau đó xác nhận để tạo đơn hàng
+    ============================================== -->
     <div class="modal" id="modal-checkout">
+      <!-- Overlay tối phía sau modal - click để đóng -->
       <div class="modal__overlay" onclick="closeCheckoutModal()"></div>
+      
+      <!-- Nội dung chính của modal -->
       <div class="modal__body">
         <div class="auth-form">
+          <!-- Header modal với tiêu đề và nút hủy -->
           <div class="auth-form__header">
             <h3 class="auth-form__heading">Thanh Toán</h3>
             <span class="auth-form__switch-btn" onclick="closeCheckoutModal()">Hủy</span>
           </div>
 
+          <!-- Form nhập thông tin giao hàng -->
           <div class="auth-form__form">
+            <!-- Input họ tên -->
             <div class="auth-form__group">
               <label class="auth-form__label">Họ và tên:</label>
               <input type="text" class="auth-form__input" id="customer-name" placeholder="Nhập họ tên của bạn"/>
             </div>
+            <!-- Input số điện thoại -->
             <div class="auth-form__group">
               <label class="auth-form__label">Số điện thoại:</label>
               <input type="text" class="auth-form__input" id="customer-phone" placeholder="Nhập số điện thoại"/>
             </div>
+            <!-- Input địa chỉ -->
             <div class="auth-form__group">
               <label class="auth-form__label">Địa chỉ nhận hàng:</label>
               <input type="text" class="auth-form__input" id="customer-address" placeholder="Nhập địa chỉ nhận hàng"/>
             </div>
+            <!-- Hiển thị tổng tiền cần thanh toán -->
             <div style="margin-top: 20px; font-size: 1.4rem">
               Tổng tiền cần thanh toán:
               <span id="checkout-total-money" style="color: #ee4d2d; font-weight: bold; font-size: 1.6rem">0đ</span>
             </div>
           </div>
 
+          <!-- Nút điều khiển: Trở lại và Xác nhận -->
           <div class="auth-form__controls">
             <button class="btn auth-form__controls-back" onclick="closeCheckoutModal()">TRỞ LẠI</button>
+            <!-- Click xác nhận sẽ gọi API tạo đơn hàng -->
             <button class="btn btn--primary" onclick="confirmCheckout()">XÁC NHẬN ĐẶT HÀNG</button>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- ==============================================
+         JAVASCRIPT FILES
+         ==============================================
+         Thứ tự load quan trọng:
+         1. validation.js - Hàm validate form
+         2. main.js - Logic chung (header, auth, cart mini)
+         3. cart.js - Logic riêng cho trang giỏ hàng
+            - renderCart() - Hiển thị danh sách sản phẩm
+            - updateQuantity() - Thay đổi số lượng
+            - deleteItem() - Xóa sản phẩm
+            - processCheckout() - Mở modal đặt hàng
+            - confirmCheckout() - Gửi đơn hàng lên server
+    ============================================== -->
     <script src="./assets/js/validation.js"></script>
     <script src="./assets/js/main.js"></script>
     <script src="./assets/js/cart.js"></script>

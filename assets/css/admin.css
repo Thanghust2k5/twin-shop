@@ -1,12 +1,39 @@
+/* =========================================================
+   TWIN SHOP - ADMIN CSS
+   =========================================================
+   
+   File này chứa style cho trang ADMIN DASHBOARD:
+   
+   CẤU TRÚC:
+   1. CSS Variables - Biến màu, kích thước
+   2. Reset CSS - Box-sizing, font
+   3. Sidebar - Menu điều hướng bên trái
+   4. Main Content - Khu vực nội dung chính
+   5. Header - Tiêu đề tab
+   6. Cards - Thẻ thống kê
+   7. Charts - Biểu đồ
+   8. Tables - Bảng dữ liệu
+   9. Modals - Popup form
+   10. Chat - Giao diện chat admin
+   11. Invoice - Hóa đơn đơn hàng
+   
+   ========================================================= */
+
+/* =========================================================
+   1. CSS VARIABLES - Biến dùng chung
+   ========================================================= */
 :root {
-    --primary: #ee4d2d;
-    --primary-light: #fff5f1;
-    --bg: #f5f5f5;
+    --primary: #ee4d2d;           /* Màu cam chủ đạo */
+    --primary-light: #fff5f1;     /* Màu cam nhạt cho hover */
+    --bg: #f5f5f5;                /* Màu nền xám */
     --white: #fff;
     --text: #333;
-    --sidebar-width: 240px;
+    --sidebar-width: 240px;       /* Chiều rộng sidebar */
 }
 
+/* =========================================================
+   2. RESET CSS
+   ========================================================= */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -21,7 +48,9 @@ body {
     overflow: hidden;
 }
 
-/* SIDEBAR */
+/* =========================================================
+   3. SIDEBAR - Menu điều hướng bên trái
+   ========================================================= */
 .sidebar {
     width: var(--sidebar-width);
     background: #fff;

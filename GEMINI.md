@@ -1,54 +1,140 @@
 # GEMINI.md - Thang Shop
 
-## Project Overview
+## Tổng Quan Dự Án
 
-This is a full-stack e-commerce web application called "Thang Shop". It is built with a classic architecture using plain HTML, CSS, and JavaScript for the frontend, and a Node.js backend.
+Đây là ứng dụng web thương mại điện tử fullstack có tên **"Thang Shop"**.
+Website được xây dựng với kiến trúc truyền thống: Frontend dùng HTML, CSS, JavaScript thuần và Backend dùng Node.js.
 
-*   **Frontend:** The frontend consists of static HTML files (`index.html`, `cart.html`, `product-detail.html`, etc.) styled with CSS and made interactive with vanilla JavaScript. It communicates with the backend via REST APIs.
+### 🎨 Frontend (Giao diện người dùng)
 
-*   **Backend:** The backend is a Node.js server using the Express.js framework. It provides a comprehensive set of RESTful APIs to manage users, products, orders, carts, and more. It also handles file uploads for product images and user avatars.
+*   **Các trang HTML:** `index.html` (trang chủ), `cart.html` (giỏ hàng), `checkout.html` (thanh toán), `product-detail.html` (chi tiết sản phẩm), `user.html` (tài khoản), `admin.html` (quản trị)
+*   **CSS:** Styling cho website, responsive cho mobile
+*   **JavaScript:** Xử lý tương tác người dùng, gọi API đến backend
+*   **Thư mục:** `assets/css/`, `assets/js/`, `assets/img/`, `components/`
 
-*   **Database:** The application uses MySQL as its database. The complete schema and seed data are available in the `db.sql` file. The database is named `twin_shop`.
+### ⚙️ Backend (Server xử lý dữ liệu)
 
-## Building and Running
+*   **Framework:** Node.js + Express.js
+*   **API:** RESTful API quản lý users, products, orders, carts, categories, reviews, ...
+*   **Realtime:** Socket.io cho hệ thống chat giữa khách hàng và admin
+*   **Upload:** Xử lý upload ảnh sản phẩm và avatar người dùng
+*   **Thư mục:** `server/server.js`
 
-### 1. Database Setup
+### 🗄️ Database (Cơ sở dữ liệu)
 
-1.  Make sure you have a MySQL server running.
-2.  The application will connect to the database using the following credentials (can be overridden with environment variables `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`):
-    *   **Host:** `localhost`
-    *   **User:** `root`
-    *   **Password:** (empty)
-    *   **Database:** `twin_shop`
-3.  Import the `db.sql` file into your MySQL server to create the database, tables, and seed data.
-    ```sh
-    # Example command, you might need to use a GUI tool
-    mysql -u root < db.sql
-    ```
+*   **Hệ quản trị:** MySQL trên Aiven Cloud
+*   **Host:** `twin-shop-db-t-winshop.i.aivencloud.com:27859`
+*   **Database:** `twin_shop`
+*   **Seed data:** `server/seed.js`, `server/seed-reviews.js`
 
-### 2. Install Dependencies
+### 🚀 Deployment (Triển khai)
 
-Install the required Node.js packages.
+*   **Hosting:** Render.com (Web Service)
+*   **URL:** https://thang-shop.onrender.com
+*   **Database:** Aiven MySQL (Cloud database miễn phí)
+
+---
+
+## Cấu Trúc Thư Mục
+
+```
+thang-shop/
+├── 📄 HTML Pages (Các trang)
+│   ├── index.html          # Trang chủ - Danh sách sản phẩm
+│   ├── cart.html           # Giỏ hàng
+│   ├── checkout.html       # Thanh toán
+│   ├── product-detail.html # Chi tiết sản phẩm
+│   ├── user.html           # Tài khoản người dùng
+│   └── admin.html          # Trang quản trị
+│
+├── 📁 assets/              # Tài nguyên tĩnh
+│   ├── css/                # File CSS styling
+│   ├── js/                 # File JavaScript logic
+│   ├── img/                # Hình ảnh (products, avatars)
+│   └── fonts/              # Font icons (FontAwesome)
+│
+├── 📁 components/          # Component HTML dùng chung
+│   ├── header.html         # Header navigation
+│   └── footer.html         # Footer
+│
+├── 📁 server/              # Backend
+│   ├── server.js           # Express server + API + Socket.io
+│   ├── seed.js             # Seed data sản phẩm/danh mục
+│   └── seed-reviews.js     # Seed data đánh giá
+│
+├── package.json            # Cấu hình npm dependencies
+└── GEMINI.md               # File tài liệu này
+```
+
+---
+
+## Hướng Dẫn Chạy Dự Án
+
+### 1. Cài đặt Dependencies
+
+Cài đặt các package Node.js cần thiết:
 
 ```sh
 npm install
 ```
 
-### 3. Run the Server
+### 2. Cấu hình Database
 
-Start the backend server. There is no `start` script in `package.json`, so you must run the server file directly. The server will run at `http://localhost:3000`.
+Tạo file `.env` hoặc set environment variables:
 
 ```sh
+DB_HOST=twin-shop-db-t-winshop.i.aivencloud.com
+DB_PORT=27859
+DB_USER=avnadmin
+DB_PASSWORD=<password>
+DB_NAME=twin_shop
+```
+
+### 3. Chạy Server
+
+Khởi động server (mặc định chạy ở cổng 3000):
+
+```sh
+npm start
+# hoặc
 node server/server.js
 ```
 
-### 4. Access the Application
+### 4. Truy cập Website
 
-Open your web browser and navigate to `http://localhost:3000`.
+Mở trình duyệt và truy cập:
+- **Local:** http://localhost:3000
+- **Production:** https://thang-shop.onrender.com
 
-## Development Conventions
+---
 
-*   **API:** The backend provides a RESTful API. The routes are defined in `server/server.js`.
-*   **Static Files:** All frontend assets (HTML, CSS, JS, images) are served statically from the project root directory.
-*   **Database Management:** The `db.sql` file is the source of truth for the database schema. Any changes to the database structure should be reflected there.
-*   **Dependencies:** Backend dependencies are managed with `npm` and defined in `package.json`. There are no frontend-specific package management tools used.
+## Quy Ước Phát Triển
+
+### API Endpoints
+
+*   **Users:** `/api/users`, `/api/login`, `/api/register`
+*   **Products:** `/api/products`, `/api/products/:id`
+*   **Categories:** `/api/categories`
+*   **Cart:** `/api/cart/:userId`
+*   **Orders:** `/api/orders`
+*   **Reviews:** `/api/reviews`
+*   **Upload:** `/api/upload`
+
+### Static Files
+
+Tất cả file frontend (HTML, CSS, JS, images) được serve từ thư mục gốc dự án.
+
+### Socket.io Events
+
+*   `chat-message`: Gửi tin nhắn chat
+*   `join-room`: Tham gia phòng chat
+*   `admin-join`: Admin tham gia phòng chat
+
+### Dependencies
+
+*   **express:** Web framework
+*   **mysql2:** MySQL driver
+*   **socket.io:** Realtime communication
+*   **multer:** File upload handling
+*   **cors:** Cross-origin resource sharing
+*   **dotenv:** Environment variables

@@ -1,32 +1,47 @@
 // =========================================================
 // TWIN SHOP - CHAT WIDGET
 // Chat tự động + Realtime với Admin
+// 
+// CHỨC NĂNG:
+// 1. Tạo giao diện chat widget (nút nổi góc phải dưới)
+// 2. Kết nối Socket.io để chat realtime
+// 3. Gửi/Nhận tin nhắn với server
+// 4. Hiển thị badge thông báo khi có tin mới
+//
+// FLOW:
+// - User click nút chat -> Mở box chat
+// - Kết nối socket, gửi event "customer:start"
+// - Server trả về tin nhắn qua event "chat:message"
 // =========================================================
 
 const ChatWidget = {
-    socket: null,
-    isOpen: false,
-    isConnected: false,
-    user: null,
-    initialized: false,
+    socket: null,           // Socket.io instance
+    isOpen: false,          // Trạng thái đóng/mở chat box
+    isConnected: false,     // Đã kết nối socket chưa
+    user: null,             // Thông tin user (id, name)
+    initialized: false,     // Đã khởi tạo widget chưa
 
     // Khởi tạo chat widget
+    // Chỉ chạy 1 lần, tạo giao diện và gắn sự kiện
     init() {
-        // Chỉ khởi tạo 1 lần
+        // Kiểm tra để không khởi tạo 2 lần
         if (this.initialized || document.getElementById("chat-widget")) return;
         this.initialized = true;
         
-        this.createWidget();
-        this.bindEvents();
-        this.loadUser();
+        this.createWidget();   // Tạo HTML cho chat widget
+        this.bindEvents();     // Gắn event click
+        this.loadUser();       // Lấy thông tin user đăng nhập
     },
 
     // Lấy thông tin user từ localStorage
+    // Nếu đã đăng nhập: Lấy id và full_name
+    // Nếu chưa: Đặt tên là "Khách"
     loadUser() {
         const userStr = localStorage.getItem("user_login");
         if (userStr && userStr !== "undefined") {
             try {
                 const parsed = JSON.parse(userStr);
+                // Lấy full_name từ user object để hiển thị đúng tên
                 this.user = {
                     id: parsed.id,
                     name: parsed.full_name || parsed.name || "Khách"

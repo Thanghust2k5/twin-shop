@@ -1,17 +1,84 @@
+<!-- 
+===================================================================================
+   USER.HTML - TRANG QUẢN LÝ TÀI KHOẢN NGƯỜI DÙNG
+===================================================================================
+   
+   MỤC ĐÍCH:
+   Trang cá nhân của người dùng đã đăng nhập.
+   Cho phép:
+   - Xem và chỉnh sửa thông tin hồ sơ
+   - Xem danh sách đơn hàng đã đặt
+   - Xem chi tiết đơn hàng + hủy đơn nếu cần
+
+   QUYỀN TRUY CẬP:
+   - Chỉ user đã đăng nhập mới xem được
+   - Nếu chưa đăng nhập → redirect về index.html
+
+   CẤU TRÚC TRANG:
+   ┌──────────────────────────────────────────────────────┐
+   │  HEADER (load từ header.html)                         │
+   ├──────────────────────────────────────────────────────┤
+   │  ┌─────────────┬─────────────────────────────────┐   │
+   │  │   SIDEBAR   │      MAIN CONTENT               │   │
+   │  │             │                                 │   │
+   │  │  - Avatar   │  TAB 1: HỒ SƠ (view-profile)    │   │
+   │  │  - Tên user │  - Username                     │   │
+   │  │             │  - Họ tên                       │   │
+   │  │  MENU:      │  - Email, SĐT                   │   │
+   │  │  - Tài khoản│  - Giới tính, ngày sinh         │   │
+   │  │  - Đơn mua  │  - Avatar upload                │   │
+   │  │  - Thông báo│                                 │   │
+   │  │  - Voucher  │  TAB 2: ĐƠN MUA (view-orders)   │   │
+   │  │             │  - Tabs: Tất cả/Chờ/Ship/Done   │   │
+   │  │             │  - Danh sách đơn hàng           │   │
+   │  │             │  - Chi tiết đơn hàng            │   │
+   │  └─────────────┴─────────────────────────────────┘   │
+   ├──────────────────────────────────────────────────────┤
+   │  FOOTER                                               │
+   └──────────────────────────────────────────────────────┘
+
+   MODALS:
+   - modal-change-email: Đổi email
+   - modal-change-phone: Đổi số điện thoại  
+   - modal-change-birthday: Đổi ngày sinh
+   - modal-cancel-order: Chọn lý do hủy đơn
+
+   FILES LIÊN QUAN:
+   - user.css: Style riêng cho trang này
+   - user.js: Logic xử lý profile và orders
+   - main.js: Logic chung
+=================================================================================== 
+-->
 <!DOCTYPE html>
 <html lang="vi">
   <head>
+    <!-- ==============================================
+         META TAGS VÀ CSS
+         ==============================================
+    -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quản lý tài khoản - T-Win Shop</title>
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="./assets/img/logo_favicon.png" />
+    
+    <!-- CSS Files -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
-    <link rel="stylesheet" href="./assets/css/base.css" />
-    <link rel="stylesheet" href="./assets/css/main.css" />
-    <link rel="stylesheet" href="./assets/css/user.css" />
+    <link rel="stylesheet" href="./assets/css/base.css" />  <!-- CSS reset + variables -->
+    <link rel="stylesheet" href="./assets/css/main.css" />  <!-- CSS chung toàn site -->
+    <link rel="stylesheet" href="./assets/css/user.css" />  <!-- CSS riêng trang user -->
     <link rel="stylesheet" href="./assets/css/responsive.css" />
     <link rel="stylesheet" href="./assets/fonts/fontawesome-free-7.1.0/css/all.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    
+    <!-- ==============================================
+         INLINE CSS CHO TAB SWITCHING
+         ==============================================
+         Cơ chế chuyển tab đơn giản:
+         - Mặc định ẩn tất cả: display: none
+         - Class .active sẽ hiển thị: display: block
+    ============================================== -->
     <style>
         /* CSS hỗ trợ chuyển tab */
         .tab-content { display: none; } /* Mặc định ẩn hết */
@@ -21,14 +88,28 @@
   </head>
   <body>
     <div class="app">
+      <!-- Placeholder load header.html -->
       <div id="header-placeholder"></div>
       
+      <!-- ==============================================
+           PHẦN NỘI DUNG CHÍNH
+           ==============================================
+           Layout 2 cột: Sidebar (2 cột) + Main content (10 cột)
+      -->
       <div class="app__container order-container" style="background-color: #f5f5f5; padding-top: 20px">
         <div class="grid">
           <div class="grid__row">
             
+            <!-- ==============================================
+                 SIDEBAR BÊN TRÁI
+                 ==============================================
+                 Hiển thị:
+                 - Avatar + tên user
+                 - Menu điều hướng các tab
+            ============================================== -->
             <div class="grid__column-2">
               <div class="user-sidebar">
+                <!-- Thông tin user: avatar + tên -->
                 <div class="user-info">
                   <img src="" alt="" class="user-avatar-small" id="sidebar-avatar" />
                   <div class="user-meta">
@@ -36,10 +117,12 @@
                   </div>
                 </div>
                 
+                <!-- Menu item: Tài khoản của tôi -->
                 <div class="user-menu-item" id="menu-profile" onclick="switchTab('profile')">
                     <i class="fa-regular fa-user user-menu-icon" style="color: #0055aa;"></i> 
                     <span style="color: #333;">Tài Khoản Của Tôi</span>
                 </div>
+                <!-- Submenu của Tài khoản -->
                 <div class="user-submenu" id="submenu-profile">
                     <a href="javascript:void(0)" class="user-submenu-item active" onclick="switchTab('profile')">Hồ Sơ</a>
                     <a href="#" class="user-submenu-item">Ngân Hàng</a>
@@ -47,16 +130,19 @@
                     <a href="#" class="user-submenu-item">Đổi Mật Khẩu</a>
                 </div>
                 
+                <!-- Menu item: Đơn mua -->
                 <div class="user-menu-item" id="menu-orders" onclick="switchTab('orders')">
                     <i class="fa-regular fa-file-lines user-menu-icon" style="color: #0055aa;"></i> 
                     <span style="color: #333;">Đơn Mua</span>
                 </div>
                 
+                <!-- Menu item: Thông báo -->
                 <div class="user-menu-item">
                     <i class="fa-regular fa-bell user-menu-icon" style="color: #ee4d2d;"></i> 
                     <span style="color: #333;">Thông Báo</span>
                 </div>
                 
+                <!-- Menu item: Kho voucher -->
                 <div class="user-menu-item">
                     <i class="fa-solid fa-ticket user-menu-icon" style="color: #ee4d2d;"></i> 
                     <span style="color: #333;">Kho Voucher</span>
@@ -64,26 +150,48 @@
               </div>
             </div>
 
+            <!-- ==============================================
+                 MAIN CONTENT BÊN PHẢI
+                 ==============================================
+                 Chứa các tab content, chỉ 1 tab hiện tại một thời điểm
+            ============================================== -->
             <div class="grid__column-10">    
+                
+                <!-- ==============================================
+                     TAB 1: HỒ SƠ CÁ NHÂN (view-profile)
+                     ==============================================
+                     Hiển thị và cho phép chỉnh sửa thông tin user:
+                     - Username (chỉ xem)
+                     - Họ tên (có thể sửa)
+                     - Email, SĐT, Ngày sinh (sửa qua modal)
+                     - Giới tính (radio buttons)
+                     - Upload avatar
+                ============================================== -->
                 <div id="view-profile" class="tab-content active">
                     <div class="profile-content">
+                        <!-- Header -->
                         <div class="profile-header">
                             <h1 class="profile-header__title">Hồ Sơ Của Tôi</h1>
                             <div class="profile-header__subtitle">Quản lý thông tin hồ sơ để bảo mật tài khoản</div>
                         </div>
                         
+                        <!-- Body: Form + Avatar -->
                         <div class="profile-body">
+                            <!-- Form thông tin bên trái -->
                             <div class="profile-form">
+                                <!-- Username - chỉ xem, không sửa được -->
                                 <div class="profile-form__group">
                                     <div class="profile-form__label">Tên đăng nhập</div>
                                     <div class="profile-form__text-display" id="display-username">...</div>
                                 </div>
 
+                                <!-- Họ tên - có thể sửa trực tiếp -->
                                 <div class="profile-form__group">
                                     <div class="profile-form__label">Tên</div>
                                     <input type="text" class="profile-form__input" id="input-fullname" value=""/>
                                 </div>
 
+                                <!-- Email - click "Thay Đổi" mở modal -->
                                 <div class="profile-form__group">
                                     <div class="profile-form__label">Email</div>
                                     <div class="profile-form__text-display">
@@ -92,6 +200,7 @@
                                     </div>
                                 </div>
 
+                                <!-- Số điện thoại - click "Thay Đổi" mở modal -->
                                 <div class="profile-form__group">
                                     <div class="profile-form__label">Số điện thoại</div>
                                     <div class="profile-form__text-display">
@@ -100,6 +209,7 @@
                                     </div>
                                 </div>
 
+                                <!-- Giới tính - radio buttons -->
                                 <div class="profile-form__group">
                                     <div class="profile-form__label">Giới tính</div>
                                     <div class="profile-form__radio-group">
@@ -109,6 +219,7 @@
                                     </div>
                                 </div>
 
+                                <!-- Ngày sinh - click "Thay Đổi" mở modal -->
                                 <div class="profile-form__group">
                                     <div class="profile-form__label">Ngày sinh</div>
                                     <div class="profile-form__text-display">
@@ -117,20 +228,26 @@
                                     </div>
                                 </div>
 
+                                <!-- Nút lưu thông tin -->
                                 <button class="btn btn--primary profile-btn-save" onclick="saveMainProfile()">Lưu</button>
                             </div>
 
+                           <!-- Phần upload avatar bên phải -->
                            <div class="profile-avatar-upload">
+                                <!-- Preview ảnh đại diện -->
                                 <img src="" alt="" class="profile-avatar-preview" id="preview-avatar"/>
                                 
+                                <!-- Input file ẩn -->
                                 <input type="file" id="input-avatar-file" accept="image/*" hidden />
                                 
+                                <!-- Nút chọn ảnh - trigger input file -->
                                 <button class="btn btn--normal btn--sm" 
                                         style="background:#fff; border:1px solid #ddd;"
                                         onclick="document.getElementById('input-avatar-file').click()">
                                     Chọn Ảnh
                                 </button>
                                 
+                                <!-- Hướng dẫn format ảnh -->
                                 <div class="profile-avatar-desc">
                                     Dụng lượng file tối đa 1 MB<br />Định dạng:.JPEG, .PNG
                                 </div>
@@ -139,8 +256,19 @@
                     </div>
                 </div>
 
+                <!-- ==============================================
+                     TAB 2: ĐƠN MUA (view-orders)
+                     ==============================================
+                     Hiển thị danh sách đơn hàng của user
+                     Có 2 view:
+                     - order-list-view: Danh sách đơn hàng
+                     - order-detail-view: Chi tiết 1 đơn hàng
+                ============================================== -->
                 <div id="view-orders" class="tab-content">
+                  
+                  <!-- VIEW 1: Danh sách đơn hàng -->
                   <div id="order-list-view">
+                      <!-- Tabs lọc theo trạng thái đơn hàng -->
                       <div class="order-tabs">
                         <div class="order-tab-item active" onclick="filterOrder('all', this)">Tất cả</div>
                         <div class="order-tab-item" onclick="filterOrder('pending', this)">Chờ xác nhận</div>
@@ -148,6 +276,8 @@
                         <div class="order-tab-item" onclick="filterOrder('completed', this)">Hoàn thành</div>
                         <div class="order-tab-item" onclick="filterOrder('cancelled', this)">Đã hủy</div>
                       </div>
+                      
+                      <!-- Container render danh sách đơn hàng -->
                       <div class="order-list-panel" id="my-order-list">
                         <div style="text-align: center; padding: 50px; font-size: 1.6rem; color: #777;">
                           <i class="fa-solid fa-spinner fa-spin"></i> Đang tải đơn hàng...
@@ -155,7 +285,9 @@
                       </div>
                   </div>
 
+                  <!-- VIEW 2: Chi tiết đơn hàng -->
                   <div id="order-detail-view" class="detail-page" style="display: none;">
+                      <!-- Header: Nút quay lại + Mã đơn + Trạng thái -->
                       <div class="detail-header-top">
                           <div class="btn-back-link" onclick="backToOrderList()">
                               <i class="fa-solid fa-chevron-left" style="margin-right: 5px;"></i> TRỞ LẠI
@@ -165,15 +297,24 @@
                               <span class="order-status-label" id="detail-order-status">...</span>
                           </div>
                       </div>
+                      
+                      <!-- Stepper: Timeline trạng thái đơn hàng -->
+                      <!-- Đặt hàng → Thanh toán → Vận chuyển → Giao hàng -->
                       <div class="stepper-container">
                           <div class="stepper"> <div class="stepper-line-bg"></div> <div class="stepper-line-active" id="stepper-line" style="width: 0%"></div> <div class="step-item" id="step-1"> <div class="step-icon"><i class="fa-solid fa-file-invoice"></i></div> <div class="step-label">Đơn Hàng Đã Đặt</div> <div class="step-date" id="date-step-1">...</div> </div> <div class="step-item" id="step-2"> <div class="step-icon"><i class="fa-solid fa-money-bill-wave"></i></div> <div class="step-label">Đã Thanh Toán</div> <div class="step-date" id="date-step-2">...</div> </div> <div class="step-item" id="step-3"> <div class="step-icon"><i class="fa-solid fa-truck"></i></div> <div class="step-label">Đang Vận Chuyển</div> <div class="step-date" id="date-step-3">...</div> </div> <div class="step-item" id="step-4"> <div class="step-icon"><i class="fa-solid fa-box-open"></i></div> <div class="step-label">Đã Giao Hàng</div> <div class="step-date" id="date-step-4">...</div> </div> </div>
                       </div>
+                      
+                      <!-- Địa chỉ nhận hàng -->
                       <div class="address-section">
                           <div class="section-title">Địa Chỉ Nhận Hàng</div>
                           <div><span class="addr-name" id="detail-name">...</span><span class="addr-phone" id="detail-phone">...</span></div>
                           <div class="addr-detail" id="detail-address">...</div>
                       </div>
+                      
+                      <!-- Container render danh sách sản phẩm trong đơn -->
                       <div id="detail-product-list"></div>
+                      
+                      <!-- Bảng tổng kết thanh toán -->
                       <table class="payment-table">
                           <tr><td>Tổng tiền hàng</td><td id="detail-subtotal">0₫</td></tr>
                           <tr><td>Phí vận chuyển</td><td id="detail-shipping">0₫</td></tr>
@@ -181,6 +322,8 @@
                           <tr class="total-row"><td>Thành tiền</td><td class="total-amount" id="detail-total">0₫</td></tr>
                           <tr><td>Phương thức thanh toán</td><td id="detail-payment-method">...</td></tr>
                       </table>
+                      
+                      <!-- Nút hành động (Hủy đơn, Mua lại, etc.) -->
                       <div class="detail-actions" id="detail-actions-buttons"></div>
                   </div>
               </div>
@@ -188,108 +331,159 @@
           </div>
         </div>
       </div>
+      
+      <!-- Placeholder cho footer -->
+      <!-- Placeholder cho footer -->
       <div id="footer-placeholder"></div>
     </div>
 
+    <!-- ==============================================
+         CÁC MODALS
+         ==============================================
+         Popups để thay đổi thông tin cá nhân và hủy đơn
+    -->
     
-        <div class="modal" id="modal-change-email">
-            <div class="modal__overlay" onclick="closeProfileModal('email')"></div>
-            <div class="modal-change-body">
-                <div class="modal-change-header">Thay đổi Email</div>
-                <div class="modal-change-content">
-                    <div class="modal-input-group auth-form__input-wrap">
-                        <input type="email" id="input-new-email" class="auth-form__input" placeholder="Nhập địa chỉ Email mới" />
-                    </div>
-                </div>
-                <div class="modal-change-footer">
-                    <button class="btn btn--normal" onclick="closeProfileModal('email')">Hủy</button>
-                    <button class="btn btn--primary" onclick="confirmChange('email')">Lưu</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal" id="modal-change-phone">
-            <div class="modal__overlay" onclick="closeProfileModal('phone')"></div>
-            <div class="modal-change-body">
-                <div class="modal-change-header">Thay đổi Số điện thoại</div>
-                <div class="modal-change-content">
-                    <div class="modal-input-group auth-form__input-wrap">
-                        <input type="text" id="input-new-phone" class="auth-form__input" placeholder="Nhập số điện thoại mới" />
-                    </div>
-                </div>
-                <div class="modal-change-footer">
-                    <button class="btn btn--normal" onclick="closeProfileModal('phone')">Hủy</button>
-                    <button class="btn btn--primary" onclick="confirmChange('phone')">Lưu</button>
+    <!-- ==============================================
+         MODAL 1: ĐỔI EMAIL
+         ==============================================
+    -->
+    <div class="modal" id="modal-change-email">
+        <div class="modal__overlay" onclick="closeProfileModal('email')"></div>
+        <div class="modal-change-body">
+            <div class="modal-change-header">Thay đổi Email</div>
+            <div class="modal-change-content">
+                <div class="modal-input-group auth-form__input-wrap">
+                    <input type="email" id="input-new-email" class="auth-form__input" placeholder="Nhập địa chỉ Email mới" />
                 </div>
             </div>
-        </div>
-
-        <div class="modal" id="modal-change-birthday">
-            <div class="modal__overlay" onclick="closeProfileModal('birthday')"></div>
-            <div class="modal-change-body">
-                <div class="modal-change-header">Thay đổi Ngày sinh</div>
-                <div class="modal-change-content">
-                    <div class="birthday-select-group">
-                        <select id="select-day" class="birthday-select"><option value="0">Ngày</option></select>
-                        <select id="select-month" class="birthday-select"><option value="0">Tháng</option></select>
-                        <select id="select-year" class="birthday-select"><option value="0">Năm</option></select>
-                    </div>
-                </div>
-                <div class="modal-change-footer">
-                    <button class="btn btn--normal" onclick="closeProfileModal('birthday')">Hủy</button>
-                    <button class="btn btn--primary" onclick="confirmChange('birthday')">Lưu</button>
-                </div>
+            <div class="modal-change-footer">
+                <button class="btn btn--normal" onclick="closeProfileModal('email')">Hủy</button>
+                <button class="btn btn--primary" onclick="confirmChange('email')">Lưu</button>
             </div>
         </div>
+    </div>
 
-        <!-- Modal Lý Do Hủy Đơn Hàng -->
-        <div class="modal" id="modal-cancel-order">
-            <div class="modal__overlay" onclick="closeCancelModal()"></div>
-            <div class="modal-cancel-body">
-                <div class="modal-cancel-header">Chọn Lý Do Hủy</div>
-                <div class="modal-cancel-warning">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <span>Vui lòng chọn lí do hủy đơn hàng. Lưu ý: Thao tác này sẽ hủy tất cả các sản phẩm có trong đơn hàng và không thể hoàn tác.</span>
-                </div>
-                <div class="modal-cancel-options">
-                    <label class="cancel-option">
-                        <input type="radio" name="cancel-reason" value="Muốn thay đổi địa chỉ giao hàng" />
-                        <span>Muốn thay đổi địa chỉ giao hàng</span>
-                    </label>
-                    <label class="cancel-option">
-                        <input type="radio" name="cancel-reason" value="Muốn nhập/thay đổi mã Voucher" />
-                        <span>Muốn nhập/thay đổi mã Voucher</span>
-                    </label>
-                    <label class="cancel-option">
-                        <input type="radio" name="cancel-reason" value="Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc, số lượng,...)" />
-                        <span>Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc, số lượng,...)</span>
-                    </label>
-                    <label class="cancel-option">
-                        <input type="radio" name="cancel-reason" value="Thủ tục thanh toán quá rắc rối" />
-                        <span>Thủ tục thanh toán quá rắc rối</span>
-                    </label>
-                    <label class="cancel-option">
-                        <input type="radio" name="cancel-reason" value="Tìm thấy giá rẻ hơn ở chỗ khác" />
-                        <span>Tìm thấy giá rẻ hơn ở chỗ khác</span>
-                    </label>
-                    <label class="cancel-option">
-                        <input type="radio" name="cancel-reason" value="Đổi ý, không muốn mua nữa" />
-                        <span>Đổi ý, không muốn mua nữa</span>
-                    </label>
-                    <label class="cancel-option">
-                        <input type="radio" name="cancel-reason" value="other" />
-                        <span>Khác</span>
-                    </label>
-                    <textarea id="cancel-reason-other" class="cancel-reason-textarea" placeholder="Nhập lý do khác..." style="display: none;"></textarea>
-                </div>
-                <input type="hidden" id="cancel-order-id" value="" />
-                <div class="modal-cancel-footer">
-                    <button class="btn btn--normal" onclick="closeCancelModal()">KHÔNG PHẢI BÂY GIỜ</button>
-                    <button class="btn btn--primary btn-cancel-confirm" onclick="confirmCancelOrder()">HỦY ĐƠN HÀNG</button>
+    <!-- ==============================================
+         MODAL 2: ĐỔI SỐ ĐIỆN THOẠI
+         ==============================================
+    -->
+    <div class="modal" id="modal-change-phone">
+        <div class="modal__overlay" onclick="closeProfileModal('phone')"></div>
+        <div class="modal-change-body">
+            <div class="modal-change-header">Thay đổi Số điện thoại</div>
+            <div class="modal-change-content">
+                <div class="modal-input-group auth-form__input-wrap">
+                    <input type="text" id="input-new-phone" class="auth-form__input" placeholder="Nhập số điện thoại mới" />
                 </div>
             </div>
+            <div class="modal-change-footer">
+                <button class="btn btn--normal" onclick="closeProfileModal('phone')">Hủy</button>
+                <button class="btn btn--primary" onclick="confirmChange('phone')">Lưu</button>
+            </div>
         </div>
+    </div>
 
+    <!-- ==============================================
+         MODAL 3: ĐỔI NGÀY SINH
+         ==============================================
+         Sử dụng 3 dropdown: Ngày, Tháng, Năm
+    -->
+    <div class="modal" id="modal-change-birthday">
+        <div class="modal__overlay" onclick="closeProfileModal('birthday')"></div>
+        <div class="modal-change-body">
+            <div class="modal-change-header">Thay đổi Ngày sinh</div>
+            <div class="modal-change-content">
+                <div class="birthday-select-group">
+                    <select id="select-day" class="birthday-select"><option value="0">Ngày</option></select>
+                    <select id="select-month" class="birthday-select"><option value="0">Tháng</option></select>
+                    <select id="select-year" class="birthday-select"><option value="0">Năm</option></select>
+                </div>
+            </div>
+            <div class="modal-change-footer">
+                <button class="btn btn--normal" onclick="closeProfileModal('birthday')">Hủy</button>
+                <button class="btn btn--primary" onclick="confirmChange('birthday')">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         MODAL 4: HỦY ĐƠN HÀNG
+         ==============================================
+         Hiển thị các lý do hủy đơn cho user chọn
+         Có option "Khác" để nhập lý do tùy chỉnh
+    -->
+    <div class="modal" id="modal-cancel-order">
+        <div class="modal__overlay" onclick="closeCancelModal()"></div>
+        <div class="modal-cancel-body">
+            <div class="modal-cancel-header">Chọn Lý Do Hủy</div>
+            
+            <!-- Cảnh báo về việc hủy đơn -->
+            <div class="modal-cancel-warning">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>Vui lòng chọn lí do hủy đơn hàng. Lưu ý: Thao tác này sẽ hủy tất cả các sản phẩm có trong đơn hàng và không thể hoàn tác.</span>
+            </div>
+            
+            <!-- Danh sách các lý do hủy -->
+            <div class="modal-cancel-options">
+                <label class="cancel-option">
+                    <input type="radio" name="cancel-reason" value="Muốn thay đổi địa chỉ giao hàng" />
+                    <span>Muốn thay đổi địa chỉ giao hàng</span>
+                </label>
+                <label class="cancel-option">
+                    <input type="radio" name="cancel-reason" value="Muốn nhập/thay đổi mã Voucher" />
+                    <span>Muốn nhập/thay đổi mã Voucher</span>
+                </label>
+                <label class="cancel-option">
+                    <input type="radio" name="cancel-reason" value="Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc, số lượng,...)" />
+                    <span>Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc, số lượng,...)</span>
+                </label>
+                <label class="cancel-option">
+                    <input type="radio" name="cancel-reason" value="Thủ tục thanh toán quá rắc rối" />
+                    <span>Thủ tục thanh toán quá rắc rối</span>
+                </label>
+                <label class="cancel-option">
+                    <input type="radio" name="cancel-reason" value="Tìm thấy giá rẻ hơn ở chỗ khác" />
+                    <span>Tìm thấy giá rẻ hơn ở chỗ khác</span>
+                </label>
+                <label class="cancel-option">
+                    <input type="radio" name="cancel-reason" value="Đổi ý, không muốn mua nữa" />
+                    <span>Đổi ý, không muốn mua nữa</span>
+                </label>
+                <!-- Option "Khác" - hiện textarea khi chọn -->
+                <label class="cancel-option">
+                    <input type="radio" name="cancel-reason" value="other" />
+                    <span>Khác</span>
+                </label>
+                <!-- Textarea nhập lý do khác (ẩn mặc định) -->
+                <textarea id="cancel-reason-other" class="cancel-reason-textarea" placeholder="Nhập lý do khác..." style="display: none;"></textarea>
+            </div>
+            
+            <!-- Hidden input lưu order_id để hủy -->
+            <input type="hidden" id="cancel-order-id" value="" />
+            
+            <!-- Nút điều khiển -->
+            <div class="modal-cancel-footer">
+                <button class="btn btn--normal" onclick="closeCancelModal()">KHÔNG PHẢI BÂY GIỜ</button>
+                <!-- Click gọi confirmCancelOrder() → PUT /orders/:id/cancel -->
+                <button class="btn btn--primary btn-cancel-confirm" onclick="confirmCancelOrder()">HỦY ĐƠN HÀNG</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         JAVASCRIPT FILES
+         ==============================================
+         Thứ tự load:
+         1. validation.js - Hàm validate input
+         2. main.js - Logic chung (auth, header)
+         3. user.js - Logic riêng trang user:
+            - loadProfile() - Load thông tin user
+            - saveMainProfile() - Lưu thông tin
+            - switchTab() - Chuyển tab
+            - loadMyOrders() - Load đơn hàng
+            - showOrderDetail() - Xem chi tiết đơn
+            - confirmCancelOrder() - Hủy đơn hàng
+    ============================================== -->
     <script src="./assets/js/validation.js"></script>
     <script src="./assets/js/main.js"></script>
     <script src="./assets/js/user.js"></script> 

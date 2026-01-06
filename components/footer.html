@@ -1,6 +1,40 @@
+<!-- 
+=========================================================
+TWIN SHOP - FOOTER COMPONENT
+=========================================================
+
+Đây là component FOOTER chung cho tất cả các trang.
+Được load vào #footer-placeholder bằng JavaScript (main.js)
+
+CẤU TRÚC:
+1. FOOTER MAIN - 5 cột thông tin
+   - Dịch vụ khách hàng (links)
+   - Về Shopee (links)
+   - Thanh toán + Vận chuyển (icons)
+   - Theo dõi (social links)
+   - Tải ứng dụng (QR + store links)
+
+2. FOOTER BOTTOM
+   - Copyright
+   - Danh sách quốc gia
+
+3. FOOTER POLICY
+   - Links chính sách
+   - Chứng nhận đăng ký
+   - Thông tin công ty
+
+4. MODAL (trong footer.html vì cần ở mọi trang)
+   - Form đăng ký
+   - Form đăng nhập
+   - Form đăng nhập admin
+=========================================================
+-->
+
 <footer class="footer">
   <div class="grid">
     <div class="grid__row">
+    
+      <!-- ========== CỘT 1: Dịch vụ khách hàng ========== -->
       <div class="grid__column-2-4">
         <h3 class="footer__heading">DỊCH VỤ KHÁCH HÀNG</h3>
         <ul class="footer-list">
@@ -39,6 +73,8 @@
           </li>
         </ul>
       </div>
+      
+      <!-- ========== CỘT 2: Về T-Win Shop ========== -->
       <div class="grid__column-2-4">
         <h3 class="footer__heading">SHOPEE VIỆT NAM</h3>
         <ul class="footer-list">
@@ -71,6 +107,10 @@
           </li>
         </ul>
       </div>
+      
+      <!-- ========== CỘT 3: Thanh toán & Vận chuyển ========== 
+           Hiển thị icons các phương thức thanh toán và đơn vị vận chuyển
+           Dùng background-image thay vì img để dễ control size -->
       <div class="grid__column-2-4">
         <h3 class="footer__heading">THANH TOÁN</h3>
         <ul class="footer-list footer__pay-ship">
@@ -182,6 +222,8 @@
           </li>
         </ul>
       </div>
+      
+      <!-- ========== CỘT 4: Theo dõi - Social Links ========== -->
       <div class="grid__column-2-4">
         <h3 class="footer__heading">THEO DÕI SHOPEE</h3>
         <ul class="footer-list">
@@ -205,6 +247,9 @@
           </li>
         </ul>
       </div>
+      
+      <!-- ========== CỘT 5: Tải ứng dụng ========== 
+           QR code + Links download từ App Store & Google Play -->
       <div class="grid__column-2-4">
         <h3 class="footer__heading">TẢI ỨNG DỤNG SHOPEE</h3>
         <div class="footer__download">
@@ -234,6 +279,7 @@
     </div>
   </div>
 
+  <!-- ========== FOOTER BOTTOM: Copyright & Quốc gia ========== -->
   <div class="footer__bottom">
     <p class="footer__text">© 2025 Shopee. Tất cả các quyền được bảo lưu.</p>
     <div class="footer__countries">
@@ -262,6 +308,8 @@
     </div>
   </div>
 
+  <!-- ========== FOOTER POLICY SECTION ========== 
+       Chính sách, chứng nhận, thông tin công ty -->
   <div class="grid__row footer__policy-section">
     <ul class="footer__policy-list">
       <li class="footer__policy-item">
@@ -321,127 +369,154 @@
   </div>
 </footer>
 
-<!-- Modal -->
-    <div class="modal">
-        <div class="modal__overlay"></div>
+<!-- 
+=========================================================
+MODAL - FORM ĐĂNG KÝ / ĐĂNG NHẬP
+=========================================================
+
+CÁCH HOẠT ĐỘNG:
+1. Modal mặc định ẩn (display: none trong CSS)
+2. Khi click "Đăng ký/Đăng nhập" → JS gọi openModal()
+3. openModal() thêm class .modal--open → hiện modal
+4. Click overlay hoặc nút "Trở lại" → closeModal() ẩn modal
+
+CÓ 3 FORM:
+- register-form: Đăng ký tài khoản mới (hiện mặc định)
+- login-form: Đăng nhập (ẩn, show khi click "Đăng nhập")
+- admin-login-form: Đăng nhập admin (show khi click "Kênh người bán")
+
+SWITCH FORM:
+- #switch-to-login: Click → ẩn register, hiện login
+- #switch-to-register: Click → ẩn login, hiện register
+=========================================================
+-->
+<div class="modal">
+    <!-- Overlay - Nền mờ đen, click để đóng modal -->
+    <div class="modal__overlay"></div>
+    
+    <div class="modal__body">
+        <div class="modal__inner">
         
-        <div class="modal__body">
-            <div class="modal__inner">
-                <!-- Register Form -->
-                <div class="auth-form" id="register-form">
-                    <div class="auth-form__container">
-                        <!-- Register Form Header -->
-                        <div class="auth-form__header">
-                            <h3 class="auth-form__heading">Đăng ký</h3>
-                            <span class="auth-form__switch-btn" id="switch-to-login">Đăng nhập</span>
-                        </div>
-                        <!-- Register Form Body -->
-                        <div class="auth-form__form">
-                            <div class="auth-form__group">
-                                <div class="auth-form__input-wrap">
-                                    <input type="text" class="auth-form__input" placeholder="Email của bạn" />
-                                </div>
-                                <div class="auth-form__input-wrap">
-                                    <input type="password" class="auth-form__input" placeholder="Mật khẩu của bạn" />
-                                </div>
-                                <div class="auth-form__input-wrap">
-                                    <input type="password" class="auth-form__input" placeholder="Nhập lại mật khẩu của bạn" />
-                                </div>
+            <!-- ========== REGISTER FORM - Form đăng ký ========== -->
+            <div class="auth-form" id="register-form">
+                <div class="auth-form__container">
+                
+                    <!-- Header: Tiêu đề + Nút chuyển form -->
+                    <div class="auth-form__header">
+                        <h3 class="auth-form__heading">Đăng ký</h3>
+                        <span class="auth-form__switch-btn" id="switch-to-login">Đăng nhập</span>
+                    </div>
+                    
+                    <!-- Body: Các input fields -->
+                    <div class="auth-form__form">
+                        <div class="auth-form__group">
+                            <!-- Mỗi input-wrap chứa input + có thể chứa error message -->
+                            <div class="auth-form__input-wrap">
+                                <input type="text" class="auth-form__input" placeholder="Email của bạn" />
+                            </div>
+                            <div class="auth-form__input-wrap">
+                                <input type="password" class="auth-form__input" placeholder="Mật khẩu của bạn" />
+                            </div>
+                            <div class="auth-form__input-wrap">
+                                <input type="password" class="auth-form__input" placeholder="Nhập lại mật khẩu của bạn" />
                             </div>
                         </div>
-                        <!-- Register Form Aside -->
-                        <div class="auth-form__aside">
-                            <p class="auth-form__policy-text">
-                                Bằng việc đăng ký, bạn đã đồng ý với T-Win Shop về
-                                <a href="https://help.shopee.vn/portal/4/article/77243" class="auth-form__policy-link">Điều khoản dịch vụ</a>
-                                &
-                                <a href="https://help.shopee.vn/portal/4/article/77244" class="auth-form__policy-link">Chính sách bảo mật</a>
-                            </p>
-                        </div>
-                        <!-- Register Form Controls -->
-                        <div class="auth-form__controls">
-                            <button class="btn btn--normal auth-form__controls-back">TRỞ LẠI</button>
-                            <button class="btn btn--primary">ĐĂNG KÝ</button>
-                        </div>
                     </div>
-                    <!-- Register Form Socials -->
-                    <div class="auth-form__socials">
-                        <a href="" class="btn btn--with-icon btn--size-s auth-form__socials--facebook">
-                            <i class="auth-form__socials-icon fa-brands fa-facebook-square"></i>
-                            <span class="auth-form__socials-title">Kết nối với Facebook</span>
-                        </a>
-                        <a href="" class="btn btn--with-icon btn--size-s auth-form__socials--google">
-                            <i class="auth-form__socials-icon fa-brands fa-google"></i>
-                            <span class="auth-form__socials-title">Kết nối với Google</span>
-                        </a>
+                    
+                    <!-- Aside: Điều khoản dịch vụ -->
+                    <div class="auth-form__aside">
+                        <p class="auth-form__policy-text">
+                            Bằng việc đăng ký, bạn đã đồng ý với T-Win Shop về
+                            <a href="https://help.shopee.vn/portal/4/article/77243" class="auth-form__policy-link">Điều khoản dịch vụ</a>
+                            &
+                            <a href="https://help.shopee.vn/portal/4/article/77244" class="auth-form__policy-link">Chính sách bảo mật</a>
+                        </p>
+                    </div>
+                    
+                    <!-- Controls: Nút Trở lại & Đăng ký -->
+                    <div class="auth-form__controls">
+                        <button class="btn btn--normal auth-form__controls-back">TRỞ LẠI</button>
+                        <button class="btn btn--primary">ĐĂNG KÝ</button>
                     </div>
                 </div>
-                <!-- Login Form -->
-                <div class="auth-form" id="login-form" style="display: none">
-                    <div class="auth-form__container">
-                        <!-- Login Form Header -->
-                        <div class="auth-form__header">
-                            <h3 class="auth-form__heading">Đăng nhập</h3>
-                            <span class="auth-form__switch-btn" id="switch-to-register">Đăng ký</span>
-                        </div>
-                        <!-- Login Form Body -->
-                        <div class="auth-form__form">
-                            <div class="auth-form__group">
-                                <div class="auth-form__input-wrap">
-                                    <input type="text" class="auth-form__input" placeholder="Email của bạn" />
-                                </div>
-                                <div class="auth-form__input-wrap">
-                                    <input type="password" class="auth-form__input" placeholder="Mật khẩu của bạn" />
-                                </div>
+                
+                <!-- Social Login: Đăng nhập bằng FB/Google -->
+                <div class="auth-form__socials">
+                    <a href="" class="btn btn--with-icon btn--size-s auth-form__socials--facebook">
+                        <i class="auth-form__socials-icon fa-brands fa-facebook-square"></i>
+                        <span class="auth-form__socials-title">Kết nối với Facebook</span>
+                    </a>
+                    <a href="" class="btn btn--with-icon btn--size-s auth-form__socials--google">
+                        <i class="auth-form__socials-icon fa-brands fa-google"></i>
+                        <span class="auth-form__socials-title">Kết nối với Google</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- ========== LOGIN FORM - Form đăng nhập ========== 
+                 Mặc định ẩn (style="display: none")
+                 Hiện khi click #switch-to-login -->
+            <div class="auth-form" id="login-form" style="display: none">
+                <div class="auth-form__container">
+                    <div class="auth-form__header">
+                        <h3 class="auth-form__heading">Đăng nhập</h3>
+                        <span class="auth-form__switch-btn" id="switch-to-register">Đăng ký</span>
+                    </div>
+                    <div class="auth-form__form">
+                        <div class="auth-form__group">
+                            <div class="auth-form__input-wrap">
+                                <input type="text" class="auth-form__input" placeholder="Email của bạn" />
                             </div>
-                        </div>
-                        <!-- Login Form Aside -->
-                        <div class="auth-form__aside">
-                            <div class="auth-form__help">
-                                <a href="" class="auth-form__help-link auth-form__help-forgot">Quên mật khẩu</a>
-                                <span class="auth-form__help-separate"></span>
-                                <a href="" class="auth-form__help-link">Cần trợ giúp?</a>
+                            <div class="auth-form__input-wrap">
+                                <input type="password" class="auth-form__input" placeholder="Mật khẩu của bạn" />
                             </div>
-                        </div>
-                        <!-- Login Form Controls -->
-                        <div class="auth-form__controls">
-                            <button class="btn btn--normal auth-form__controls-back">TRỞ LẠI</button>
-                            <button class="btn btn--primary">ĐĂNG NHẬP</button>
                         </div>
                     </div>
-                    <!-- Login Form Socials -->
-                    <div class="auth-form__socials">
-                        <a href="" class="btn btn--with-icon btn--size-s auth-form__socials--facebook">
-                            <i class="auth-form__socials-icon fa-brands fa-facebook-square"></i>
-                            <span class="auth-form__socials-title">Kết nối với Facebook</span>
-                        </a>
-                        <a href="" class="btn btn--with-icon btn--size-s auth-form__socials--google">
-                            <i class="auth-form__socials-icon fa-brands fa-google"></i>
-                            <span class="auth-form__socials-title">Kết nối với Google</span>
-                        </a>
+                    <div class="auth-form__aside">
+                        <div class="auth-form__help">
+                            <a href="" class="auth-form__help-link auth-form__help-forgot">Quên mật khẩu</a>
+                            <span class="auth-form__help-separate"></span>
+                            <a href="" class="auth-form__help-link">Cần trợ giúp?</a>
+                        </div>
+                    </div>
+                    <div class="auth-form__controls">
+                        <button class="btn btn--normal auth-form__controls-back">TRỞ LẠI</button>
+                        <button class="btn btn--primary">ĐĂNG NHẬP</button>
                     </div>
                 </div>
-                <!-- Admin Login Form -->
-                <div class="auth-form" id="admin-login-form" style="display: none">
-                    <div class="auth-form__container">
-                        <!-- Admin Login Form Header -->
-                        <div class="auth-form__header">
-                            <h3 class="auth-form__heading">Đăng nhập Quản trị</h3>
+                <div class="auth-form__socials">
+                    <a href="" class="btn btn--with-icon btn--size-s auth-form__socials--facebook">
+                        <i class="auth-form__socials-icon fa-brands fa-facebook-square"></i>
+                        <span class="auth-form__socials-title">Kết nối với Facebook</span>
+                    </a>
+                    <a href="" class="btn btn--with-icon btn--size-s auth-form__socials--google">
+                        <i class="auth-form__socials-icon fa-brands fa-google"></i>
+                        <span class="auth-form__socials-title">Kết nối với Google</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- ========== ADMIN LOGIN FORM ========== 
+                 Chỉ hiện khi click "Kênh Người Bán"
+                 Form đơn giản hơn, không có social login -->
+            <div class="auth-form" id="admin-login-form" style="display: none">
+                <div class="auth-form__container">
+                    <div class="auth-form__header">
+                        <h3 class="auth-form__heading">Đăng nhập Quản trị</h3>
+                    </div>
+                    <div class="auth-form__form">
+                        <div class="auth-form__group">
+                            <input type="text" class="auth-form__input" id="admin-email" placeholder="Tài khoản Admin" />
+                            <input type="password" class="auth-form__input" id="admin-password" placeholder="Mật khẩu" />
                         </div>
-                        <!-- Admin Login Form Body -->
-                        <div class="auth-form__form">
-                            <div class="auth-form__group">
-                                <input type="text" class="auth-form__input" id="admin-email" placeholder="Tài khoản Admin" />
-                                <input type="password" class="auth-form__input" id="admin-password" placeholder="Mật khẩu" />
-                            </div>
-                        </div>
-                        <!-- Admin Login Form Controls -->
-                        <div class="auth-form__controls" style="margin-top: 30px">
-                            <button class="btn btn--normal auth-form__controls-back" onclick="closeModal()">TRỞ LẠI</button>
-                            <button class="btn btn--primary" id="admin-submit-btn">ĐĂNG NHẬP</button>
-                        </div>
+                    </div>
+                    <div class="auth-form__controls" style="margin-top: 30px">
+                        <button class="btn btn--normal auth-form__controls-back" onclick="closeModal()">TRỞ LẠI</button>
+                        <button class="btn btn--primary" id="admin-submit-btn">ĐĂNG NHẬP</button>
                     </div>
                 </div>
             </div>
+            
         </div>
     </div>
+</div>

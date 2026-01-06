@@ -1,48 +1,66 @@
 // =========================================================
 // TWIN SHOP - ADMIN CHAT
 // Quản lý chat realtime phía Admin
+//
+// CHỨC NĂNG:
+// 1. Hiển thị danh sách các phiên chat với khách hàng
+// 2. Nhận thông báo khi có khách mới
+// 3. Trả lời tin nhắn realtime
+// 4. Theo dõi trạng thái online/offline của khách
+//
+// EVENTS SOCKET:
+// - admin:join        : Đăng ký là admin
+// - admin:sessions    : Nhận danh sách phiên chat
+// - admin:newSession  : Có phiên chat mới
+// - admin:message     : Nhận tin nhắn mới
+// - admin:sessionUpdate: Cập nhật trạng thái phiên
 // =========================================================
 
 const AdminChat = {
-    socket: null,
-    sessions: new Map(),
-    currentSessionId: null,
-    isConnected: false,
+    socket: null,                    // Socket.io instance
+    sessions: new Map(),             // Map lưu các phiên chat (key: sessionId)
+    currentSessionId: null,          // Phiên đang xem
+    isConnected: false,              // Trạng thái kết nối
 
-    // Khởi tạo
+    // Khởi tạo - Gọi khi trang load
     init() {
         this.connect();
     },
 
-    // Kết nối Socket
+    // Kết nối Socket và đăng ký các event listener
     connect() {
+        // Kết nối tới server hiện tại
         this.socket = io(window.location.origin);
 
+        // === EVENT: Kết nối thành công ===
         this.socket.on("connect", () => {
             this.isConnected = true;
             console.log("✅ Admin đã kết nối chat server");
             
-            // Đăng ký là admin
+            // Gửi event để server biết đây là admin
             this.socket.emit("admin:join");
         });
 
+        // === EVENT: Mất kết nối ===
         this.socket.on("disconnect", () => {
             this.isConnected = false;
             console.log("❌ Admin mất kết nối chat server");
         });
 
-        // Nhận danh sách phiên chat
+        // === EVENT: Nhận DANH SÁCH phiên chat hiện có ===
+        // Gửi từ server ngay khi admin join
         this.socket.on("admin:sessions", (sessions) => {
-            this.sessions.clear(); // Clear trước khi thêm mới
+            // Xóa hết rồi thêm mới để tránh trùng lặp
+            this.sessions.clear();
             sessions.forEach(s => {
                 this.sessions.set(s.id, s);
             });
             this.renderSessionsList();
         });
 
-        // Có phiên chat mới
+        // === EVENT: Có PHIÊN CHAT MỚI ===
         this.socket.on("admin:newSession", (session) => {
-            // Kiểm tra nếu session đã tồn tại thì không thêm mới
+            // Chỉ thêm nếu chưa tồn tại (tránh trùng lặp)
             if (!this.sessions.has(session.id)) {
                 this.sessions.set(session.id, session);
                 this.renderSessionsList();
@@ -51,47 +69,51 @@ const AdminChat = {
             }
         });
 
-        // Có khách cần hỗ trợ trực tiếp
+        // === EVENT: Khách cần HỖ TRỢ TRỰC TIẾPa ===
+        // Khi bot không trả lời được, chuyển sang admin
         this.socket.on("admin:needSupport", (data) => {
             const session = this.sessions.get(data.sessionId);
             if (session) {
-                session.status = "waiting";
+                session.status = "waiting";  // Đánh dấu cần hỗ trợ
                 this.renderSessionsList();
                 this.showNotification(`${session.user.name || 'Khách'} cần hỗ trợ trực tiếp!`);
                 this.playSound();
             }
         });
 
-        // Nhận tin nhắn mới
+        // === EVENT: Nhận TIN NHẮN MỚI từ khách ===
         this.socket.on("admin:message", (data) => {
             const session = this.sessions.get(data.sessionId);
             if (session) {
+                // Thêm tin nhắn vào session
                 session.messages.push(data.message);
-                session.unread = (session.unread || 0) + 1;
+                session.unread = (session.unread || 0) + 1;  // Tăng số chưa đọc
                 
-                // Nếu đang xem session này, render tin nhắn
+                // Nếu đang xem session này, hiện tin nhắn ngay
                 if (this.currentSessionId === data.sessionId) {
                     this.appendMessage(data.message);
-                    this.socket.emit("admin:read", data.sessionId);
+                    this.socket.emit("admin:read", data.sessionId);  // Đánh dấu đã đọc
                     session.unread = 0;
                 }
                 
                 this.renderSessionsList();
-                this.updateBadge();
+                this.updateBadge();  // Cập nhật số thông báo
             }
         });
 
-        // Cập nhật trạng thái session
+        // === EVENT: CẬP NHẬT trạng thái phiên ===
+        // VD: Khách đóng tab -> status = "disconnected"
         this.socket.on("admin:sessionUpdate", (data) => {
-            // Cập nhật hoặc thêm mới session
+            // Cập nhật nếu đã có, hoặc thêm mới
             if (this.sessions.has(data.id)) {
                 const session = this.sessions.get(data.id);
-                Object.assign(session, data);
+                Object.assign(session, data);  // Merge data mới
             } else {
                 this.sessions.set(data.id, data);
             }
             this.renderSessionsList();
             
+            // Cập nhật header nếu đang xem session này
             if (this.currentSessionId === data.id) {
                 this.updateChatHeader(this.sessions.get(data.id));
             }

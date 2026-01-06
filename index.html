@@ -1,42 +1,98 @@
 <!DOCTYPE html>
+<!-- 
+  =========================================================
+  TWIN SHOP - TRANG CHỦ (index.html)
+  =========================================================
+  
+  ĐÂY LÀ TRANG CHÍNH CỦA WEBSITE:
+  - Hiển thị danh sách sản phẩm
+  - Bộ lọc sắp xếp (Phổ biến, Mới nhất, Bán chạy, Giá)
+  - Sidebar danh mục sản phẩm
+  - Phân trang
+  - Thanh tìm kiếm trong header
+  
+  CẤU TRÚC FILE:
+  1. <head>: Khai báo CSS, fonts, favicon
+  2. <body>: 
+     - Header (load từ components/header.html)
+     - Sidebar danh mục + Grid sản phẩm
+     - Footer (load từ components/footer.html)
+  3. Scripts: validation.js, main.js, socket.io, chat.js
+  =========================================================
+-->
 <html lang="en">
 <head>
+    <!-- Khai báo mã hóa ký tự UTF-8 (hỗ trợ tiếng Việt) -->
     <meta charset="UTF-8" />
+    
+    <!-- Responsive: Đảm bảo trang hiển thị đúng trên mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
     <title>T-Win Shop</title>
+    
+    <!-- Favicon: Icon nhỏ hiển thị trên tab trình duyệt -->
     <link rel="icon" type="image/png" href="./assets/img/logo_favicon.png" />
+    
+    <!-- Normalize CSS: Reset CSS mặc định của các trình duyệt để đồng nhất -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+    
+    <!-- CSS Files theo thứ tự:
+         1. base.css: Reset, grid system, button cơ bản
+         2. main.css: Style cho header, footer, product cards...
+         3. chat.css: Style cho chat widget
+         4. responsive.css: Style riêng cho mobile/tablet -->
     <link rel="stylesheet" href="./assets/css/base.css" />
     <link rel="stylesheet" href="./assets/css/main.css" />
     <link rel="stylesheet" href="./assets/css/chat.css" />
     <link rel="stylesheet" href="./assets/css/responsive.css" />
+    
+    <!-- Preconnect: Tối ưu tốc độ load fonts từ Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Font Awesome: Thư viện icon (fa-solid, fa-brands...) -->
     <link rel="stylesheet" href="./assets/fonts/fontawesome-free-7.1.0/css/all.min.css" />
+    
+    <!-- Google Fonts: Font chữ Roboto -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wdth,wght@75..100,100..900&display=swap" rel="stylesheet" />
 </head>
 <body>
+    <!-- Container chính của toàn bộ app -->
     <div class="app">
-        <!-- Header -->
+    
+        <!-- ========== HEADER ========== 
+             Placeholder để JavaScript load header.html vào đây
+             Xem file: components/header.html -->
         <div id="header-placeholder"></div>
-        <!-- Content -->
+        
+        <!-- ========== CONTENT CHÍNH ========== -->
         <div class="app__container">
             <div class="grid">
                 <div class="grid__row app__content">
+                
+                    <!-- SIDEBAR DANH MỤC (Cột trái - 2/12 = 16.66%)
+                         Hiển thị trên desktop, ẩn trên mobile -->
                     <div class="grid__column-2">
                         <nav class="category">
                             <h3 class="category__heading">Danh mục</h3>
+                            <!-- Danh sách category sẽ được JS render vào đây -->
                             <ul class="category-list" id="category-list"></ul>
                         </nav>
                     </div>
 
+                    <!-- VÙNG SẢN PHẨM CHÍNH (Cột phải - 10/12 = 83.33%) -->
                     <div class="grid__column-10">
+                    
+                        <!-- THANH LỌC SẢN PHẨM -->
                         <div class="home-filter">
                             <span class="home-filter__label">Sắp xếp theo</span>
+                            
+                            <!-- Các nút lọc: Phổ biến, Mới nhất, Bán chạy -->
                             <button class="home-filter__btn btn">Phổ biến</button>
                             <button class="home-filter__btn btn btn--primary">Mới nhất</button>
                             <button class="home-filter__btn btn">Bán chạy</button>
 
+                            <!-- Dropdown chọn sắp xếp theo giá -->
                             <div class="select-input">
                                 <span class="select-input__label">Giá</span>
                                 <i class="select-input__icon fa-solid fa-angle-down"></i>
@@ -50,6 +106,7 @@
                                 </ul>
                             </div>
 
+                            <!-- Điều hướng trang (trên desktop) -->
                             <div class="home-filter__page">
                                 <span class="home-filter__page-num">
                                     <span class="home-filter__page-current">1</span>/14
@@ -65,23 +122,41 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Product List -->
+                        
+                        <!-- DANH SÁCH SẢN PHẨM
+                             JavaScript sẽ fetch từ API và render vào đây -->
                         <div class="home-product">
                             <div id="product-list" class="grid__row"></div>
                         </div>
-                        <!-- Pagination -->
+                        
+                        <!-- PHÂN TRANG (ở cuối trang)
+                             JavaScript tự động tạo các nút phân trang -->
                         <ul class="pagination home-product__pagination"></ul>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Footer -->
+        
+        <!-- ========== FOOTER ========== 
+             Placeholder để JavaScript load footer.html vào đây -->
         <div id="footer-placeholder"></div>
     </div>
+    
+    <!-- ========== JAVASCRIPT FILES ========== -->
+    
+    <!-- 1. Validation: Kiểm tra dữ liệu form (email, password, phone...) -->
     <script src="./assets/js/validation.js"></script>
+    
+    <!-- 2. Main: Logic chính (load sản phẩm, xử lý tìm kiếm, đăng nhập...) -->
     <script src="./assets/js/main.js"></script>
+    
+    <!-- 3. Socket.io: Thư viện chat realtime (từ CDN) -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    
+    <!-- 4. Chat: Widget chat với admin -->
     <script src="./assets/js/chat.js"></script>
+    
+    <!-- 5. Khởi tạo chat widget khi trang load xong -->
     <script>document.addEventListener('DOMContentLoaded', () => ChatWidget.init());</script>
 </body>
 </html>

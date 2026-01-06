@@ -1,15 +1,86 @@
+<!-- 
+===================================================================================
+   PRODUCT-DETAIL.HTML - TRANG CHI TIẾT SẢN PHẨM
+===================================================================================
+   
+   MỤC ĐÍCH:
+   Hiển thị thông tin đầy đủ của một sản phẩm cụ thể.
+   Cho phép người dùng:
+   - Xem gallery ảnh sản phẩm
+   - Chọn biến thể (màu sắc, size)
+   - Điều chỉnh số lượng
+   - Thêm vào giỏ hàng hoặc mua ngay
+   - Đọc mô tả và đánh giá sản phẩm
+
+   CÁCH TRUY CẬP:
+   Người dùng click vào sản phẩm từ trang chủ hoặc kết quả tìm kiếm
+   URL format: product-detail.html?id=123
+
+   CẤU TRÚC TRANG:
+   ┌──────────────────────────────────────────────────────┐
+   │  HEADER (load từ header.html)                         │
+   ├──────────────────────────────────────────────────────┤
+   │  ┌────────────┬──────────────────────────────────┐   │
+   │  │   GALLERY  │  THÔNG TIN SẢN PHẨM              │   │
+   │  │   - Ảnh    │  - Tên sản phẩm                  │   │
+   │  │     chính  │  - Rating + Số đánh giá + Đã bán │   │
+   │  │   - List   │  - Giá gốc / Giá sale / % giảm   │   │
+   │  │     ảnh    │  - Chính sách đổi trả            │   │
+   │  │     phụ    │  - Vận chuyển                    │   │
+   │  │            │  - Chọn Màu Sắc                  │   │
+   │  │            │  - Chọn Size                     │   │
+   │  │            │  - Số lượng: [-] [1] [+]         │   │
+   │  │            │  - [Thêm vào giỏ] [Mua ngay]     │   │
+   │  └────────────┴──────────────────────────────────┘   │
+   ├──────────────────────────────────────────────────────┤
+   │  MÔ TẢ SẢN PHẨM                                       │
+   │  - Nội dung mô tả chi tiết                           │
+   ├──────────────────────────────────────────────────────┤
+   │  ĐÁNH GIÁ SẢN PHẨM                                    │
+   │  - Điểm trung bình + sao                             │
+   │  - Filter theo số sao                                │
+   │  - Danh sách reviews từ khách hàng                   │
+   │  - Pagination                                        │
+   ├──────────────────────────────────────────────────────┤
+   │  FOOTER (load từ footer.html)                         │
+   └──────────────────────────────────────────────────────┘
+
+   LUỒNG HOẠT ĐỘNG:
+   1. Page load → product-detail.js đọc ?id từ URL
+   2. Gọi API GET /products/:id lấy thông tin sản phẩm
+   3. Render: ảnh, tên, giá, variants
+   4. User chọn màu + size → bật quantity box
+   5. User click "Thêm vào giỏ" → POST /cart
+   6. User click "Mua ngay" → Thêm vào giỏ + redirect checkout
+
+   FILES LIÊN QUAN:
+   - product-detail.css: Style riêng cho trang này
+   - product-detail.js: Logic xử lý hiển thị và thao tác
+   - main.js: Logic chung
+=================================================================================== 
+-->
 <!DOCTYPE html>
 <html lang="vi">
   <head>
+    <!-- ==============================================
+         META TAGS VÀ CSS
+         ==============================================
+    -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chi tiết sản phẩm</title>
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="./assets/img/logo_favicon.png" />
+    
+    <!-- CSS Files -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
-    <link rel="stylesheet" href="./assets/css/base.css" />
-    <link rel="stylesheet" href="./assets/css/main.css" />
-    <link rel="stylesheet" href="./assets/css/product-detail.css" />
-    <link rel="stylesheet" href="./assets/css/responsive.css" />
+    <link rel="stylesheet" href="./assets/css/base.css" />           <!-- CSS reset + variables -->
+    <link rel="stylesheet" href="./assets/css/main.css" />           <!-- CSS chung toàn site -->
+    <link rel="stylesheet" href="./assets/css/product-detail.css" /> <!-- CSS riêng trang này -->
+    <link rel="stylesheet" href="./assets/css/responsive.css" />     <!-- CSS responsive -->
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="./assets/fonts/fontawesome-free-7.1.0/css/all.min.css"/>
@@ -18,53 +89,94 @@
   </head>
   <body>
     <div class="app">
+      <!-- Placeholder load header.html -->
       <div id="header-placeholder"></div>
 
+      <!-- ==============================================
+           PHẦN NỘI DUNG CHÍNH - CHI TIẾT SẢN PHẨM
+           ==============================================
+      -->
       <div class="app__container pd-page-container">
         <div class="grid">
+          <!-- Layout 2 cột: 5 phần gallery + 7 phần thông tin -->
           <div class="grid__row app__content pd-main-content">
+            
+            <!-- ==============================================
+                 CỘT TRÁI: GALLERY ẢNH SẢN PHẨM
+                 ==============================================
+                 - Ảnh chính lớn
+                 - Danh sách ảnh nhỏ (thumbnail)
+                 - Click thumbnail → đổi ảnh chính
+            ============================================== -->
             <div class="grid__column-5">
               <div class="product-detail__img-wrapper">
+                <!-- Container ảnh chính -->
                 <div class="product-detail__img-main-wrap pd-img-wrapper-main">
                   <img src="" class="product-detail__img-main pd-img-main"/>
                 </div>
+                <!-- Container danh sách ảnh nhỏ -->
+                <!-- product-detail.js sẽ render thumbnails vào đây -->
                 <div class="product-detail__list-img pd-list-img"></div>
               </div>
             </div>
 
+            <!-- ==============================================
+                 CỘT PHẢI: THÔNG TIN SẢN PHẨM
+                 ==============================================
+            ============================================== -->
             <div class="grid__column-7 pd-col-right">
+              <!-- Tên sản phẩm -->
               <h1 class="product-detail__name pd-name">
                 Đang tải tên sản phẩm...
               </h1>
 
+              <!-- Meta: Rating + Số đánh giá + Đã bán -->
               <div class="product-detail__meta pd-meta">
+                <!-- Điểm rating + sao (click scroll tới reviews) -->
                 <div class="product-detail__rating pd-rating" onclick="scrollToReviews()">
                   <u class="product-detail__rating-score pd-rating-score">5.0</u>
                   <span class="product-detail__rating-stars">
                     </span>
                 </div>
                 
+                <!-- Số lượt đánh giá -->
                 <div class="product-detail__review-count pd-review-count" onclick="scrollToReviews()">
                      <u class="pd-review-num">411</u> 
                      <span style="color: #767676;">Đánh Giá</span>
                 </div>
 
+                <!-- Số lượng đã bán -->
                 <div class="product-detail__sold pd-sold">
                   <span class="product-detail__sold-num">1.2k</span> Đã Bán
                 </div>
               </div>
 
+              <!-- ==============================================
+                   HIỂN THỊ GIÁ
+                   ==============================================
+                   - Giá gốc (gạch ngang nếu có giảm giá)
+                   - Giá hiện tại
+                   - Tag phần trăm giảm giá
+              ============================================== -->
               <div class="product-detail__price-wrap pd-price-wrap">
                 <span class="product-detail__price-old pd-price-old">300.000đ</span>
                 <span class="product-detail__price-current pd-price-current">150.000đ</span>
                 <span class="product-detail__discount-tag pd-discount-tag">GIẢM 50%</span>
               </div>
 
+              <!-- ==============================================
+                   THÔNG TIN BỔ SUNG (CHÍNH SÁCH, VẬN CHUYỂN, VARIANTS)
+                   ==============================================
+              ============================================== -->
               <div class="product-detail__info-section pd-info-section">
+                
+                <!-- Chính sách T-Win: Trả hàng + Bảo hiểm -->
                 <div class="pd-row align-baseline">
                     <span class="pd-label">An tâm mua sắm cùng T-Win</span>
                     
+                    <!-- Tooltip hiển thị chi tiết chính sách -->
                     <div class="twin-policy-container">
+                        <!-- Trigger text - hover để xem tooltip -->
                         <div class="twin-policy-trigger">
                             <i class="fas fa-shield-halved" style="color: #ee4d2d; margin-right: 5px;"></i>
                             <span style="color: #333;">Trả hàng miễn phí 15 ngày</span>
@@ -73,9 +185,11 @@
                             <i class="fas fa-angle-down" style="font-size: 1.2rem; margin-left: 5px; color: #767676;"></i>
                         </div>
 
+                        <!-- Tooltip content - hiển thị khi hover -->
                         <div class="twin-policy-tooltip">
                             <h4 style="margin: 0 0 10px 0; font-size: 1.5rem; color: #333;">An tâm mua sắm cùng T-Win </h4>
                             
+                            <!-- Chính sách 1: Trả hàng -->
                             <div style="display: flex; margin-bottom: 15px;">
                                 <i class="fas fa-rotate-left" style="color: #ee4d2d; font-size: 1.6rem; margin-top: 2px; margin-right: 10px;"></i>
                                 <div>
@@ -84,6 +198,7 @@
                                 </div>
                             </div>
 
+                            <!-- Chính sách 2: Bảo hiểm -->
                             <div style="display: flex;">
                                 <i class="fas fa-shield-halved" style="color: #ee4d2d; font-size: 1.6rem; margin-top: 2px; margin-right: 10px;"></i>
                                 <div>
@@ -95,6 +210,7 @@
                     </div>
                 </div>
 
+                <!-- Thông tin vận chuyển -->
                 <div class="pd-row">
                   <span class="pd-label">Vận chuyển</span>
                   <div style="color: #333">
@@ -104,76 +220,145 @@
                   </div>
                 </div>
 
+                <!-- ==============================================
+                     CHỌN BIẾN THỂ - MÀU SẮC
+                     ==============================================
+                     Container sẽ được product-detail.js render
+                     các nút chọn màu vào đây
+                ============================================== -->
                 <div class="pd-row align-start">
                   <span class="pd-label mt-8">Màu Sắc</span>
                   <div id="variant-colors" style="flex: 1; display: flex; flex-wrap: wrap;"></div>
                 </div>
 
+                <!-- ==============================================
+                     CHỌN BIẾN THỂ - SIZE
+                     ==============================================
+                ============================================== -->
                 <div class="pd-row align-start">
                   <span class="pd-label mt-8">Size</span>
                   <div id="variant-sizes" style="flex: 1; display: flex; flex-wrap: wrap;"></div>
                 </div>
 
+                <!-- ==============================================
+                     CHỌN SỐ LƯỢNG
+                     ==============================================
+                     Quantity box: [-] [số lượng] [+]
+                     Mặc định disabled cho đến khi chọn đủ variants
+                ============================================== -->
                 <div class="pd-row align-center">
                   <span class="pd-label">Số Lượng</span>
                   
+                  <!-- 
+                    class="disabled" → màu xám, không click được
+                    Khi user chọn đủ màu + size → JS remove class disabled
+                  -->
                   <div id="qnt-box-container" class="qnt-box disabled"> 
                     <button class="qnt-btn" onclick="changeQuantity(-1)">-</button>
                     <input type="number" value="1" id="qnt-input" class="qnt-input" readonly />
                     <button class="qnt-btn" onclick="changeQuantity(1)">+</button>
                   </div>
 
+                  <!-- Hiển thị số lượng còn trong kho -->
                   <span style="margin-left: 15px; font-size: 1.2rem">
                     (còn <span id="stock-display" class="product-detail__stock">...</span> sản phẩm)
                   </span>
                 </div>
               </div>
 
+              <!-- ==============================================
+                   NÚT HÀNH ĐỘNG: THÊM VÀO GIỎ + MUA NGAY
+                   ==============================================
+              ============================================== -->
               <div class="product-detail__actions pd-actions">
+                <!-- 
+                  Thêm vào giỏ hàng
+                  addToCart(false) → chỉ thêm, không redirect
+                -->
                 <button class="btn btn--primary-tint btn-add-cart" onclick="addToCart(false)">
                   <i class="fas fa-cart-plus" style="margin-right: 10px"></i>
                   Thêm Vào Giỏ Hàng
                 </button>
+                <!-- 
+                  Mua ngay
+                  addToCart(true) → thêm giỏ + redirect checkout
+                -->
                 <button class="btn btn--primary btn-buy-now" onclick="addToCart(true)">
                   Mua Ngay
                 </button>
               </div>
             </div>
           </div>
+          
+          <!-- ==============================================
+               PHẦN MÔ TẢ SẢN PHẨM
+               ==============================================
+               Hiển thị nội dung mô tả chi tiết sản phẩm
+               Được load từ database qua API
+          ============================================== -->
           <div class="grid__row product-content-box" style="padding: 25px;">
-          <div class="product-content-header">MÔ TẢ SẢN PHẨM</div>
-          <div id="product-description-content" class="product-content-body">
-              Đang tải mô tả...
+            <div class="product-content-header">MÔ TẢ SẢN PHẨM</div>
+            <!-- Container để render mô tả từ API -->
+            <div id="product-description-content" class="product-content-body">
+                Đang tải mô tả...
+            </div>
           </div>
-        </div>
 
+        <!-- ==============================================
+             PHẦN ĐÁNH GIÁ SẢN PHẨM
+             ==============================================
+             - Rating overview: Điểm trung bình + sao
+             - Filters: Lọc theo số sao (5, 4, 3, 2, 1)
+             - Danh sách reviews từ khách hàng
+             - Pagination phân trang
+        ============================================== -->
         <div id="product-reviews-section" class="grid__row product-content-box" style="padding: 15px;margin-bottom: 30px;">
           <div class="product-content-header" style="background-color: white; padding-bottom: 20px;">ĐÁNH GIÁ SẢN PHẨM</div>
           
           <div class="review-list">
+              <!-- Rating Overview: Điểm + sao tổng quan -->
               <div class="rating-overview">
                   <div class="rating-overview__score-wrapper">
                       <span id="avg-rating-score" class="rating-overview__score" style="margin-right: 5px;">5.0</span>
                       <span class="rating-overview__score-out-of">trên 5</span>
+                      <!-- Container render sao trung bình -->
                       <div id="avg-rating-stars" class="rating-overview__stars">
                           </div>
                   </div>
+                  <!-- Container render các nút filter (Tất cả, 5⭐, 4⭐, ...) -->
                   <div id="rating-filters" class="rating-overview__filters"></div>
               </div>
 
+              <!-- Container render danh sách reviews -->
               <div id="review-list-container">
                   <div style="text-align:center; padding: 20px; color: #777;">Đang tải đánh giá...</div>
               </div>
 
+              <!-- Pagination cho reviews -->
               <div id="review-pagination" class="home-product__pagination" style="display: flex; justify-content: center; padding-top: 20px; margin: 0;"></div>
 
           </div>
         </div>
         </div>
       </div>
+      
+      <!-- Placeholder cho footer -->
       <div id="footer-placeholder"></div>
     </div>
 
+    <!-- ==============================================
+         JAVASCRIPT FILES
+         ==============================================
+         Thứ tự load:
+         1. validation.js - Hàm validate
+         2. main.js - Logic chung (auth, header, cart mini)
+         3. product-detail.js - Logic riêng trang này:
+            - loadProduct() - Fetch và render thông tin SP
+            - renderVariants() - Render nút chọn màu/size
+            - changeQuantity() - Tăng/giảm số lượng
+            - addToCart() - Thêm vào giỏ hàng
+            - loadReviews() - Load đánh giá với pagination
+    ============================================== -->
     <script src="./assets/js/validation.js"></script>
     <script src="./assets/js/main.js"></script>
     <script src="./assets/js/product-detail.js"></script>

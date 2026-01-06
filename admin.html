@@ -1,3 +1,55 @@
+<!-- 
+===================================================================================
+   ADMIN.HTML - TRANG QUẢN TRỊ VIÊN (ADMIN DASHBOARD)
+===================================================================================
+   
+   MỤC ĐÍCH:
+   Trang quản lý toàn bộ hệ thống e-commerce dành cho admin/seller.
+   Cho phép:
+   - Xem thống kê tổng quan (Dashboard)
+   - Quản lý sản phẩm (CRUD)
+   - Quản lý đơn hàng (xem, duyệt, giao, hủy)
+   - Quản lý danh mục, vận chuyển, thanh toán
+   - Xem danh sách khách hàng và đánh giá
+   - Chat hỗ trợ khách hàng realtime
+
+   QUYỀN TRUY CẬP:
+   - Chỉ user có role = 'admin' mới truy cập được
+   - Kiểm tra trong admin.js → nếu không phải admin → redirect
+
+   CẤU TRÚC TRANG:
+   ┌────────────────────────────────────────────────────────────┐
+   │  SIDEBAR (Bên trái)       │      MAIN CONTENT              │
+   │  ┌─────────────────────┐  │  ┌──────────────────────────┐ │
+   │  │  Logo: TWIN SHOP    │  │  │  Header: Tiêu đề tab     │ │
+   │  ├─────────────────────┤  │  ├──────────────────────────┤ │
+   │  │  📊 Tổng Quan       │  │  │                          │ │
+   │  │  📦 Sản Phẩm        │  │  │  TAB CONTENT             │ │
+   │  │  📋 Đơn Hàng        │  │  │  (Dashboard, Products,   │ │
+   │  │  📁 Danh Mục        │  │  │   Orders, Categories,    │ │
+   │  │  🚚 Vận Chuyển      │  │  │   Shipping, Payment,     │ │
+   │  │  💳 Thanh Toán      │  │  │   Users, Reviews, Chat)  │ │
+   │  │  👥 Khách Hàng      │  │  │                          │ │
+   │  │  ⭐ Đánh Giá        │  │  │                          │ │
+   │  │  💬 Chat Hỗ Trợ     │  │  │                          │ │
+   │  └─────────────────────┘  │  └──────────────────────────┘ │
+   └────────────────────────────────────────────────────────────┘
+
+   MODALS:
+   - modal-product: Thêm/sửa sản phẩm
+   - modal-simple: Thêm/sửa danh mục, vận chuyển, thanh toán
+   - modal-detail: Xem chi tiết tổng quát
+   - modal-order-invoice: Xem hóa đơn chi tiết đơn hàng
+
+   FILES LIÊN QUAN:
+   - admin.css: Style riêng cho trang admin
+   - admin.js: Logic xử lý tất cả các tab
+   - admin-chat.js: Logic chat realtime với Socket.io
+   - validation.js: Hàm validate form
+   - Chart.js: Thư viện vẽ biểu đồ
+   - Socket.io: Realtime chat
+=================================================================================== 
+-->
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -10,11 +62,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
-    <!-- Sidebar-wrapper -->
+    <!-- ==============================================
+         SIDEBAR - MENU ĐIỀU HƯỚNG BÊN TRÁI
+         ==============================================
+         Menu cố định bên trái màn hình
+         Click vào item → switchTab() → hiện tab tương ứng
+    ============================================== -->
     <div class="sidebar">
+      <!-- Logo -->
       <div class="brand">
         <i class="fa-solid fa-bag-shopping"></i> TWIN SHOP
       </div>
+      
+      <!-- Menu Items -->
       <div class="menu-item active" onclick="switchTab('dashboard', this)">
         <i class="fa-solid fa-gauge-high"></i> Tổng Quan
       </div>
@@ -39,25 +99,39 @@
       <div class="menu-item" onclick="switchTab('reviews', this)">
         <i class="fa-solid fa-comment-dots"></i> Đánh Giá
       </div>
+      <!-- Chat có badge hiển thị số tin nhắn mới -->
       <div class="menu-item" onclick="switchTab('chat', this)">
         <i class="fa-solid fa-comments"></i> Chat Hỗ Trợ
         <span class="chat-badge" id="admin-chat-badge" style="display:none">0</span>
       </div>
     </div>
 
+    <!-- ==============================================
+         MAIN - PHẦN NỘI DUNG CHÍNH BÊN PHẢI
+         ==============================================
+    -->
     <div class="main">
-      <!-- Header -->
       <div class="header">
         <h3 id="page-title">Tổng Quan</h3>
         <a href="index.html" target="_blank" style="text-decoration: none; color: #ee4d2d; font-weight: 500;">
           <i class="fa-solid fa-share-from-square"></i> Xem Website
         </a>
       </div>
-      <!-- Content -->
+      
       <div class="content">
-        <!-- Sidebar Dashboard -->
+        <!-- ==============================================
+             TAB 1: DASHBOARD - TỔNG QUAN
+             ==============================================
+             Hiển thị thống kê tổng quan:
+             - 4 thẻ stat: Doanh thu, Đơn hàng, Sản phẩm, Khách hàng
+             - Biểu đồ doanh thu 7 ngày
+             - Biểu đồ tròn tỉ lệ đơn hàng
+             - Bảng đơn hàng mới nhất
+             - Bảng sản phẩm sắp hết hàng
+        ============================================== -->
         <div id="tab-dashboard" class="section active">
           <div class="cards-grid">
+            <!-- Thẻ Doanh Thu -->
             <div class="card-stat">
               <div class="stat-info">
                 <h3 id="stat-revenue">0đ</h3>
@@ -67,6 +141,7 @@
                 <i class="fa-solid fa-money-bill-wave"></i>
               </div>
             </div>
+            <!-- Thẻ Đơn Hàng -->
             <div class="card-stat">
               <div class="stat-info">
                 <h3 id="stat-orders">0</h3>
@@ -76,6 +151,7 @@
                 <i class="fa-solid fa-cart-shopping"></i>
               </div>
             </div>
+            <!-- Thẻ Sản Phẩm -->
             <div class="card-stat">
               <div class="stat-info">
                 <h3 id="stat-products">0</h3>
@@ -85,6 +161,7 @@
                 <i class="fa-solid fa-box-open"></i>
               </div>
             </div>
+            <!-- Thẻ Khách Hàng -->
             <div class="card-stat">
               <div class="stat-info">
                 <h3 id="stat-users">0</h3>
@@ -95,7 +172,10 @@
               </div>
             </div>
           </div>
+          
+          <!-- Container biểu đồ -->
           <div class="charts-container">
+            <!-- Biểu đồ doanh thu 7 ngày (Line/Bar Chart) -->
             <div class="chart-box">
               <div class="chart-header">
                 <h4>Doanh Thu (7 Ngày)</h4>
@@ -104,6 +184,7 @@
                 <canvas id="revenueChart"></canvas>
               </div>
             </div>
+            <!-- Biểu đồ tròn tỉ lệ đơn hàng (Pie Chart) -->
             <div class="chart-box">
               <div class="chart-header">
                 <h4>Tỉ Lệ Đơn Hàng</h4>
@@ -113,7 +194,10 @@
               </div>
             </div>
           </div>
+          
+          <!-- Bảng dữ liệu -->
           <div class="dash-tables">
+            <!-- Bảng đơn hàng mới nhất -->
             <div class="panel">
               <h4>Đơn Hàng Mới Nhất</h4>
               <table>
@@ -128,6 +212,7 @@
                 <tbody id="dash-orders"></tbody>
               </table>
             </div>
+            <!-- Bảng sản phẩm sắp hết hàng -->
             <div class="panel">
               <h4>Sắp Hết Hàng (10)</h4>
               <table>
@@ -143,15 +228,26 @@
             </div>
           </div>
         </div>
-        <!-- Sidebar Products -->
+        
+        <!-- ==============================================
+             TAB 2: QUẢN LÝ SẢN PHẨM
+             ==============================================
+             - Toolbar: Tìm kiếm + sắp xếp
+             - Bảng danh sách sản phẩm
+             - Pagination
+             - Nút thêm sản phẩm → mở modal
+        ============================================== -->
         <div id="tab-products" class="section">
           <div class="panel">
             <div class="panel-header">
               <h4>Quản Lý Sản Phẩm</h4>
+              <!-- Nút thêm sản phẩm mới -->
               <button class="btn btn-add" onclick="openProductModal('add')">+ Thêm Sản Phẩm</button>
             </div>
+            <!-- Toolbar: Tìm kiếm + sắp xếp -->
             <div class="toolbar">
               <input type="text" id="prod-search" placeholder="Tìm tên sản phẩm..." style="width: 250px;" onkeyup="if(event.key==='Enter') loadProducts()">
+              <!-- Dropdown sắp xếp -->
               <select id="prod-sort" onchange="loadProducts()">
                 <option value="newest">Mới nhất</option>
                 <option value="name_asc">Tên (A-Z)</option>
@@ -167,6 +263,7 @@
                 <i class="fa-solid fa-magnifying-glass"></i> Tìm
               </button>
             </div>
+            <!-- Bảng danh sách sản phẩm -->
             <table>
               <thead>
                 <tr>
@@ -178,17 +275,27 @@
                   <th>Hành động</th>
                 </tr>
               </thead>
+              <!-- admin.js sẽ render rows vào đây -->
               <tbody id="product-list"></tbody>
             </table>
+            <!-- Pagination phân trang -->
             <div id="product-pagination" class="pagination"></div>
           </div>
         </div>
-        <!-- Sidebar Orders -->
+        
+        <!-- ==============================================
+             TAB 3: QUẢN LÝ ĐƠN HÀNG
+             ==============================================
+             - Toolbar: Tìm kiếm + lọc theo trạng thái
+             - Bảng danh sách đơn hàng
+             - Actions: Xem chi tiết, duyệt, giao, hủy
+        ============================================== -->
         <div id="tab-orders" class="section">
           <div class="panel">
             <h4>Danh Sách Đơn Hàng</h4>
             <div class="toolbar">
               <input type="text" id="order-search" placeholder="Tìm tên người nhận..." style="width: 250px;" onkeyup="if(event.key==='Enter') loadOrders()">
+              <!-- Dropdown lọc theo trạng thái -->
               <select id="order-status" onchange="loadOrders()">
                 <option value="">Tất cả trạng thái</option>
                 <option value="pending">Chờ duyệt</option>
@@ -215,7 +322,13 @@
             </table>
           </div>
         </div>
-        <!-- Sidebar Users -->
+        
+        <!-- ==============================================
+             TAB 4: QUẢN LÝ KHÁCH HÀNG
+             ==============================================
+             Hiển thị danh sách tất cả users
+             - Tìm kiếm theo tên, email, SĐT
+        ============================================== -->
         <div id="tab-users" class="section">
           <div class="panel">
             <h4>Danh Sách Khách Hàng</h4>
@@ -239,7 +352,12 @@
             </table>
           </div>
         </div>
-        <!-- Sidebar Categories -->
+        
+        <!-- ==============================================
+             TAB 5: QUẢN LÝ DANH MỤC
+             ==============================================
+             CRUD danh mục sản phẩm
+        ============================================== -->
         <div id="tab-categories" class="section">
           <div class="panel">
             <div class="panel-header">
@@ -259,7 +377,13 @@
             </table>
           </div>
         </div>
-        <!-- Sidebar Reviews -->
+        
+        <!-- ==============================================
+             TAB 6: QUẢN LÝ ĐÁNH GIÁ
+             ==============================================
+             Hiển thị danh sách reviews từ khách hàng
+             Có thể xóa review không phù hợp
+        ============================================== -->
         <div id="tab-reviews" class="section">
           <div class="panel">
             <h4>Đánh Giá Sản Phẩm</h4>
@@ -279,7 +403,13 @@
           </div>
         </div>
 
-        <!-- Tab Chat Hỗ Trợ -->
+        <!-- ==============================================
+             TAB 7: CHAT HỖ TRỢ KHÁCH HÀNG
+             ==============================================
+             Giao diện chat realtime với Socket.io
+             - Bên trái: Danh sách phiên chat
+             - Bên phải: Khung chat chi tiết
+        ============================================== -->
         <div id="tab-chat" class="section">
           <div class="admin-chat-container">
             <!-- Danh sách phiên chat -->
@@ -298,6 +428,7 @@
 
             <!-- Khung chat chi tiết -->
             <div class="chat-detail-panel" id="chat-detail-panel">
+              <!-- Placeholder khi chưa chọn chat nào -->
               <div class="chat-detail-placeholder">
                 <i class="fa-regular fa-comment-dots"></i>
                 <p>Chọn một cuộc trò chuyện để bắt đầu</p>
@@ -305,8 +436,9 @@
               
               <!-- Khi có chat được chọn -->
               <div class="chat-detail-active" id="chat-detail-active" style="display:none">
+                <!-- Header: Thông tin user đang chat -->
                 <div class="chat-detail-header">
-                  <div class="chat-user-info">
+                  <div class="chat-user-info"> 
                     <div class="chat-user-avatar">
                       <i class="fa-solid fa-user"></i>
                     </div>
@@ -319,10 +451,12 @@
                   </div>
                 </div>
                 
+                <!-- Container tin nhắn -->
                 <div class="chat-detail-messages" id="admin-chat-messages">
                   <!-- Messages sẽ được render ở đây -->
                 </div>
                 
+                <!-- Input gửi tin nhắn --> 
                 <div class="chat-detail-input">
                   <input type="text" id="admin-chat-input" placeholder="Nhập tin nhắn..." 
                          onkeypress="if(event.key==='Enter') AdminChat.sendMessage()" />
@@ -335,7 +469,11 @@
           </div>
         </div>
 
-        <!-- Sidebar Shipping -->
+        <!-- ==============================================
+             TAB 8: QUẢN LÝ VẬN CHUYỂN
+             ==============================================
+             CRUD phương thức vận chuyển
+        ============================================== -->
         <div id="tab-shipping" class="section">
           <div class="panel">
             <div class="panel-header">
@@ -355,7 +493,12 @@
             </table>
           </div>
         </div>
-        <!-- Sidebar Payment -->
+        
+        <!-- ==============================================
+             TAB 9: QUẢN LÝ THANH TOÁN
+             ==============================================
+             CRUD phương thức thanh toán
+        ============================================== -->
         <div id="tab-payment" class="section">
           <div class="panel">
             <div class="panel-header">
@@ -377,7 +520,16 @@
         </div>
       </div>
     </div>
-    <!-- Modal add/edit product -->
+    
+    <!-- ==============================================
+         MODAL 1: THÊM/SỬA SẢN PHẨM
+         ==============================================
+         Form đầy đủ để thêm hoặc chỉnh sửa sản phẩm:
+         - Tên, giá, tồn kho
+         - Danh mục
+         - Ảnh đại diện + ảnh phụ
+         - Mô tả
+    ============================================== -->
     <div id="modal-product" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -385,11 +537,16 @@
           <i class="fa-solid fa-xmark" style="cursor: pointer" onclick="closeModal('modal-product')"></i>
         </div>
         <form id="form-product">
+          <!-- Hidden input lưu ID khi edit -->
           <input type="hidden" id="p-id" />
+          
+          <!-- Tên sản phẩm -->
           <div class="form-group auth-form__input-wrap">
             <label>Tên sản phẩm</label>
             <input type="text" id="p-name" class="auth-form__input" required />
           </div>
+          
+          <!-- Giá + Kho (2 cột) -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px">
             <div class="form-group auth-form__input-wrap">
               <label>Giá tiền</label>
@@ -400,9 +557,12 @@
               <input type="number" id="p-stock" class="auth-form__input" value="100" />
             </div>
           </div>
+          
+          <!-- Danh mục + Ảnh đại diện -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px">
             <div class="form-group">
               <label>Danh mục</label>
+              <!-- Dropdown render từ API /categories -->
               <select id="p-category"></select>
             </div>
             <div class="form-group">
@@ -410,14 +570,20 @@
               <input type="file" id="p-thumbnail" />
             </div>
           </div>
+          
+          <!-- Ảnh phụ (multiple) -->
           <div class="form-group">
             <label>Ảnh phụ:</label>
             <input type="file" id="p-images" multiple />
           </div>
+          
+          <!-- Mô tả sản phẩm -->
           <div class="form-group">
             <label>Mô tả</label>
             <textarea id="p-desc" rows="3"></textarea>
           </div>
+          
+          <!-- Nút hành động -->
           <div style="text-align: right">
             <button type="button" class="btn" style="background: #eee; color: #333" onclick="closeModal('modal-product')">Hủy</button>
             <button type="submit" class="btn btn-add">Lưu</button>
@@ -425,7 +591,15 @@
         </form>
       </div>
     </div>
-    <!-- Modal add category -->
+    
+    <!-- ==============================================
+         MODAL 2: THÊM/SỬA DANH MỤC / VẬN CHUYỂN / THANH TOÁN
+         ==============================================
+         Modal đơn giản dùng chung cho 3 loại:
+         - Category: Tên + Mô tả
+         - Shipping: Tên + Giá
+         - Payment: Tên + Code
+    ============================================== -->
     <div id="modal-simple" class="modal">
       <div class="modal-content" style="width: 400px">
         <div class="modal-header">
@@ -433,36 +607,59 @@
           <i class="fa-solid fa-xmark" onclick="closeModal('modal-simple')"></i>
         </div>
         <form id="form-simple">
+          <!-- Hidden inputs để biết type + ID -->
           <input type="hidden" id="simple-type" />
           <input type="hidden" id="simple-id" />
+          
+          <!-- Field 1: Tên -->
           <div class="form-group">
             <label id="lbl-1">Tên</label>
             <input type="text" id="inp-1" required />
           </div>
+          
+          <!-- Field 2: Mô tả / Giá / Code (tùy type) -->
           <div class="form-group">
             <label id="lbl-2">Mô tả</label>
             <input type="text" id="inp-2" />
           </div>
+          
           <div style="text-align: right">
             <button type="submit" class="btn btn-add">Lưu</button>
           </div>
         </form>
       </div>
     </div>
-    <!-- Modal detail -->
+    
+    <!-- ==============================================
+         MODAL 3: XEM CHI TIẾT TỔNG QUÁT
+         ==============================================
+         Modal hiển thị thông tin chi tiết
+    ============================================== -->
     <div id="modal-detail" class="modal">
       <div class="modal-content modal-invoice">
         <div class="modal-header">
           <h3 id="detail-title">Chi Tiết</h3>
           <i class="fa-solid fa-xmark" onclick="closeModal('modal-detail')"></i>
         </div>
+        <!-- Content được render bởi JavaScript -->
         <div id="detail-content"></div>
       </div>
     </div>
 
-    <!-- Modal Chi Tiết Đơn Hàng (Hóa Đơn) -->
+    <!-- ==============================================
+         MODAL 4: HÓA ĐƠN CHI TIẾT ĐƠN HÀNG
+         ==============================================
+         Hiển thị hóa đơn đẹp có thể in
+         Bao gồm:
+         - Header: Logo + Số hóa đơn
+         - Thông tin khách hàng + đơn hàng
+         - Bảng sản phẩm
+         - Tổng kết thanh toán
+         - Footer: Thông tin liên hệ
+    ============================================== -->
     <div id="modal-order-invoice" class="modal">
       <div class="modal-content modal-invoice-content">
+        <!-- Wrapper có thể in -->
         <div class="invoice-wrapper" id="invoice-printable">
           <!-- Header Hóa Đơn -->
           <div class="invoice-header">
@@ -476,15 +673,17 @@
             </div>
           </div>
 
-          <!-- Thông tin đơn hàng -->
+          <!-- Thông tin đơn hàng (2 cột) -->
           <div class="invoice-info">
             <div class="invoice-info-row">
+              <!-- Cột trái: Thông tin khách hàng -->
               <div class="invoice-info-col">
                 <h4>Thông tin khách hàng</h4>
                 <p><strong>Họ tên:</strong> <span id="inv-customer-name">---</span></p>
                 <p><strong>Điện thoại:</strong> <span id="inv-customer-phone">---</span></p>
                 <p><strong>Địa chỉ:</strong> <span id="inv-customer-address">---</span></p>
               </div>
+              <!-- Cột phải: Thông tin đơn hàng -->
               <div class="invoice-info-col">
                 <h4>Thông tin đơn hàng</h4>
                 <p><strong>Ngày đặt:</strong> <span id="inv-order-date">---</span></p>
@@ -507,6 +706,7 @@
                   <th style="width:15%">Thành tiền</th>
                 </tr>
               </thead>
+              <!-- Rows render bởi JavaScript -->
               <tbody id="inv-items-body">
               </tbody>
             </table>
@@ -514,14 +714,17 @@
 
           <!-- Tổng kết -->
           <div class="invoice-summary">
+            <!-- Ghi chú đơn hàng (bên trái) -->
             <div class="invoice-note">
               <h4>Ghi chú đơn hàng:</h4>
               <p id="inv-note">Không có ghi chú</p>
+              <!-- Lý do hủy (nếu có) -->
               <div id="inv-cancel-reason-wrap" style="display:none; margin-top:10px;">
                 <h4 style="color:#ee4d2d;">Lý do hủy:</h4>
                 <p id="inv-cancel-reason" style="color:#ee4d2d;">---</p>
               </div>
             </div>
+            <!-- Tổng tiền (bên phải) -->
             <div class="invoice-totals">
               <div class="invoice-total-row">
                 <span>Tạm tính:</span>
@@ -552,11 +755,29 @@
         <!-- Nút hành động -->
         <div class="invoice-actions">
           <button class="btn" style="background:#eee;color:#333" onclick="closeModal('modal-order-invoice')">Đóng</button>
+          <!-- Nút in hóa đơn -->
           <button class="btn btn-add" onclick="printInvoice()"><i class="fa-solid fa-print"></i> In Hóa Đơn</button>
         </div>
       </div>
     </div>
 
+    <!-- ==============================================
+         JAVASCRIPT FILES
+         ==============================================
+         Thứ tự load quan trọng:
+         1. validation.js - Hàm validate form
+         2. Socket.io - Thư viện realtime chat
+         3. admin.js - Logic chính trang admin:
+            - switchTab() - Chuyển tab
+            - loadProducts/Orders/Users() - Load dữ liệu
+            - openProductModal() - Mở modal thêm/sửa SP
+            - saveProduct() - Lưu sản phẩm
+            - updateOrderStatus() - Cập nhật đơn hàng
+         4. admin-chat.js - Logic chat realtime:
+            - AdminChat.init() - Khởi tạo Socket.io
+            - AdminChat.joinSession() - Join vào phiên chat
+            - AdminChat.sendMessage() - Gửi tin nhắn
+    ============================================== -->
     <script src="./assets/js/validation.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="./assets/js/admin.js"></script>

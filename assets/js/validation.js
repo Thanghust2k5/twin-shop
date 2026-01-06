@@ -1,4 +1,29 @@
-// Suppress uncaught JSON parse errors from browser extensions
+/* =========================================================
+   TWIN SHOP - VALIDATION.JS
+   =========================================================
+   
+   File này chứa các HÀM KIỂM TRA DỮ LIỆU (Validation):
+   
+   1. PATTERNS (Regex)
+      - Các biểu thức chính quy để kiểm tra format
+      - VD: email phải có @, phone 10 số...
+   
+   2. VALIDATE FUNCTIONS
+      - validateEmail(), validatePhone(), validatePassword()...
+      - Trả về { isValid: true/false, message: 'Lỗi...' }
+   
+   3. UI HELPER FUNCTIONS
+      - showError(): Hiện thông báo lỗi dưới input
+      - clearError(): Xóa thông báo lỗi
+      - showSuccess(): Viền xanh khi hợp lệ
+   
+   4. UTILITY FUNCTIONS
+      - safeJSONParse(): Parse JSON an toàn
+      - showToast(): Hiện thông báo toast
+   
+   ========================================================= */
+
+// Bắt lỗi JSON parse từ browser extension (tránh log lỗi không cần thiết)
 window.addEventListener('unhandledrejection', function(event) {
     if (event.reason && event.reason.message && event.reason.message.includes('is not valid JSON')) {
         event.preventDefault();
@@ -6,38 +31,87 @@ window.addEventListener('unhandledrejection', function(event) {
     }
 });
 
+/* =========================================================
+   VALIDATOR OBJECT - Chứa tất cả logic validation
+   ========================================================= */
 const Validator = {
+    
+    /* ---------------------------------------------------------
+       PATTERNS - Biểu thức chính quy (Regular Expression/Regex)
+       ---------------------------------------------------------
+       
+       Regex là cách kiểm tra xem chuỗi có khớp với mẫu không.
+       
+       Cú pháp cơ bản:
+       - ^     : Bắt đầu chuỗi
+       - $     : Kết thúc chuỗi
+       - [abc] : Một trong các ký tự a, b, c
+       - [0-9] : Một chữ số từ 0-9
+       - {n,m} : Lặp lại từ n đến m lần
+       - +     : Lặp lại 1 hoặc nhiều lần
+       - *     : Lặp lại 0 hoặc nhiều lần
+       - ?     : 0 hoặc 1 lần (tùy chọn)
+       - (?=..): Lookahead - kiểm tra có chứa ... không
+       --------------------------------------------------------- */
     patterns: {
-        // Email: phải có @ và domain hợp lệ
+        // Email: 
+        // [a-zA-Z0-9._%+-]+ : Phần trước @, gồm chữ/số và ._%+-
+        // @                  : Bắt buộc có @
+        // [a-zA-Z0-9.-]+     : Tên domain (gmail, yahoo...)
+        // \\.                : Dấu chấm
+        // [a-zA-Z]{2,}       : Đuôi domain (com, vn...) ít nhất 2 ký tự
         email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
         
-        // Số điện thoại Việt Nam: 10 số, bắt đầu 0
+        // Số điện thoại Việt Nam:
+        // ^0              : Bắt đầu bằng 0
+        // [3|5|7|8|9]     : Số thứ 2 là 3, 5, 7, 8 hoặc 9 (đầu số mới)
+        // [0-9]{8}$       : Tiếp theo 8 chữ số -> Tổng 10 số
         phone: /^(0[3|5|7|8|9])[0-9]{8}$/,
         
-        // Password: ít nhất 6 ký tự, có chữ và số
+        // Password:
+        // (?=.*[A-Za-z])  : Phải có ít nhất 1 chữ cái
+        // (?=.*\\d)        : Phải có ít nhất 1 chữ số
+        // [A-Za-z\\d@$!%*#?&]{6,} : Gồm chữ/số/ký tự đặc biệt, ít nhất 6 ký tự
         password: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$/,
         
-        // Tên: chỉ chữ cái và khoảng trắng, 2-50 ký tự
+        // Tên: Chỉ chữ cái (bao gồm tiếng Việt) và khoảng trắng
+        // À-ỹ : Các ký tự có dấu tiếng Việt
+        // {2,50} : Từ 2 đến 50 ký tự
         fullName: /^[a-zA-ZÀ-ỹ\s]{2,50}$/,
         
-        // Giá tiền: số dương
+        // Giá tiền: Số dương, bắt đầu từ 1
         price: /^[1-9]\d*$/,
         
-        // Số lượng: số nguyên dương
+        // Số lượng: Số nguyên dương
         quantity: /^[1-9]\d*$/
     },
 
-    // ========== VALIDATION FUNCTIONS ==========
+    /* =========================================================
+       VALIDATION FUNCTIONS - Các hàm kiểm tra
+       =========================================================
+       
+       Tất cả đều trả về object:
+       { 
+         isValid: true/false,    // Hợp lệ hay không
+         message: 'Lỗi...'       // Thông báo lỗi (nếu có)
+       }
+       ========================================================= */
     
     /**
-     * Validate Email
-     * @param {string} email 
+     * Kiểm tra Email
+     * @param {string} email - Email cần kiểm tra
      * @returns {object} { isValid: boolean, message: string }
+     * 
+     * Ví dụ:
+     * validateEmail('test@gmail.com') -> { isValid: true, message: '' }
+     * validateEmail('invalid')        -> { isValid: false, message: 'Email không hợp lệ!' }
      */
     validateEmail(email) {
+        // Kiểm tra rỗng
         if (!email || email.trim() === '') {
             return { isValid: false, message: 'Vui lòng nhập email!' };
         }
+        // Kiểm tra format bằng regex
         if (!this.patterns.email.test(email.trim())) {
             return { isValid: false, message: 'Email không hợp lệ! (VD: example@gmail.com)' };
         }
@@ -45,15 +119,19 @@ const Validator = {
     },
 
     /**
-     * Validate Số điện thoại Việt Nam
-     * @param {string} phone 
+     * Kiểm tra Số điện thoại Việt Nam
+     * @param {string} phone - SĐT cần kiểm tra
      * @returns {object} { isValid: boolean, message: string }
+     * 
+     * Ví dụ:
+     * validatePhone('0912345678') -> { isValid: true }
+     * validatePhone('0123456789') -> { isValid: false } (đầu 012 không hợp lệ)
      */
     validatePhone(phone) {
         if (!phone || phone.trim() === '') {
             return { isValid: false, message: 'Vui lòng nhập số điện thoại!' };
         }
-        // Loại bỏ khoảng trắng và dấu -
+        // Loại bỏ khoảng trắng và dấu gạch ngang
         const cleanPhone = phone.replace(/[\s-]/g, '');
         if (!this.patterns.phone.test(cleanPhone)) {
             return { isValid: false, message: 'SĐT không hợp lệ! (10 số, bắt đầu 03/05/07/08/09)' };
@@ -62,7 +140,9 @@ const Validator = {
     },
 
     /**
-     * Validate Password
+     * Kiểm tra Mật khẩu
+     * Yêu cầu: Ít nhất 6 ký tự, có cả chữ và số
+     * 
      * @param {string} password 
      * @returns {object} { isValid: boolean, message: string }
      */
@@ -80,9 +160,11 @@ const Validator = {
     },
 
     /**
-     * Validate Confirm Password
-     * @param {string} password 
-     * @param {string} confirmPassword 
+     * Kiểm tra Xác nhận mật khẩu
+     * So sánh với mật khẩu gốc
+     * 
+     * @param {string} password - Mật khẩu gốc
+     * @param {string} confirmPassword - Mật khẩu xác nhận
      * @returns {object} { isValid: boolean, message: string }
      */
     validateConfirmPassword(password, confirmPassword) {
@@ -96,7 +178,7 @@ const Validator = {
     },
 
     /**
-     * Validate Họ tên
+     * Kiểm tra Họ tên
      * @param {string} name 
      * @returns {object} { isValid: boolean, message: string }
      */
@@ -226,25 +308,38 @@ const Validator = {
         return { isValid: true, message: '' };
     },
 
-    // ========== UI HELPER FUNCTIONS ==========
+    /* =========================================================
+       UI HELPER FUNCTIONS - Hàm hỗ trợ giao diện
+       =========================================================
+       
+       Dùng để hiển thị/xóa thông báo lỗi trên form
+       ========================================================= */
 
     /**
      * Hiển thị lỗi dưới input
-     * @param {HTMLElement} inputElement 
-     * @param {string} message 
+     * 
+     * Tạo thẻ div.validation-error và chèn vào cuối wrapper
+     * 
+     * @param {HTMLElement} inputElement - Thẻ input bị lỗi
+     * @param {string} message - Thông báo lỗi
+     * 
+     * Ví dụ:
+     * Validator.showError(emailInput, 'Email không hợp lệ!')
+     * -> Input có viền đỏ, hiện text lỗi bên dưới
      */
     showError(inputElement, message) {
-        // Bỏ qua input search header
+        // Bỏ qua input search header (không cần hiện lỗi)
         if (inputElement.id === 'search-input') return;
         
-        // Xóa error cũ nếu có
+        // Xóa error cũ nếu có (tránh trùng lặp)
         this.clearError(inputElement);
         
-        // Thêm class error cho input
+        // Thêm class error và viền đỏ cho input
         inputElement.classList.add('input-error');
-        inputElement.style.borderColor = '#ee4d2d';
+        inputElement.style.borderColor = '#ee4d2d';  // Viền cam
         
-        // Tìm wrapper (hỗ trợ nhiều loại wrapper, KHÔNG lấy header__search-input-wrap)
+        // Tìm wrapper (parent chứa input)
+        // Hỗ trợ nhiều loại wrapper khác nhau
         let wrapper = inputElement.closest('.auth-form__input-wrap') 
                    || inputElement.closest('.modal-input-group') 
                    || inputElement.closest('.form-group');
@@ -269,21 +364,25 @@ const Validator = {
     },
 
     /**
-     * Xóa hiển thị lỗi
+     * Xóa hiển thị lỗi khỏi input
+     * Bỏ viền đỏ và xóa thẻ thông báo lỗi
+     * 
      * @param {HTMLElement} inputElement 
      */
     clearError(inputElement) {
         // Bỏ qua input search header
         if (inputElement.id === 'search-input') return;
         
+        // Xóa class và reset border
         inputElement.classList.remove('input-error');
-        inputElement.style.borderColor = '';
+        inputElement.style.borderColor = '';  // Reset về mặc định
         
         // Tìm wrapper
         let wrapper = inputElement.closest('.auth-form__input-wrap') 
                    || inputElement.closest('.modal-input-group') 
                    || inputElement.closest('.form-group');
         
+        // Xóa thẻ error nếu có
         if (wrapper) {
             const errorDiv = wrapper.querySelector('.validation-error');
             if (errorDiv) {
@@ -291,7 +390,7 @@ const Validator = {
             }
         }
         
-        // Cũng xóa error nếu nằm ngay sau input
+        // Cũng xóa error nếu nằm ngay sau input (trường hợp không có wrapper)
         const nextEl = inputElement.nextElementSibling;
         if (nextEl && nextEl.classList.contains('validation-error')) {
             nextEl.remove();
@@ -299,12 +398,14 @@ const Validator = {
     },
 
     /**
-     * Hiển thị success cho input
+     * Hiển thị trạng thái success (viền xanh)
+     * Dùng khi input hợp lệ
+     * 
      * @param {HTMLElement} inputElement 
      */
     showSuccess(inputElement) {
         this.clearError(inputElement);
-        inputElement.style.borderColor = '#28a745';
+        inputElement.style.borderColor = '#28a745';  // Viền xanh lá
     },
 
     /**
@@ -395,14 +496,26 @@ const Validator = {
     }
 };
 
-// ========== UTILITY FUNCTIONS ==========
+/* =========================================================
+   UTILITY FUNCTIONS - Hàm tiện ích dùng chung
+   ========================================================= */
 
 /**
- * Safe JSON Parse - Tránh lỗi "undefined" is not valid JSON
- * @param {string} str 
- * @returns {any}
+ * Safe JSON Parse - Parse JSON an toàn, tránh lỗi
+ * 
+ * JavaScript sẽ báo lỗi nếu JSON.parse("undefined") hoặc JSON.parse(null)
+ * Hàm này xử lý các trường hợp đó
+ * 
+ * @param {string} str - Chuỗi JSON cần parse
+ * @returns {any} - Object đã parse, hoặc null nếu lỗi
+ * 
+ * Ví dụ:
+ * safeJSONParse('{"name":"John"}')  -> { name: 'John' }
+ * safeJSONParse('undefined')        -> null (không báo lỗi)
+ * safeJSONParse(null)               -> null (không báo lỗi)
  */
 function safeJSONParse(str) {
+    // Kiểm tra các giá trị không hợp lệ
     if (!str || str === "undefined" || str === "null") return null;
     try {
         return JSON.parse(str);
@@ -412,16 +525,32 @@ function safeJSONParse(str) {
     }
 }
 
-// ========== TOAST NOTIFICATION ==========
+/* =========================================================
+   TOAST NOTIFICATION - Thông báo dạng toast
+   =========================================================
+   
+   Toast = Thông báo nhỏ xuất hiện góc màn hình, tự mất sau vài giây
+   
+   Các loại:
+   - success: Màu xanh, icon check (thành công)
+   - error: Màu đỏ, icon X (lỗi)
+   - warning: Màu vàng, icon tam giác (cảnh báo)
+   - info: Màu xanh dương, icon i (thông tin)
+   ========================================================= */
 
 /**
  * Hiển thị Toast Notification
+ * 
  * @param {string} message - Nội dung thông báo
  * @param {string} type - Loại: 'success', 'error', 'warning', 'info'
- * @param {number} duration - Thời gian hiển thị (ms), mặc định 3000
+ * @param {number} duration - Thời gian hiển thị (ms), mặc định 3000 = 3 giây
+ * 
+ * Ví dụ:
+ * showToast('Đăng nhập thành công!', 'success');
+ * showToast('Có lỗi xảy ra!', 'error', 5000);
  */
 function showToast(message, type = 'success', duration = 3000) {
-    // Tạo container nếu chưa có
+    // Tạo container nếu chưa có (chỉ tạo 1 lần)
     let container = document.getElementById('toast-container');
     if (!container) {
         container = document.createElement('div');
@@ -433,7 +562,7 @@ function showToast(message, type = 'success', duration = 3000) {
     const toast = document.createElement('div');
     toast.className = `toast toast--${type}`;
     
-    // Icon theo loại
+    // Icon theo loại toast
     const icons = {
         success: '<i class="fa-solid fa-circle-check"></i>',
         error: '<i class="fa-solid fa-circle-xmark"></i>',
@@ -441,6 +570,7 @@ function showToast(message, type = 'success', duration = 3000) {
         info: '<i class="fa-solid fa-circle-info"></i>'
     };
 
+    // Cấu trúc HTML của toast
     toast.innerHTML = `
         <div class="toast__icon">${icons[type] || icons.success}</div>
         <div class="toast__content">
@@ -451,20 +581,22 @@ function showToast(message, type = 'success', duration = 3000) {
         </div>
     `;
 
+    // Thêm toast vào container
     container.appendChild(toast);
 
-    // Animation hiện
+    // Animation hiện (delay 10ms để CSS transition hoạt động)
     setTimeout(() => toast.classList.add('toast--show'), 10);
 
-    // Tự động ẩn và xóa
+    // Tự động ẩn và xóa sau duration
     setTimeout(() => {
         toast.classList.remove('toast--show');
         toast.classList.add('toast--hide');
+        // Xóa khỏi DOM sau khi animation ẩn xong (300ms)
         setTimeout(() => toast.remove(), 300);
     }, duration);
 }
 
-// Export cho module (nếu dùng)
+// Export cho Node.js module (nếu dùng)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { Validator, safeJSONParse };
 }

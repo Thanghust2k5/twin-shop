@@ -1,12 +1,43 @@
+<!-- 
+=========================================================
+TWIN SHOP - HEADER COMPONENT
+=========================================================
+
+Đây là component HEADER dùng chung cho tất cả các trang.
+Được load vào #header-placeholder bằng JavaScript (main.js)
+
+CẤU TRÚC:
+1. NAVBAR (Thanh trên cùng - desktop only)
+   - Logo, QR code, social links
+   - Nút Đăng ký / Đăng nhập
+
+2. HEADER-WITH-SEARCH (Thanh chính)
+   - Mobile menu button (ẩn trên desktop)
+   - Logo shop
+   - Thanh tìm kiếm + lịch sử
+   - Icon giỏ hàng
+
+3. MOBILE NAV DRAWER (Menu trượt - mobile only)
+   - Thông tin user
+   - Menu điều hướng
+   - Danh mục sản phẩm
+=========================================================
+-->
+
 <header class="header">
   <div class="grid">
+  
+    <!-- ========== NAVBAR - Thanh trên cùng ========== 
+         Ẩn trên mobile (responsive.css: display: none) -->
     <nav class="header__navbar">
+    
+      <!-- Cột trái: Logo, QR, Kênh người bán -->
       <ul class="header__navbar-list">
         <li
           class="header__navbar-item header__navbar-item-has-qr header__navbar-item--separate"
         >
           Chào mừng đến T-Win Shop
-          <!-- Header QR code -->
+          <!-- Popup QR code khi hover -->
           <div class="header__qr">
             <img
               src="./assets/img/qr_code.png"
@@ -29,6 +60,8 @@
             </div>
           </div>
         </li>
+        
+        <!-- Nút vào trang Admin (cho người bán) -->
         <li
           class="header__navbar-item header__navbar-item--separate"
           id="seller-channel-btn"
@@ -36,6 +69,8 @@
         >
           Kênh Người Bán
         </li>
+        
+        <!-- Social links -->
         <li class="header__navbar-item">
           <span class="header__navbar-title--no-pointer">Kết nối</span>
           <a
@@ -54,6 +89,7 @@
         </li>
       </ul>
 
+      <!-- Cột phải: Thông báo, Trợ giúp, Đăng nhập -->
       <ul class="header__navbar-list">
         <li class="header__navbar-item">
           <a href="" class="header__navbar-icon-link">
@@ -70,12 +106,16 @@
             Trợ giúp
           </a>
         </li>
+        
+        <!-- Nút Đăng ký - JavaScript sẽ gắn event onclick -->
         <li
           id="register-btn"
           class="header__navbar-item header__navbar-item--strong header__navbar-item--separate"
         >
           Đăng ký
         </li>
+        
+        <!-- Nút Đăng nhập -->
         <li
           id="login-btn"
           class="header__navbar-item header__navbar-item--strong"
@@ -85,13 +125,16 @@
       </ul>
     </nav>
 
-    <!-- Header with search -->
+    <!-- ========== HEADER WITH SEARCH - Thanh chính ========== 
+         Chứa: Menu button | Logo | Search | Cart -->
     <div class="header-with-search">
-      <!-- Mobile menu button -->
+    
+      <!-- Nút hamburger menu (chỉ hiện trên mobile) -->
       <button class="mobile-menu-toggle" onclick="toggleMobileNav()">
         <i class="fa-solid fa-bars"></i>
       </button>
 
+      <!-- Logo shop -->
       <div class="header__logo">
         <a href="index.html" class="header__logo-link">
           <img
@@ -101,6 +144,8 @@
           />
         </a>
       </div>
+      
+      <!-- Thanh tìm kiếm -->
       <div class="header__search">
         <div class="header__search-input-wrap">
           <input
@@ -109,19 +154,23 @@
             id="search-input"
             placeholder="Nhập để tìm kiếm"
           />
-          <!-- Search history -->
+          <!-- Dropdown lịch sử tìm kiếm (render bởi JS) -->
           <div class="header__search-history"></div>
         </div>
         <button class="header__search-btn" id="search-btn">
           <i class="header__search-btn-icon fa-solid fa-magnifying-glass"></i>
         </button>
       </div>
-      <!-- Header cart -->
+      
+      <!-- Icon giỏ hàng + Dropdown xem nhanh -->
       <div class="header__cart">
         <a href="cart.html" class="header__cart-wrap">
           <i class="header__cart-icon fa-solid fa-cart-shopping"></i>
-
+          
+          <!-- Badge số lượng (render bởi JS) -->
           <span class="header__cart-notice"></span>
+          
+          <!-- Dropdown xem nhanh giỏ hàng -->
           <div class="header__cart-list header__cart-list--no-cart">
             <img
               src="./assets/img/no_cart.png"
@@ -138,39 +187,56 @@
   </div>
 </header>
 
-<!-- Mobile Navigation Drawer -->
+<!-- ========== MOBILE NAVIGATION DRAWER ==========
+     Menu trượt từ bên trái trên mobile
+     - Overlay: Nền mờ đen, click để đóng
+     - Nav: Menu chính, danh mục sản phẩm
+-->
 <div class="mobile-menu-overlay" onclick="toggleMobileNav()"></div>
+
 <nav class="mobile-nav" id="mobile-nav">
+  <!-- Nút đóng (X) -->
   <button class="mobile-nav__close" onclick="toggleMobileNav()">
     <i class="fa-solid fa-xmark"></i>
   </button>
+  
+  <!-- Header của drawer: Avatar + Tên user -->
   <div class="mobile-nav__header">
     <div class="mobile-nav__user">
       <div class="mobile-nav__avatar" id="mobile-nav-avatar">
         <i class="fa-solid fa-user"></i>
       </div>
       <div>
+        <!-- JS sẽ cập nhật tên và email khi đăng nhập -->
         <div class="mobile-nav__name" id="mobile-nav-name">Chào bạn!</div>
         <div class="mobile-nav__email" id="mobile-nav-email">Đăng nhập để mua sắm</div>
       </div>
     </div>
   </div>
+  
+  <!-- Menu chính -->
   <ul class="mobile-nav__menu">
     <li class="mobile-nav__item">
       <a href="index.html" class="mobile-nav__link">
         <i class="fa-solid fa-house"></i> Trang chủ
       </a>
     </li>
+    
+    <!-- Nút đăng nhập (hiện khi chưa login) -->
     <li class="mobile-nav__item" id="mobile-login-btn" onclick="openModal('login'); toggleMobileNav();">
       <a href="javascript:void(0)" class="mobile-nav__link">
         <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
       </a>
     </li>
+    
+    <!-- Nút đăng ký (hiện khi chưa login) -->
     <li class="mobile-nav__item" id="mobile-register-btn" onclick="openModal('register'); toggleMobileNav();">
       <a href="javascript:void(0)" class="mobile-nav__link">
         <i class="fa-solid fa-user-plus"></i> Đăng ký
       </a>
     </li>
+    
+    <!-- Menu user (ẩn, chỉ hiện khi đã login) -->
     <li class="mobile-nav__item mobile-nav__user-menu" style="display:none;">
       <a href="user.html" class="mobile-nav__link">
         <i class="fa-solid fa-user"></i> Tài khoản của tôi
@@ -181,20 +247,28 @@
         <i class="fa-solid fa-box"></i> Đơn hàng
       </a>
     </li>
+    
+    <!-- Giỏ hàng -->
     <li class="mobile-nav__item">
       <a href="cart.html" class="mobile-nav__link">
         <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
       </a>
     </li>
   </ul>
+  
   <div class="mobile-nav__divider"></div>
+  
+  <!-- Danh mục sản phẩm (load bởi JS) -->
   <div class="mobile-nav__categories">
     <div class="mobile-nav__categories-title">Danh mục</div>
     <ul class="mobile-nav__category-list" id="mobile-category-list">
-      <!-- Categories will be loaded here -->
+      <!-- Categories will be loaded here by JavaScript -->
     </ul>
   </div>
+  
   <div class="mobile-nav__divider"></div>
+  
+  <!-- Nút đăng xuất (chỉ hiện khi đã login) -->
   <ul class="mobile-nav__menu">
     <li class="mobile-nav__item mobile-nav__user-menu" style="display:none;">
       <a href="javascript:void(0)" class="mobile-nav__link" onclick="handleLogout(); toggleMobileNav();">

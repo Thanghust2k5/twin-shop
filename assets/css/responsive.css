@@ -1,62 +1,75 @@
 /* =========================================================
    TWIN SHOP - RESPONSIVE CSS
    Mobile First Approach
+   
+   File này xử lý responsive cho toàn bộ website:
+   - Tablet (max-width: 1024px): Điều chỉnh grid, sidebar
+   - Mobile Landscape (max-width: 768px): Ẩn sidebar, header gọn
+   - Mobile Portrait (max-width: 576px): Tối ưu cho màn hình nhỏ
    ========================================================= */
 
 /* =========================================================
-   VARIABLES
+   VARIABLES - Biến CSS dùng chung
    ========================================================= */
 :root {
+    /* Chiều cao header trên mobile - dùng để tính padding/margin */
     --mobile-header-height: 60px;
 }
 
 /* =========================================================
-   MOBILE MENU TOGGLE
+   MOBILE MENU TOGGLE - Nút hamburger menu
+   Mặc định ẩn, chỉ hiện khi màn hình <= 768px
    ========================================================= */
 .mobile-menu-toggle {
-    display: none;
+    display: none;           /* Ẩn trên desktop */
     background: none;
     border: none;
-    color: #fff;
+    color: #fff;             /* Màu trắng để nổi trên header cam */
     font-size: 24px;
     cursor: pointer;
     padding: 8px;
 }
 
+/* Overlay mờ phía sau khi menu drawer mở
+   Khi click vào overlay sẽ đóng menu */
 .mobile-menu-overlay {
-    display: none;
-    position: fixed;
+    display: none;           /* Mặc định ẩn */
+    position: fixed;         /* Cố định toàn màn hình */
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+    background: rgba(0, 0, 0, 0.5);  /* Nền đen mờ 50% */
+    z-index: 999;            /* Dưới menu drawer (z-index: 1000) */
 }
 
+/* Khi menu mở, thêm class .active để hiện overlay */
 .mobile-menu-overlay.active {
     display: block;
 }
 
 /* =========================================================
    TABLET (max-width: 1024px)
+   Áp dụng cho iPad, tablet và màn hình nhỏ hơn desktop
    ========================================================= */
 @media (max-width: 1024px) {
+    /* Grid container chiếm 100% width thay vì fixed width */
     .grid {
         width: 100%;
         padding: 0 15px;
     }
 
-    /* Product grid 4 columns */
+    /* Sản phẩm: 4 cột (25% mỗi cột) thay vì 5 cột trên desktop */
     .grid__column-2-4 {
         width: 25%;
     }
 
-    /* Category sidebar smaller */
+    /* Sidebar danh mục: Thu nhỏ từ 16.66% xuống 20% */
     .grid__column-2 {
         width: 20%;
     }
 
+    /* Vùng nội dung chính: Tăng từ 83.33% lên 80% */
     .grid__column-10 {
         width: 80%;
     }
@@ -64,98 +77,116 @@
 
 /* =========================================================
    MOBILE LANDSCAPE (max-width: 768px)
+   Áp dụng cho điện thoại ngang và tablet nhỏ
+   Đây là breakpoint chính cho mobile!
    ========================================================= */
 @media (max-width: 768px) {
-    /* === HEADER === */
+    /* === HEADER === 
+       Trên mobile: [Menu] [=====Search=====] [Cart]
+       Không có navbar phía trên (Thông báo, Trợ giúp...) */
+    
+    /* Ẩn navbar phía trên (chỉ hiện trên desktop) */
     .header__navbar {
         display: none;
     }
 
+    /* Header tự động cao theo nội dung */
     .header {
         height: auto;
         padding: 8px 0;
     }
 
+    /* Container chính của header: flex không wrap
+       Giữ menu + search + cart trên cùng 1 hàng */
     .header-with-search {
-        flex-wrap: nowrap;
+        flex-wrap: nowrap;       /* KHÔNG xuống dòng */
         height: auto;
         padding: 0 8px;
-        align-items: center;
+        align-items: center;     /* Căn giữa theo chiều dọc */
     }
 
-    /* Ẩn logo trên mobile */
+    /* ẨN LOGO trên mobile để tiết kiệm không gian
+       Theo kiểu Shopee mobile app */
     .header__logo {
         display: none;
     }
 
-    /* Search bar chiếm toàn bộ */
+    /* Thanh tìm kiếm: Chiếm toàn bộ không gian còn lại
+       flex: 1 = co giãn để fill hết */
     .header__search {
         flex: 1;
         height: 38px;
-        max-width: none;
-        margin: 0 10px;
+        max-width: none;         /* Bỏ giới hạn width */
+        margin: 0 10px;          /* Khoảng cách với menu và cart */
     }
 
     .header__search-input {
         font-size: 14px;
     }
 
-    /* Cart icon */
+    /* Icon giỏ hàng: Bỏ margin trái (vì search đã có margin) */
     .header__cart {
         margin-left: 0;
     }
 
+    /* Dropdown giỏ hàng: Điều chỉnh vị trí để không bị tràn màn hình */
     .header__cart-list {
         width: 320px;
-        right: -80px;
+        right: -80px;            /* Dịch sang phải để căn với icon */
     }
 
-    /* Mobile menu toggle - sát mép trái */
+    /* NÚT HAMBURGER MENU - Hiện trên mobile
+       order: -1 để đưa lên đầu (trước search) */
     .mobile-menu-toggle {
-        display: block;
-        order: -1;
-        padding: 8px 12px 8px 0;
-        margin-left: 0;
+        display: block;          /* HIỆN nút menu */
+        order: -1;               /* Đặt đầu tiên trong flex container */
+        padding: 8px 12px 8px 0; /* Padding phải để cách search */
+        margin-left: 0;          /* Sát mép trái */
     }
 
-    /* === CONTENT === */
-    /* Hide category sidebar on mobile */
+    /* === CONTENT AREA === */
+    
+    /* ẨN SIDEBAR danh mục trên mobile
+       Thay vào đó hiển thị trong menu drawer */
     .grid__column-2 {
         display: none;
     }
 
+    /* Vùng nội dung chiếm 100% (vì không còn sidebar) */
     .grid__column-10 {
         width: 100%;
     }
 
-    /* Product grid 2 columns */
+    /* Lưới sản phẩm: 2 CỘT trên mobile (thay vì 4-5 cột) */
     .grid__column-2-4 {
-        width: 50%;
+        width: 50%;              /* 50% = 2 sản phẩm mỗi hàng */
     }
 
-    /* Home filter */
+    /* === THANH LỌC SẢN PHẨM ===
+       Trên mobile: [Phổ biến] [Mới nhất] [Bán chạy] [Giá]
+       Tất cả nằm trên 1 hàng, không wrap */
     .home-filter {
-        flex-wrap: nowrap;
-        gap: 6px;
+        flex-wrap: nowrap;       /* KHÔNG xuống dòng */
+        gap: 6px;                /* Khoảng cách giữa các nút */
         padding: 10px 8px;
         align-items: center;
     }
 
-    /* Ẩn label "Sắp xếp theo" */
+    /* ẨN nhãn "Sắp xếp theo" - chỉ giữ các nút */
     .home-filter__label {
         display: none;
     }
 
-    /* Filter buttons nhỏ gọn */
+    /* Các nút lọc: Nhỏ gọn để vừa 1 hàng */
     .home-filter__btn {
-        flex: 0 0 auto;
-        padding: 6px 10px;
-        font-size: 12px;
+        flex: 0 0 auto;          /* Không co giãn, giữ kích thước */
+        padding: 6px 10px;       /* Padding nhỏ hơn */
+        font-size: 12px;         /* Font nhỏ hơn */
         min-width: auto;
-        white-space: nowrap;
+        white-space: nowrap;     /* Không ngắt dòng text */
     }
 
-    /* Select Giá */
+    /* Dropdown chọn giá */
     .select-input {
         flex: 0 0 auto;
         min-width: auto;
@@ -167,18 +198,20 @@
         font-size: 12px;
     }
 
-    /* Ẩn pagination trong filter (chỉ giữ pagination ở dưới) */
+    /* ẨN PHÂN TRANG trong thanh filter
+       (Chỉ giữ phân trang ở DƯỚI CÙNG trang) */
     .home-filter__page {
         display: none;
     }
 
-    /* Pagination bottom */
+    /* === PHÂN TRANG Ở CUỐI TRANG === */
     .pagination {
-        justify-content: center;
+        justify-content: center; /* Căn giữa */
         padding: 15px 10px;
-        margin-bottom: 20px;
+        margin-bottom: 20px;     /* Khoảng cách với footer */
     }
 
+    /* Các nút phân trang nhỏ hơn */
     .pagination-item {
         width: 32px;
         height: 32px;
@@ -217,55 +250,60 @@
 
 /* =========================================================
    MOBILE PORTRAIT (max-width: 576px)
+   Màn hình điện thoại dọc - NHỎ NHẤT
+   Tối ưu cho iPhone SE, Android nhỏ (~320-375px)
    ========================================================= */
 @media (max-width: 576px) {
+    /* Giảm font-size gốc để mọi thứ nhỏ hơn
+       (vì dùng rem nên giảm ở html sẽ ảnh hưởng toàn bộ) */
     html {
-        font-size: 55%;
+        font-size: 55%;          /* Giảm từ 62.5% xuống 55% */
     }
 
     /* === HEADER === */
     .header-with-search {
-        padding: 0 6px;
+        padding: 0 6px;          /* Padding nhỏ hơn */
     }
 
-    /* Logo vẫn ẩn ở mobile nhỏ */
+    /* Logo vẫn ẩn (kế thừa từ 768px) */
     .header__logo {
         display: none;
     }
 
+    /* Thanh search nhỏ hơn */
     .header__search {
-        height: 34px;
+        height: 34px;            /* Thấp hơn */
         margin: 0 8px;
     }
 
     .header__search-input {
-        font-size: 13px;
+        font-size: 13px;         /* Font nhỏ hơn */
         padding-left: 10px;
     }
 
     .header__search-btn {
-        width: 45px;
+        width: 45px;             /* Nút tìm hẹp hơn */
     }
 
     .header__cart-icon {
-        font-size: 20px;
+        font-size: 20px;         /* Icon nhỏ hơn */
     }
 
-    /* Mobile menu toggle nhỏ hơn */
+    /* Nút menu hamburger nhỏ hơn */
     .mobile-menu-toggle {
         font-size: 22px;
         padding: 6px 10px 6px 0;
     }
 
-    /* === FILTER === */
+    /* === THANH LỌC - Còn nhỏ hơn nữa === */
     .home-filter {
         padding: 8px 5px;
-        gap: 4px;
+        gap: 4px;                /* Gap nhỏ hơn */
     }
 
     .home-filter__btn {
-        padding: 5px 8px;
-        font-size: 11px;
+        padding: 5px 8px;        /* Padding tối thiểu */
+        font-size: 11px;         /* Font rất nhỏ */
     }
 
     .select-input {
@@ -426,25 +464,29 @@
 }
 
 /* =========================================================
-   MOBILE NAV DRAWER
+   MOBILE NAV DRAWER - Menu trượt từ bên trái
+   Hiện khi nhấn nút hamburger menu
+   Chứa: Thông tin user, Menu chính, Danh mục sản phẩm
    ========================================================= */
 .mobile-nav {
-    position: fixed;
+    position: fixed;         /* Cố định vị trí */
     top: 0;
-    left: -280px;
-    width: 280px;
-    height: 100%;
+    left: -280px;            /* Mặc định: Ẩn bên trái (ngoài màn hình) */
+    width: 280px;            /* Chiều rộng drawer */
+    height: 100%;            /* Full chiều cao */
     background: #fff;
-    z-index: 1000;
-    transition: left 0.3s ease;
-    overflow-y: auto;
+    z-index: 1000;           /* Trên overlay (z-index: 999) */
+    transition: left 0.3s ease;  /* Animation trượt mượt */
+    overflow-y: auto;        /* Scroll nếu nội dung dài */
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Khi menu mở: Trượt vào màn hình */
 .mobile-nav.active {
-    left: 0;
+    left: 0;                 /* Đưa về vị trí hiển thị */
 }
 
+/* Header của drawer: Nền gradient cam (giống Shopee) */
 .mobile-nav__header {
     background: linear-gradient(135deg, #ee4d2d 0%, #ff7337 100%);
     padding: 20px 15px;
@@ -590,22 +632,26 @@
 }
 
 /* =========================================================
-   UTILITIES
+   UTILITY CLASSES - Class tiện ích dùng trong HTML
    ========================================================= */
+
+/* .hide-on-mobile: Hiện trên desktop, ẨN trên mobile */
 .hide-on-mobile {
     display: block;
 }
 
+/* .show-on-mobile: ẨN trên desktop, HIỆN trên mobile */
 .show-on-mobile {
     display: none;
 }
 
+/* Áp dụng trên mobile (<=768px) */
 @media (max-width: 768px) {
     .hide-on-mobile {
-        display: none !important;
+        display: none !important;    /* Ẩn với !important để override */
     }
 
     .show-on-mobile {
-        display: block !important;
+        display: block !important;   /* Hiện với !important */
     }
 }

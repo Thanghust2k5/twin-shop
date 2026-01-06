@@ -1,6 +1,46 @@
 /* =========================================================
-   1. CORE STYLES (HEADER, NAVBAR, HOME)
+   MAIN.CSS - FILE CSS CHÍNH CỦA WEBSITE TWIN SHOP
+   =========================================================
+   
+   File này chứa TẤT CẢ styles cho giao diện website bao gồm:
+   
+   1. CORE STYLES - Header, Navbar, Thanh tìm kiếm
+   2. MODALS - Popup đăng nhập/đăng ký
+   3. HOME PAGE - Trang chủ, Banner, Danh mục
+   4. PRODUCT GRID - Lưới sản phẩm
+   5. CART PAGE - Trang giỏ hàng
+   6. PAGINATION - Phân trang
+   7. FOOTER - Chân trang
+   8. ANIMATIONS - Hiệu ứng động
+   
+   NGUYÊN TẮC VIẾT CSS (quan trọng cho người mới):
+   - Dùng class thay vì id để tái sử dụng
+   - Naming convention: BEM (Block__Element--Modifier)
+   - CSS Variables: Định nghĩa ở base.css, dùng var() để gọi
+   - Mobile-first: Styles cơ bản trước, responsive sau
+   
    ========================================================= */
+
+
+/* =========================================================
+   SECTION 1: HEADER - THANH ĐIỀU HƯỚNG TRÊN CÙNG
+   =========================================================
+   
+   Header bao gồm:
+   - Thanh navbar nhỏ (kết nối, thông báo, ngôn ngữ, user)
+   - Logo shop
+   - Thanh search
+   - Icon giỏ hàng với mini cart preview
+   
+   Layout: Fixed ở top, luôn hiển thị khi scroll
+   ========================================================= */
+
+/* 
+ * .header: Container chính của header
+ * - position: fixed -> Cố định ở top khi scroll
+ * - z-index: 999 -> Nằm trên các element khác
+ * - Gradient cam đỏ: #ee4d2d -> #ff7337 (màu thương hiệu)
+ */
 .header {
   height: var(--header-height);
   background-image: linear-gradient(#ee4d2d, #ff7337);
@@ -11,15 +51,27 @@
   z-index: 999;
 }
 
+/*
+ * .app__container: Container chính của nội dung
+ * margin-top = header-height để nội dung không bị che bởi fixed header
+ */
 .app__container {
   margin-top: var(--header-height);
 }
 
+/* 
+ * .header__navbar: Thanh menu nhỏ phía trên
+ * Flexbox với justify-content: space-between để 2 nhóm menu nằm 2 bên
+ */
 .header__navbar {
   display: flex;
   justify-content: space-between;
 }
 
+/* 
+ * .header__navbar-list: Nhóm các menu items
+ * Flexbox horizontal, reset default ul styles
+ */
 .header__navbar-list {
   list-style: none;
   padding-left: 0;
@@ -28,16 +80,25 @@
   align-items: center;
 }
 
+/* 
+ * .header__navbar-item: Mỗi item trong navbar
+ * position: relative để chứa dropdown menu
+ */
 .header__navbar-item {
   margin: 0 8px;
   position: relative;
   min-height: 26px;
 }
 
+/* Hiển thị QR code khi hover vào item có QR */
 .header__navbar-item-has-qr:hover .header__qr {
   display: block;
 }
 
+/* 
+ * Styles chung cho navbar items và links
+ * Font size nhỏ (1.4rem), màu trắng, font nhẹ
+ */
 .header__navbar-item,
 .header__navbar-item-link {
   display: inline-block;
@@ -47,6 +108,7 @@
   font-weight: 300;
 }
 
+/* Flexbox để icon và text căn giữa theo chiều dọc */
 .header__navbar-item,
 .header__navbar-item-link,
 .header__navbar-icon-link {
@@ -54,6 +116,7 @@
   align-items: center;
 }
 
+/* Hover effect: giảm opacity để có cảm giác interactive */
 .header__navbar-item:hover,
 .header__navbar-icon-link:hover,
 .header__navbar-item-link:hover {
@@ -61,10 +124,15 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* Modifier: Text đậm hơn */
 .header__navbar-item--strong {
   font-weight: 400;
 }
 
+/* 
+ * Modifier: Item có dấu gạch phân cách
+ * Dùng pseudo-element ::after để tạo thanh dọc
+ */
 .header__navbar-item--separate::after {
   content: "";
   display: block;
@@ -74,24 +142,31 @@
   background-color: #fb9086;
   right: -10px;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%); /* Căn giữa theo chiều dọc */
 }
 
+/* Link chứa icon trong navbar */
 .header__navbar-icon-link {
   color: var(--white-color);
   text-decoration: none;
 }
 
+/* Icon trong navbar: size lớn hơn text */
 .header__navbar-icon {
   font-size: 1.8rem;
   margin: 0 3px;
 }
 
+/* Title không click được (pure text) */
 .header__navbar-title--no-pointer {
   cursor: text;
   color: var(--white-color);
 }
 
+/* 
+ * Badge thông báo số lượng giỏ hàng
+ * Position absolute để nằm ở góc trên phải của icon
+ */
 .header__cart-notice {
   position: absolute;
   top: -6px;
@@ -106,18 +181,30 @@
   font-weight: 500;
 }
 
-/* USER MENU */
+/* =========================================================
+   SECTION 1.1: USER DROPDOWN MENU
+   =========================================================
+   Menu dropdown khi hover vào avatar user
+   Hiển thị: Tài khoản, Đơn hàng, Đăng xuất
+   ========================================================= */
+
+/* Container cho user menu */
 .header__navbar-user {
   display: flex;
   align-items: center;
-  position: relative;
+  position: relative; /* Để chứa dropdown menu */
 }
 
+/* 
+ * Dropdown menu chính
+ * Mặc định: display: none (ẩn)
+ * Hiện khi hover vào parent
+ */
 .header__navbar-user-menu {
   position: absolute;
   z-index: 2;
   padding-left: 0;
-  top: calc(100% + 4px);
+  top: calc(100% + 4px); /* Nằm ngay dưới avatar */
   right: 0;
   background-color: var(--white-color);
   border-radius: 2px;
@@ -128,6 +215,10 @@
   animation: fadeIn ease-in 0.2s;
 }
 
+/* 
+ * Mũi tên trỏ lên (pseudo-element)
+ * Dùng border trick để tạo tam giác
+ */
 .header__navbar-user-menu::after {
   content: "";
   display: block;
@@ -139,6 +230,10 @@
   border-color: transparent transparent var(--white-color) transparent;
 }
 
+/* 
+ * Vùng hover mở rộng (invisible)
+ * Giữ menu mở khi di chuột từ avatar xuống menu
+ */
 .header__navbar-user-menu::before {
   content: "";
   display: block;
@@ -150,10 +245,12 @@
   background-color: transparent;
 }
 
+/* Hover vào user -> hiện menu */
 .header__navbar-user:hover .header__navbar-user-menu {
   display: block;
 }
 
+/* Styles cho mỗi item trong menu */
 .header__navbar-user-item a {
   text-decoration: none;
   color: var(--text-color);
@@ -162,12 +259,20 @@
   display: block;
 }
 
+/* Hover effect cho menu item */
 .header__navbar-user-item a:hover {
   background-color: #fafafa;
   color: var(--primary-color);
 }
 
-/* HEADER QR */
+
+/* =========================================================
+   SECTION 1.2: QR CODE POPUP
+   =========================================================
+   Popup hiển thị QR code để tải app mobile
+   ========================================================= */
+
+/* Container popup QR */
 .header__qr {
   width: 186px;
   background-color: var(--white-color);
@@ -176,11 +281,13 @@
   left: 0;
   padding: 8px;
   border-radius: 2px;
-  display: none;
+  display: none; /* Mặc định ẩn */
   animation: fadeIn ease 0.5s;
   z-index: 1;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
+
+/* Vùng hover mở rộng */
 .header__qr::before {
   content: "";
   position: absolute;
@@ -191,15 +298,18 @@
   display: block;
 }
 
+/* Ảnh QR code full width */
 .header__qr-img {
   width: 100%;
 }
 
+/* Container cho app store links */
 .header__qr-app {
   display: flex;
   justify-content: space-between;
 }
 
+/* Spacing cho app links */
 .header__qr-link:first-child {
   margin-left: 11px;
 }
@@ -208,10 +318,19 @@
   margin-right: 11px;
 }
 
+/* Ảnh App Store/Play Store */
 .header__qr-download-img {
   height: 16px;
 }
 
+
+/* =========================================================
+   SECTION 1.3: LOGO VÀ THANH TÌM KIẾM
+   =========================================================
+   Phần giữa header: Logo + Search bar + Cart icon
+   ========================================================= */
+
+/* Container cho logo, search, cart */
 .header-with-search {
   height: var(--header-with-search-height);
   display: flex;
@@ -219,19 +338,26 @@
   margin: 0 8px;
 }
 
+/* Container logo */
 .header__logo {
   width: 200px;
 }
 
+/* Link logo (transparent để click được) */
 .header__logo-link {
   color: transparent;
   text-decoration: none;
 }
 
+/* Ảnh logo */
 .header__logo-img {
   width: 150px;
 }
 
+/* 
+ * Thanh tìm kiếm
+ * flex: 1 -> Chiếm toàn bộ không gian còn lại
+ */
 .header__search {
   flex: 1;
   height: 40px;
@@ -241,12 +367,20 @@
   align-items: center;
 }
 
-/* HEADER CART */
+
+/* =========================================================
+   SECTION 1.4: MINI CART (GIỎ HÀNG PREVIEW)
+   =========================================================
+   Icon giỏ hàng + Dropdown preview sản phẩm
+   ========================================================= */
+
+/* Container icon giỏ hàng */
 .header__cart {
   width: 150px;
   text-align: center;
 }
 
+/* Wrapper có position relative cho dropdown */
 .header__cart-wrap {
   position: relative;
   display: inline-block;
@@ -254,16 +388,22 @@
   cursor: pointer;
 }
 
+/* Icon giỏ hàng (màu trắng, size lớn) */
 .header__cart-icon {
   font-size: 2.4rem;
   color: var(--white-color);
   margin-top: 6px;
 }
 
+/* Hover vào cart -> hiện dropdown list */
 .header__cart-wrap:hover .header__cart-list {
   display: block;
 }
 
+/* 
+ * Dropdown chứa danh sách sản phẩm trong giỏ
+ * Position absolute, nằm dưới icon
+ */
 .header__cart-list {
   cursor: default;
   position: absolute;
@@ -278,6 +418,7 @@
   z-index: 1;
 }
 
+/* Mũi tên trỏ lên (border triangle) */
 .header__cart-list::after {
   cursor: pointer;
   content: "";
@@ -289,10 +430,12 @@
   border-color: transparent transparent var(--white-color) transparent;
 }
 
+/* Trạng thái giỏ hàng trống */
 .header__cart-list--no-cart {
   padding: 28px 0;
 }
 
+/* Ảnh giỏ hàng trống */
 .header__cart-no-cart-img {
   width: 54%;
 }
@@ -413,13 +556,21 @@
   background-color: #f05d41;
 }
 
-/* HEADER SEARCH */
+
+/* =========================================================
+   SECTION 1.5: THANH TÌM KIẾM (SEARCH BAR)
+   =========================================================
+   Input tìm kiếm với lịch sử tìm kiếm dropdown
+   ========================================================= */
+
+/* Wrapper cho input (chiếm full width còn lại) */
 .header__search-input-wrap {
   flex: 1;
   height: 100%;
-  position: relative;
+  position: relative; /* Cho dropdown history */
 }
 
+/* Input field chính */
 .header__search-input {
   width: 100%;
   height: 100%;
@@ -431,6 +582,7 @@
   border-radius: 2px;
 }
 
+/* Nút tìm kiếm (màu cam) */
 .header__search-btn {
   background-color: var(--primary-color);
   border: none;
@@ -446,15 +598,21 @@
   background-color: #fb6445;
 }
 
+/* Icon kính lúp trong nút */
 .header__search-btn-icon {
   font-size: 1.4rem;
   color: var(--white-color);
 }
 
+/* 
+ * Hiện lịch sử tìm kiếm khi focus vào input
+ * Dùng CSS sibling selector (~)
+ */
 .header__search-input:focus ~ .header__search-history {
   display: block;
 }
 
+/* Dropdown lịch sử tìm kiếm */
 .header__search-history {
   position: absolute;
   top: calc(100% + 2px);
@@ -463,11 +621,12 @@
   background-color: var(--white-color);
   box-shadow: 0 1px 5px #d6d1d1;
   border-radius: 2px;
-  display: none;
+  display: none; /* Mặc định ẩn */
   overflow: hidden;
   z-index: 1;
 }
 
+/* Tiêu đề "Lịch sử tìm kiếm" */
 .header__search-history-heading {
   margin: 12px 12px 0 12px;
   font-size: 1.4rem;
@@ -475,12 +634,14 @@
   color: #999;
 }
 
+/* List các từ khóa đã tìm */
 .header__search-history-list {
   list-style: none;
   padding-left: 0;
   margin: 6px 0 0;
 }
 
+/* Mỗi item trong lịch sử */
 .header__search-history-item {
   height: 38px;
   padding: 0 12px;
@@ -491,6 +652,7 @@
   cursor: pointer;
 }
 
+/* Link trong history item */
 .header__search-history-item a {
   display: flex;
   align-items: center;
@@ -500,7 +662,20 @@
   font-size: 1.4rem;
 }
 
-/* AUTH MODAL */
+
+/* =========================================================
+   SECTION 2: AUTH MODAL - POPUP ĐĂNG NHẬP/ĐĂNG KÝ
+   =========================================================
+   
+   Modal form cho:
+   - Đăng nhập (Login)
+   - Đăng ký (Register)
+   - Quên mật khẩu
+   
+   Hiển thị ở giữa màn hình với overlay backdrop
+   ========================================================= */
+
+/* Container form (500px width, bo góc) */
 .auth-form {
   width: 500px;
   background-color: var(--white-color);
@@ -508,10 +683,12 @@
   overflow: hidden;
 }
 
+/* Padding nội dung bên trong */
 .auth-form__container {
   padding: 0 32px;
 }
 
+/* Header form: Title + Switch button */
 .auth-form__header {
   display: flex;
   align-items: center;
@@ -520,12 +697,14 @@
   margin-top: 10px;
 }
 
+/* Tiêu đề form (Đăng nhập / Đăng ký) */
 .auth-form__heading {
   font-size: 2.2rem;
   font-weight: 400;
   color: var(--text-color);
 }
 
+/* Nút switch giữa Login/Register */
 .auth-form__switch-btn {
   font-size: 1.6rem;
   font-weight: 400;
@@ -533,14 +712,17 @@
   cursor: pointer;
 }
 
+/* Form chính */
 .auth-form__form {
   margin-top: 16px;
 }
 
+/* Wrapper cho mỗi input field */
 .auth-form__input-wrap {
   margin-bottom: 8px;
 }
 
+/* Input field styling */
 .auth-form__input {
   width: 100%;
   height: 40px;
@@ -553,13 +735,16 @@
   box-sizing: border-box;
 }
 
+/* Focus state: border đậm hơn */
 .auth-form__input:focus {
   border-color: #777;
 }
 
-/* Validation Error Styles */
+
+/* ----- Validation Error Styles ----- */
+/* Thông báo lỗi validation */
 .validation-error {
-  color: #ee4d2d;
+  color: #ee4d2d;        /* Màu đỏ cam */
   font-size: 1.2rem;
   margin-top: 4px;
   display: flex;
@@ -567,14 +752,18 @@
   gap: 4px;
 }
 
+/* Input có lỗi: border đỏ */
 .input-error {
   border-color: #ee4d2d !important;
 }
 
+
+/* Phần aside (chính sách, điều khoản) */
 .auth-form__aside {
   margin-top: 18px;
 }
 
+/* Text chính sách */
 .auth-form__policy-text {
   font-size: 1.2rem;
   line-height: 1.8rem;
@@ -582,21 +771,25 @@
   padding: 0 12px;
 }
 
+/* Link trong policy (màu cam) */
 .auth-form__policy-link {
   color: var(--primary-color);
   text-decoration: none;
 }
 
+/* Container nút điều khiển (Quay lại, Đăng nhập) */
 .auth-form__controls {
   margin-top: 80px;
   display: flex;
   justify-content: flex-end;
 }
 
+/* Nút quay lại */
 .auth-form__controls-back {
   margin-right: 8px;
 }
 
+/* Phần đăng nhập bằng mạng xã hội */
 .auth-form__socials {
   background-color: #f5f5f5;
   padding: 16px 36px;
@@ -605,6 +798,7 @@
   margin-top: 22px;
 }
 
+/* Nút social có icon */
 .btn.btn--with-icon {
   display: flex;
   align-items: center;
@@ -614,10 +808,12 @@
   padding: 0 8px;
 }
 
+/* Icon trong nút social */
 .auth-form__socials-icon {
   font-size: 1.8rem;
 }
 
+/* Nút Facebook: nền xanh, chữ trắng */
 .auth-form__socials--facebook {
   color: var(--white-color);
   background-color: #3a5a98;
@@ -627,15 +823,18 @@
   color: var(--white-color);
 }
 
+/* Text trong nút social */
 .auth-form__socials-title {
   margin: 0 24px;
 }
 
+/* Nút Google: nền trắng, chữ xám */
 .auth-form__socials--google {
   color: #666;
   background-color: var(--white-color);
 }
 
+/* Links hỗ trợ (Quên mật khẩu, Cần trợ giúp?) */
 .auth-form__help {
   display: flex;
   justify-content: flex-end;
@@ -647,6 +846,7 @@
   color: #939393;
 }
 
+/* Dấu ngăn cách giữa các link */
 .auth-form__help-separate {
   display: block;
   height: 22px;
@@ -654,19 +854,37 @@
   border-left: 1px solid #eaeaea;
 }
 
+/* Link "Quên mật khẩu": màu cam */
 .auth-form__help-forgot {
   color: var(--primary-color);
 }
 
-/* APP CONTENT */
+
+/* =========================================================
+   SECTION 3: HOME PAGE - NỘI DUNG TRANG CHỦ
+   =========================================================
+   
+   Bao gồm:
+   - Sidebar danh mục (categories)
+   - Bộ lọc sản phẩm (sorting & filters)
+   - Grid sản phẩm
+   ========================================================= */
+
+/* Container chính cho nội dung */
 .app__content {
   padding-top: 36px;
 }
 
+
+/* ----- SIDEBAR DANH MỤC ----- */
+
+/* Container sidebar */
 .category {
   border-radius: 2px;
   background-color: var(--white-color);
 }
+
+/* Tiêu đề danh mục */
 .category__heading {
   font-size: 1.8rem;
   font-weight: 600;
@@ -677,15 +895,18 @@
   margin-top: 0;
 }
 
+/* List danh mục */
 .category-list {
   padding: 0 0 6px 0;
   list-style: none;
 }
 
+/* Item đang active: màu cam */
 .category-item--active .category-item__link {
   color: var(--primary-color);
 }
 
+/* Link danh mục */
 .category-item__link {
   position: relative;
   color: var(--text-color);
@@ -697,6 +918,10 @@
   transition: right linear 0.1s;
 }
 
+/* 
+ * Mũi tên indicator (pseudo-element)
+ * Mặc định ẩn, hiện khi hover/active
+ */
 .category-item__link::before {
   content: "";
   position: absolute;
@@ -710,26 +935,33 @@
   transition: left linear 0.1s, opacity linear 0.1s;
 }
 
+/* Hover effect: dịch phải + đổi màu */
 .category-item__link:hover {
   right: -4px;
   color: var(--primary-color);
 }
 
+/* Hover: hiện mũi tên */
 .category-item__link:hover::before {
   left: 12px;
   opacity: 1;
 }
 
+/* Active state: mũi tên luôn hiện */
 .category-item--active .category-item__link::before {
   left: 12px;
   opacity: 1;
 }
 
-/* HOME SORTING & FILTERS */
+
+/* ----- BỘ LỌC SẮP XẾP (SORTING & FILTERS) ----- */
+
+/* Container bộ lọc */
 .home-product {
   margin-bottom: 10px;
 }
 
+/* Thanh filter (nền xám nhạt) */
 .home-filter {
   display: flex;
   padding: 12px 20px;
@@ -738,33 +970,39 @@
   background-color: rgba(0, 0, 0, 0.05);
 }
 
+/* Label "Sắp xếp theo" */
 .home-filter__label {
   font-size: 1.4rem;
   color: #555;
   margin-right: 16px;
 }
 
+/* Nút filter (Phổ biến, Mới nhất, Bán chạy...) */
 .home-filter__btn {
   min-width: 90px;
   margin-right: 12px;
 }
 
+/* Phân trang trong filter bar */
 .home-filter__page {
   display: flex;
   align-items: center;
-  margin-left: auto;
+  margin-left: auto; /* Đẩy sang phải */
 }
 
+/* Số trang: "1/3" */
 .home-filter__page-num {
   font-size: 1.5rem;
   color: var(--text-color);
   margin-right: 22px;
 }
 
+/* Số trang hiện tại: màu cam */
 .home-filter__page-current {
   color: var(--primary-color);
 }
 
+/* Container nút prev/next */
 .home-filter__page-control {
   border-radius: 2px;
   overflow: hidden;
@@ -773,6 +1011,7 @@
   height: 36px;
 }
 
+/* Nút prev/next */
 .home-filter__page-btn {
   display: flex;
   flex: 1;
@@ -780,16 +1019,19 @@
   background-color: var(--white-color);
 }
 
+/* Border giữa 2 nút */
 .home-filter__page-btn:first-child {
   border-right: 1px solid #eee;
 }
 
+/* Icon trong nút */
 .home-filter__page-icon {
   margin: auto;
   font-size: 1.4rem;
   color: #555;
 }
 
+/* Nút bị disable (trang đầu/cuối) */
 .home-filter__page-btn--disable {
   pointer-events: none;
   background-color: #f9f9f9;
@@ -799,6 +1041,7 @@
   color: #ccc;
 }
 
+/* Vùng hover mở rộng cho dropdown */
 .select-input__list::before {
   content: "";
   display: block;
@@ -810,7 +1053,21 @@
   cursor: auto;
 }
 
-/* HOME PRODUCT ITEM */
+
+/* =========================================================
+   SECTION 4: PRODUCT CARD - THẺ SẢN PHẨM
+   =========================================================
+   
+   Card hiển thị trong grid sản phẩm bao gồm:
+   - Ảnh thumbnail
+   - Tên sản phẩm (max 2 dòng)
+   - Giá hiện tại + Giảm giá
+   - Rating + Sold count
+   
+   Hover effect: nổi lên + shadow
+   ========================================================= */
+
+/* Container card sản phẩm */
 .home-product-item {
   display: block;
   text-decoration: none;
@@ -820,17 +1077,24 @@
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
-  will-change: transform;
+  will-change: transform;       /* Optimize animation performance */
   transition: transform linear 0.1s;
 }
 
+/* Hover effect: nổi lên + shadow lớn hơn */
 .home-product-item:hover {
   transform: translateY(-1px);
   box-shadow: 0 1px 20px rgba(0, 0, 0, 0.15);
   cursor: pointer;
 }
+
+/* 
+ * Ảnh sản phẩm (padding-top trick)
+ * Tạo aspect ratio 1:1 (vuông) bằng padding-top: 100%
+ * Ảnh là background-image, cover full area
+ */
 .home-product-item__img {
-  padding-top: 100%;
+  padding-top: 100%;             /* Aspect ratio 1:1 */
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -838,21 +1102,27 @@
   border-top-right-radius: 4px;
 }
 
+/* 
+ * Tên sản phẩm
+ * Max 2 dòng, cắt bớt với ...
+ * Dùng -webkit-line-clamp
+ */
 .home-product-item__name {
   font-size: 1.4rem;
   color: var(--text-color);
   font-weight: 400;
   line-height: 1.8rem;
-  height: 3.6rem;
+  height: 3.6rem;              /* = line-height * 2 dòng */
   margin: 10px 10px 6px;
   overflow: hidden;
   display: block;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 2;       /* Max 2 dòng */
   line-clamp: 2;
 }
 
+/* Container giá */
 .home-product-item__price {
   display: flex;
   align-items: center;
@@ -860,6 +1130,7 @@
   flex-wrap: wrap;
 }
 
+/* Giá hiện tại: màu cam, nổi bật */
 .home-product-item__price-current {
   font-size: 1.6rem;
   color: var(--primary-color);
@@ -867,6 +1138,7 @@
   font-weight: 400;
 }
 
+/* Ký hiệu tiền tệ (₫) */
 .home-product-item__currency {
   font-size: 1rem;
   text-decoration: underline;
@@ -874,6 +1146,7 @@
   top: -1px;
 }
 
+/* Badge giảm giá: "-10%" */
 .home-product-item__discount {
   font-size: 1rem;
   color: #ee4d2d;
@@ -886,11 +1159,13 @@
   text-transform: uppercase;
 }
 
+/* Container voucher label */
 .home-product-item__voucher {
   margin: 6px 10px 0;
   display: flex;
 }
 
+/* Label voucher: nền cam */
 .home-product-item__voucher-label {
   position: relative;
   background-color: #f69113;
@@ -902,6 +1177,10 @@
   border-radius: 2px;
 }
 
+/* 
+ * Container meta info (rating + sold)
+ * Flexbox, 2 đầu
+ */
 .home-product-item__meta {
   display: flex;
   justify-content: space-between;
@@ -909,6 +1188,10 @@
   margin: 6px 10px 0;
 }
 
+/* 
+ * Container rating stars
+ * Nền vàng nhạt với border vàng
+ */
 .home-product-item__rating {
   font-size: 1.6rem;
   display: flex;
@@ -920,6 +1203,7 @@
   color: #fabc65;
 }
 
+/* Icon sao vàng */
 .home-product-item__star--gold {
   position: relative;
   color: #ffce3e;
@@ -927,22 +1211,34 @@
   margin-right: 4px;
 }
 
+/* Điểm rating số */
 .home-product-item__rating-score {
   color: var(--text-color);
   font-size: 1.4rem;
 }
 
+/* Số lượng đã bán */
 .home-product-item__sold {
   font-size: 1.4rem;
   color: var(--text-color);
 }
 
-/* PAGINATION */
+
+/* =========================================================
+   SECTION 5: PAGINATION - PHÂN TRANG
+   =========================================================
+   
+   Thanh phân trang ở cuối danh sách sản phẩm
+   Gồm: Prev, số trang, Next
+   ========================================================= */
+
+/* Container pagination */
 .home-product__pagination {
   margin: 48px 0 32px 0;
   padding-left: 0;
 }
 
+/* List các pagination items */
 .pagination {
   display: flex;
   justify-content: center;
@@ -950,12 +1246,14 @@
   list-style: none;
 }
 
+/* Mỗi item (số trang hoặc nút) */
 .pagination-item {
   margin: 0 12px;
 }
 
+/* Link trong pagination item */
 .pagination-item__link {
-  --height: 30px;
+  --height: 30px;            /* CSS Variable cục bộ */
   display: block;
   text-decoration: none;
   font-size: 2rem;
@@ -963,38 +1261,54 @@
   color: #939393;
   min-width: 40px;
   height: var(--height);
-  line-height: var(--height);
+  line-height: var(--height);  /* Căn giữa text theo chiều dọc */
   text-align: center;
   border-radius: 2px;
 }
 
+/* Icon prev/next */
 .pagination-item__icon {
   font-size: 1.8rem;
   color: #939393;
 }
 
+/* Trang đang active: nền cam, chữ trắng */
 .pagination-item--active .pagination-item__link {
   background-color: var(--primary-color);
   color: var(--white-color);
 }
 
+/* Hover effect cho trang active */
 .pagination-item--active .pagination-item__link:hover {
   background-color: #ed5c3f;
 }
 
+/* Hover effect cho các trang khác */
 .pagination-item__link:hover {
   opacity: 0.8;
 }
 
+
 /* =========================================================
-   2. FOOTER STYLES
+   SECTION 6: FOOTER - CHÂN TRANG
+   =========================================================
+   
+   Footer bao gồm:
+   - Thông tin shop (Về chúng tôi, Liên hệ...)
+   - Chính sách (Đổi trả, Bảo hành...)
+   - Phương thức thanh toán & vận chuyển
+   - Download app QR
+   - Copyright
    ========================================================= */
+
+/* Container footer chính */
 .footer {
   border-top: 4px solid var(--primary-color);
   padding-top: 16px;
   background-color: var(--white-color);
 }
 
+/* Tiêu đề mỗi cột footer */
 .footer__heading {
   font-size: 1.4rem;
   text-transform: uppercase;
@@ -1003,6 +1317,7 @@
   margin: 40px 0 20px 0;
 }
 
+/* Cột đầu tiên: margin-top = 0 */
 .grid__row .grid__column-2-4:first-child .footer__heading {
   margin-top: 0;
 }
@@ -1010,11 +1325,13 @@
   margin-top: 0;
 }
 
+/* List links trong footer */
 .footer-list {
   list-style: none;
   padding-left: 0;
 }
 
+/* Link item trong footer */
 .footer-item__link {
   text-decoration: none;
   font-size: 1.2rem;
@@ -1024,16 +1341,19 @@
   align-items: center;
 }
 
+/* Hover: đổi màu cam */
 .footer-item__link:hover {
   color: var(--primary-color);
 }
 
+/* Icon trong footer link */
 .footer-item__icon {
   font-size: 1.6rem;
   margin: -1px 6px 0 0;
   color: #4a4a4a;
 }
 
+/* Container logos thanh toán & vận chuyển */
 .footer__pay-ship {
   display: flex;
   flex-wrap: wrap;
@@ -1041,6 +1361,7 @@
   margin-bottom: 24px;
 }
 
+/* Logo thanh toán/vận chuyển */
 .footer-item__pay-img,
 .footer-item__ship-img {
   background-size: contain;
@@ -1055,16 +1376,19 @@
   box-sizing: border-box;
 }
 
+/* Container phần download app */
 .footer__download {
   display: flex;
 }
 
+/* Ảnh QR code */
 .footer__download-qr {
   width: 80px;
   height: 80px;
   border: 1px solid #dbdbdb;
 }
 
+/* Container app store links */
 .footer__download-apps {
   flex: 1;
   margin-left: 16px;
@@ -1073,35 +1397,42 @@
   justify-content: center;
   gap: 16px;
 }
-
+/* Ảnh app store trong footer */
 .footer__download-app-img {
   height: 16px;
 }
 
+/* Link download app */
 .footer__download-app-link {
   color: transparent;
   text-decoration: none;
 }
 
+/* Phần bottom footer (nền xám) */
 .footer__bottom {
   background-color: #f5f5f5;
   padding: 42px 0 30px 0;
   margin-top: 36px;
 }
 
+/* Layout bottom footer */
 .footer__bottom .grid__row {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* POLICY & COMPANY */
+
+/* ----- POLICY & COMPANY INFO ----- */
+
+/* Section chính sách */
 .footer__policy-section {
   display: block !important;
   margin-top: 40px;
   text-align: center;
 }
 
+/* List links chính sách */
 .footer__policy-list {
   list-style: none;
   padding-left: 0;
@@ -1110,15 +1441,18 @@
   margin-bottom: 25px;
 }
 
+/* Mỗi item chính sách có border phải */
 .footer__policy-item {
   border-right: 1px solid #dbdbdb;
   padding: 0 25px;
 }
 
+/* Item cuối: không có border */
 .footer__policy-item:last-child {
   border-right: none;
 }
 
+/* Link chính sách */
 .footer__policy-link {
   text-decoration: none;
   font-size: 1.2rem;
@@ -1131,6 +1465,7 @@
   color: var(--primary-color);
 }
 
+/* Container chứng nhận (Bộ Công Thương...) */
 .footer__certification {
   display: flex;
   justify-content: center;
@@ -1143,6 +1478,7 @@
   text-decoration: none;
 }
 
+/* Logo chứng nhận */
 .footer__certification-img {
   height: 45px;
   width: auto;
@@ -1152,6 +1488,7 @@
   height: 48px;
 }
 
+/* Thông tin công ty */
 .footer__company-info {
   font-size: 1.2rem;
   color: #737373;
@@ -1166,23 +1503,40 @@
   margin: 6px 0;
 }
 
+
 /* =========================================================
-   3. PRODUCT DETAIL STYLES (ĐÃ ĐƯỢC DỌN DẸP & LÀM SẠCH)
+   SECTION 7: PRODUCT DETAIL - TRANG CHI TIẾT SẢN PHẨM
+   =========================================================
+   
+   Styles cho trang product-detail.html bao gồm:
+   - Gallery ảnh sản phẩm (main + thumbnails)
+   - Thông tin sản phẩm (tên, giá, đánh giá)
+   - Variant selection (màu sắc, size)
+   - Quantity selector
+   - Nút thêm giỏ hàng / Mua ngay
+   - Policy tooltips
    ========================================================= */
 
-/* FIX LỖI LAYOUT GRID */
+
+/* ----- FIX LỖI LAYOUT GRID ----- */
+/* Đảm bảo grid system hoạt động đúng */
+
 .grid__row {
     display: flex;
     flex-wrap: wrap;
     margin-left: -5px;
     margin-right: -5px;
 }
+
+/* Column 5/12 (41.67%) */
 .grid__column-5 {
     padding-left: 5px;
     padding-right: 5px;
     width: 41.66667%;
     box-sizing: border-box;
 }
+
+/* Column 7/12 (58.33%) */
 .grid__column-7 {
     padding-left: 5px;
     padding-right: 5px;
@@ -1190,7 +1544,10 @@
     box-sizing: border-box;
 }
 
-/* ẢNH SẢN PHẨM */
+
+/* ----- ẢNH SẢN PHẨM (PRODUCT GALLERY) ----- */
+
+/* Container ảnh chính */
 .product-detail__img-main-wrap {
   width: 450px;
   height: 450px;
@@ -1204,23 +1561,26 @@
   margin: 0 auto;
 }
 
+/* Ảnh chính (full size, contain) */
 .product-detail__img-main {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
+/* Container list thumbnail ảnh */
 .product-detail__list-img {
   display: flex;
   gap: 10px;
   margin-top: 15px;
   justify-content: flex-start;
-  overflow-x: auto;
+  overflow-x: auto;           /* Scroll ngang nếu nhiều ảnh */
   width: 450px;
   margin-left: auto;
   margin-right: auto;
 }
 
+/* Mỗi thumbnail wrapper */
 .product-detail__sub-img-wrap {
   width: 82px;
   height: 82px;
@@ -1231,17 +1591,21 @@
   overflow: hidden;
 }
 
+/* Ảnh thumbnail */
 .product-detail__sub-img-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
+/* Thumbnail đang active: border cam */
 .product-detail__sub-img-wrap.active {
   border: 2px solid #ee4d2d;
 }
 
-/* --- TOOLTIP CHÍNH SÁCH T-WIN --- */
+
+/* ----- TOOLTIP CHÍNH SÁCH T-WIN ----- */
+/* Tooltip hiển thị chi tiết chính sách khi hover */
 
 .twin-policy-container {
     position: relative;
@@ -1249,7 +1613,10 @@
     display: inline-block;
 }
 
-/* Vẫn giữ lớp giả "cây cầu" để di chuột xuống được */
+/* 
+ * Pseudo-element tạo "cầu nối"
+ * Giữ tooltip mở khi di chuột từ trigger xuống tooltip
+ */
 .twin-policy-container::after {
     content: "";
     display: block;
@@ -1261,16 +1628,20 @@
     background-color: transparent;
 }
 
+/* Trigger (phần được hover) */
 .twin-policy-trigger {
     display: flex;
     align-items: center;
 }
 
-/* Hộp thoại nội dung (Đã bỏ phần ::before tạo mũi tên) */
+/* 
+ * Hộp thoại tooltip
+ * Mặc định ẩn, hiện khi hover
+ */
 .twin-policy-tooltip {
     display: none;
     position: absolute;
-    top: 30px; /* Vị trí hộp thoại */
+    top: 30px;
     left: -20px;
     width: 400px;
     background: #fff;
@@ -1287,7 +1658,11 @@
     display: block;
 }
 
-/* BIẾN THỂ (SIZE/MÀU) */
+
+/* ----- BIẾN THỂ (VARIANT) - SIZE & MÀU SẮC ----- */
+/* Các nút chọn variant (size S, M, L / màu Đen, Trắng...) */
+
+/* Nút variant cơ bản */
 .variant-btn {
     min-width: 80px;
     height: 34px;
@@ -1301,24 +1676,31 @@
     border-radius: 2px;
 }
 
+/* Hover: border và text cam */
 .variant-btn:hover {
     border-color: #ee4d2d;
     color: #ee4d2d;
 }
 
+/* Active (đang chọn): nền hồng nhạt */
 .variant-btn.active {
     border-color: #ee4d2d;
     color: #ee4d2d;
     background-color: #fff5f1;
 }
 
+/* Disabled (hết hàng): mờ, không click được */
 .variant-btn.disabled {
     opacity: 0.5;
     cursor: not-allowed;
     background: #eee;
 }
 
-/* INPUT SỐ LƯỢNG (QUANTITY) */
+
+/* ----- INPUT SỐ LƯỢNG (QUANTITY) ----- */
+/* Bộ chọn số lượng: [-] [5] [+] */
+
+/* Container chính */
 .qnt-box {
     display: flex;
     align-items: center;
@@ -1329,6 +1711,7 @@
     transition: all 0.2s;
 }
 
+/* Nút +/- */
 .qnt-btn {
     border: none;
     background: transparent;
@@ -1339,6 +1722,7 @@
     font-weight: 400;
 }
 
+/* Input số lượng */
 .qnt-input {
     width: 50px;
     text-align: center;
@@ -1351,14 +1735,14 @@
     background: transparent;
 }
 
-/* Ẩn mũi tên input number */
+/* Ẩn mũi tên mặc định của input[type=number] */
 .qnt-input::-webkit-outer-spin-button,
 .qnt-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-/* Trạng thái Disabled (Khi hết hàng/chưa chọn) */
+/* Trạng thái Disabled (Khi hết hàng/chưa chọn variant) */
 .qnt-box.disabled {
     border-color: #eee;
     background-color: #fff; 
@@ -1375,11 +1759,18 @@
     cursor: not-allowed;
 }
 
+
 /* =========================================================
-   GIAO DIỆN MÔ TẢ & ĐÁNH GIÁ (CHUẨN SHOPEE)
+   SECTION 8: MÔ TẢ & ĐÁNH GIÁ SẢN PHẨM
+   =========================================================
+   
+   Phần dưới thông tin sản phẩm:
+   - Box mô tả chi tiết sản phẩm
+   - Box đánh giá với overview score
+   - Danh sách reviews từ người mua
    ========================================================= */
 
-/* KHUNG CHUNG */
+/* Container chung cho mô tả/đánh giá */
 .product-content-box {
     display: block;
     background-color: #fff;
@@ -1389,44 +1780,52 @@
     overflow: hidden;
 }
 
+/* Header box (MÔ TẢ SẢN PHẨM / ĐÁNH GIÁ) */
 .product-content-header {
     background: rgba(0,0,0,.02);
     padding: 14px 20px;
     color: rgba(0,0,0,.87);
     font-size: 1.8rem;
-    font-weight: 400; /* Font mỏng hơn chút cho giống */
+    font-weight: 400;
     text-transform: uppercase;
     margin: 0;
 }
 
+/* Body content */
 .product-content-body {
-    padding: 30px 18px; /* Padding rộng rãi */
+    padding: 30px 18px;
     font-size: 1.4rem;
     color: rgba(0,0,0,.8);
-    line-height: 1.8; /* Dãn dòng dễ đọc */
-    white-space: pre-line;
+    line-height: 1.8;        /* Dãn dòng dễ đọc */
+    white-space: pre-line;   /* Giữ xuống dòng từ text */
     overflow: hidden;
     text-align: justify;
 }
 
-/* --- PHẦN TỔNG HỢP ĐÁNH GIÁ (CÁI HỘP MÀU HỒNG NHẠT) --- */
+
+/* ----- RATING OVERVIEW (TỔNG HỢP ĐÁNH GIÁ) ----- */
+/* Box hiển thị điểm trung bình + phân bố sao */
+
+/* Container overview */
 .rating-overview {
     display: flex;
     align-items: center;
-    background-color: #fffbf8; /* Màu nền hồng phấn nhạt */
+    background-color: #fffbf8;  /* Nền hồng phấn nhạt */
     border: 1px solid #f9ede5;
     margin-bottom: 20px;
     padding: 30px;
     border-radius: 2px;
 }
 
+/* Wrapper điểm số */
 .rating-overview__score-wrapper {
     text-align: center;
     margin-right: 30px;
 }
 
+/* Điểm số lớn (4.9) */
 .rating-overview__score {
-    font-size: 3rem; /* Số to 4.9 */
+    font-size: 3rem;
     font-weight: 500;
     color: #ee4d2d;
 }
@@ -1452,6 +1851,7 @@
     margin-left: 15px;
 }
 
+/* Nút filter đánh giá (Tất cả, 5 Sao, 4 Sao...) */
 .rating-filter-btn {
     height: 32px;
     line-height: 32px;
@@ -1469,23 +1869,29 @@
     min-width: 100px;
 }
 
+/* Filter button active: border cam */
 .rating-filter-btn.active {
     border-color: #ee4d2d;
     color: #ee4d2d;
     fill: #ee4d2d;
 }
 
-/* --- DANH SÁCH ĐÁNH GIÁ --- */
+
+/* ----- DANH SÁCH ĐÁNH GIÁ (REVIEW LIST) ----- */
+
+/* Container list reviews */
 .review-list {
     padding: 0 20px 20px;
 }
 
+/* Mỗi review item */
 .review-item {
     display: flex;
     padding: 18px 0;
     border-bottom: 1px solid rgba(0,0,0,.09);
 }
 
+/* Avatar người đánh giá */
 .review-avatar {
     width: 40px;
     height: 40px;
@@ -1502,31 +1908,37 @@
     object-fit: cover;
 }
 
+/* Phần content review */
 .review-main {
     flex: 1;
 }
 
+/* Tên người đánh giá */
 .review-author-name {
     font-size: 1.2rem;
     color: #333;
     text-decoration: none;
 }
 
+/* Container sao + ngày */
 .review-star-date {
     margin-top: 6px;
 }
 
+/* Rating stars màu cam */
 .review-stars {
     color: #ee4d2d;
     font-size: 1rem;
     margin-right: 8px;
 }
 
+/* Thời gian đánh giá */
 .review-time {
     font-size: 1.2rem;
     color: rgba(0,0,0,.54);
 }
 
+/* Nội dung đánh giá */
 .review-content {
     position: relative;
     margin-top: 15px;
@@ -1536,7 +1948,7 @@
     margin-bottom: 15px;
 }
 
-/* KHUNG PHẢN HỒI CỦA NGƯỜI BÁN (MÀU XÁM) */
+/* Phản hồi của shop (nền xám) */
 .review-response {
     background-color: #f5f5f5;
     padding: 12px;
@@ -1544,20 +1956,22 @@
     border-radius: 2px;
 }
 
+/* Label "Phản hồi của Người bán" */
 .review-response__label {
-    color: #8b572a; /* Màu nâu đặc trưng của shopee */
+    color: #8b572a;       /* Màu nâu đặc trưng */
     font-size: 1.4rem;
     margin-bottom: 8px;
     display: block;
 }
 
+/* Nội dung phản hồi */
 .review-response__content {
     font-size: 1.4rem;
     color: rgba(0,0,0,.87);
     line-height: 1.5;
 }
 
-/* NÚT THÍCH & MENU */
+/* Actions (Thích, Menu...) */
 .review-actions {
     margin-top: 18px;
     display: flex;
@@ -1571,26 +1985,40 @@
     display: flex;
     align-items: center;
 }
+
 .review-action-btn:hover {
     color: #333;
 }
 
+
 /* =========================================================
-   TOAST NOTIFICATION
+   SECTION 9: TOAST NOTIFICATION - THÔNG BÁO NỔI
+   =========================================================
+   
+   Toast hiển thị ở giữa màn hình:
+   - Success: màu xanh lá
+   - Error: màu đỏ
+   - Warning: màu cam
+   - Info: màu xanh dương
+   
+   Animation: fade + scale
    ========================================================= */
+
+/* Container chứa tất cả toasts */
 #toast-container {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 10000;
+    z-index: 10000;           /* Trên tất cả mọi thứ */
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    pointer-events: none;
+    pointer-events: none;     /* Click through khi không có toast */
 }
 
+/* Mỗi toast item */
 .toast {
     display: flex;
     align-items: center;
@@ -1609,41 +2037,47 @@
     flex-direction: column;
 }
 
+/* Toast đang hiển thị */
 .toast--show {
     opacity: 1;
     transform: scale(1);
 }
 
+/* Toast đang ẩn */
 .toast--hide {
     opacity: 0;
     transform: scale(0.8);
 }
 
+/* Icon trong toast */
 .toast__icon {
     font-size: 50px;
     margin-bottom: 15px;
 }
 
+/* Màu icon theo loại toast */
 .toast--success .toast__icon {
-    color: #4caf50;
+    color: #4caf50;           /* Xanh lá */
 }
 
 .toast--error .toast__icon {
-    color: #f44336;
+    color: #f44336;           /* Đỏ */
 }
 
 .toast--warning .toast__icon {
-    color: #ff9800;
+    color: #ff9800;           /* Cam */
 }
 
 .toast--info .toast__icon {
-    color: #2196f3;
+    color: #2196f3;           /* Xanh dương */
 }
 
+/* Container content */
 .toast__content {
     flex: 1;
 }
 
+/* Message text */
 .toast__message {
     margin: 0;
     font-size: 1.6rem;

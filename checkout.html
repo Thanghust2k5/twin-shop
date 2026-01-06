@@ -1,49 +1,145 @@
+<!-- 
+===================================================================================
+   CHECKOUT.HTML - TRANG THANH TOÁN ĐƠN HÀNG
+===================================================================================
+   
+   MỤC ĐÍCH:
+   Trang hoàn tất đơn hàng sau khi người dùng chọn sản phẩm từ giỏ hàng.
+   Cho phép người dùng:
+   - Chọn/thêm địa chỉ giao hàng
+   - Xem lại danh sách sản phẩm đã chọn
+   - Chọn phương thức vận chuyển
+   - Chọn phương thức thanh toán (COD hoặc T-WinPay)
+   - Xác nhận đặt hàng
+
+   CẤU TRÚC TRANG:
+   ┌──────────────────────────────────────────────────────┐
+   │  HEADER: Logo + "Thanh Toán"                          │
+   ├──────────────────────────────────────────────────────┤
+   │  SECTION 1: Địa chỉ nhận hàng                         │
+   │  - Hiển thị địa chỉ đã chọn                           │
+   │  - Nút "Thay Đổi" mở modal chọn địa chỉ               │
+   ├──────────────────────────────────────────────────────┤
+   │  SECTION 2: Danh sách sản phẩm                        │
+   │  - Bảng: Sản phẩm | Phân loại | Giá | SL | Thành tiền │
+   │  - Lời nhắn cho người bán                             │
+   │  - Chọn đơn vị vận chuyển                             │
+   ├──────────────────────────────────────────────────────┤
+   │  SECTION 3: Thanh toán                                │
+   │  - Chọn phương thức: COD hoặc T-WinPay                │
+   │  - Hiển thị chi phí: Tiền hàng + Phí ship             │
+   │  - Nút "Đặt hàng"                                     │
+   ├──────────────────────────────────────────────────────┤
+   │  FOOTER                                               │
+   └──────────────────────────────────────────────────────┘
+
+   MODALS:
+   - modal-address: Chọn địa chỉ từ danh sách
+   - modal-add-address: Thêm địa chỉ mới
+   - modal-shipping: Chọn đơn vị vận chuyển
+   - modal-warning: Hiển thị thông báo lỗi/cảnh báo
+
+   LUỒNG HOẠT ĐỘNG:
+   1. User từ cart.html chọn sản phẩm → click "Mua Hàng"
+   2. Dữ liệu sản phẩm được lưu vào sessionStorage
+   3. Redirect đến checkout.html
+   4. checkout.js đọc sessionStorage → render danh sách sản phẩm
+   5. User chọn địa chỉ, vận chuyển, thanh toán
+   6. Click "Đặt hàng" → gọi API /orders → tạo đơn hàng
+
+   FILES LIÊN QUAN:
+   - checkout.css: Style riêng cho trang này
+   - checkout.js: Logic xử lý đặt hàng
+   - main.js: Logic chung (auth, utils)
+   - validation.js: Validate form input
+=================================================================================== 
+-->
 <!DOCTYPE html>
 <html lang="vi">
   <head>
+    <!-- ==============================================
+         META TAGS VÀ CSS
+         ==============================================
+    -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Thanh toán - T-Win Shop</title>
+    
+    <!-- Favicon - icon trên tab trình duyệt -->
     <link rel="icon" type="image/png" href="./assets/img/logo_favicon.png" />
+    
+    <!-- CSS Files -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
-    <link rel="stylesheet" href="./assets/css/base.css" />
-    <link rel="stylesheet" href="./assets/css/main.css" />
-    <link rel="stylesheet" href="./assets/css/checkout.css" />
-    <link rel="stylesheet" href="./assets/css/responsive.css" />
+    <link rel="stylesheet" href="./assets/css/base.css" />      <!-- CSS reset và variables -->
+    <link rel="stylesheet" href="./assets/css/main.css" />      <!-- CSS chung toàn site -->
+    <link rel="stylesheet" href="./assets/css/checkout.css" />  <!-- CSS riêng trang checkout -->
+    <link rel="stylesheet" href="./assets/css/responsive.css" /><!-- CSS responsive -->
     <link rel="stylesheet" href="./assets/fonts/fontawesome-free-7.1.0/css/all.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 
   </head>
   <body>
     <div class="app">
+      <!-- ==============================================
+           HEADER ĐƠN GIẢN CHO TRANG CHECKOUT
+           ==============================================
+           Khác với header thông thường:
+           - Không có menu, search bar
+           - Chỉ có logo + text "Thanh Toán"
+           - Background trắng, static (không sticky)
+      ============================================== -->
       <header class="header" style="height: 100px; background-image: none; background-color: #fff; border-bottom: 1px solid #e0e0e0; position: static;">
         <div class="grid" style="height: 100%; display: flex; align-items: center; justify-content: space-between;">
+          <!-- Logo + Text "Thanh Toán" -->
           <div style="display: flex; align-items: center">
             <a href="index.html" style="text-decoration: none; display: flex; align-items: center">
               <i class="fa-solid fa-bag-shopping" style="font-size: 40px; color: #ee4d2d; margin-right: 15px"></i>
               <span style="font-size: 28px; color: #ee4d2d; font-weight: 500; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">Twin Shop</span>
             </a>
+            <!-- Đường kẻ phân cách -->
             <div style="margin-left: 20px; border-left: 1px solid #ee4d2d; height: 30px;"></div>
             <span style="margin-left: 20px; font-size: 22px; color: #ee4d2d">Thanh Toán</span>
           </div>
+          <!-- Link hỗ trợ -->
           <a href="#" style="text-decoration: none; color: #ee4d2d; font-size: 1.4rem">Cần trợ giúp?</a>
         </div>
       </header>
 
+      <!-- ==============================================
+           PHẦN NỘI DUNG CHÍNH
+           ==============================================
+      -->
       <div class="app__container" style="padding-top: 20px">
         <div class="grid">
+          
+          <!-- ==============================================
+               SECTION 1: ĐỊA CHỈ NHẬN HÀNG
+               ==============================================
+               Hiển thị địa chỉ giao hàng đã chọn
+               Có nút "Thay Đổi" để mở modal chọn địa chỉ khác
+          ============================================== -->
           <div class="checkout-section">
+            <!-- Đường kẻ gradient màu cam-xanh ở trên -->
             <div class="checkout-address-line"></div>
             <div class="checkout-address-content">
+              <!-- Tiêu đề với icon location -->
               <div class="checkout-header" style="color: #ee4d2d; font-size: 1.8rem; margin-bottom: 15px">
                 <i class="fa-solid fa-location-dot"></i> Địa Chỉ Nhận Hàng
               </div>
+              
+              <!-- Box hiển thị địa chỉ đã chọn -->
               <div id="selected-address-box" style="display: flex; align-items: center; justify-content: space-between; font-size: 1.6rem;">
+                <!-- Tên + SĐT người nhận -->
                 <div style="font-weight: bold; margin-right: 10px" id="addr-name-phone">Đang tải...</div>
+                <!-- Địa chỉ chi tiết -->
                 <div style="flex: 1; margin-left: 20px; color: #333" id="addr-detail">...</div>
+                <!-- Badge "Mặc định" nếu là địa chỉ default -->
                 <div style="margin-left: 20px; color: #ee4d2d; border: 1px solid #ee4d2d; padding: 2px 5px; font-size: 1.2rem; display: none;" id="addr-default-badge">Mặc định</div>
+                <!-- Nút thay đổi địa chỉ -->
                 <button class="btn btn--text" onclick="openAddressModal()">Thay Đổi</button>
               </div>
+              
+              <!-- Box hiển thị khi chưa có địa chỉ -->
               <div id="no-address-box" style="display: none; text-align: center">
                 <p>Bạn chưa có địa chỉ nhận hàng.</p>
                 <button class="btn btn--primary" onclick="openAddressModal()">+ Thêm Địa Chỉ</button>
@@ -51,7 +147,15 @@
             </div>
           </div>
 
+          <!-- ==============================================
+               SECTION 2: DANH SÁCH SẢN PHẨM
+               ==============================================
+               Hiển thị các sản phẩm đã chọn mua
+               + Input lời nhắn cho người bán
+               + Chọn phương thức vận chuyển
+          ============================================== -->
           <div class="checkout-section">
+            <!-- Header bảng sản phẩm -->
             <div class="product-header">
               <div class="co-col-product">Sản phẩm</div>
               <div class="co-col-variant">Phân loại hàng</div>
@@ -59,22 +163,31 @@
               <div class="co-col-qnt">Số lượng</div>
               <div class="co-col-total">Thành tiền</div>
             </div>
+            
+            <!-- Container render danh sách sản phẩm -->
+            <!-- checkout.js sẽ inject HTML vào đây -->
             <div class="product-list" id="checkout-list-wrapper"></div>
             
+            <!-- Row: Lời nhắn + Vận chuyển -->
             <div class="checkout-message-row">
+                <!-- Input lời nhắn cho người bán -->
                 <div style="flex: 1; display: flex; align-items: center;">
                     <span class="message-label">Lời nhắn:</span>
                     <input type="text" id="order-note" class="message-input" placeholder="Lưu ý cho Người bán...">
                 </div>
                 
+                <!-- Thông tin vận chuyển -->
                 <div class="shipping-info">
                     <span style="color: #00bfa5; margin-right: 15px; font-weight: 500;">Đơn vị vận chuyển:</span>
                     <div style="display: flex; align-items: center; justify-content:flex-end;">
                         <div>
+                            <!-- Tên phương thức vận chuyển -->
                             <span id="shipping-method-name" style="font-weight: bold; color: #333; margin: 0 25px;">Nhanh</span>
                         </div>
                         <div style="display: flex; align-items: center;">
+                            <!-- Nút thay đổi mở modal shipping -->
                             <span class="btn btn--text" onclick="openShippingModal()">Thay Đổi</span>
+                            <!-- Phí vận chuyển -->
                             <span id="shipping-method-price" style="color: #333; font-weight: 400;">30.000₫</span>
                         </div>
                     </div>
@@ -82,27 +195,42 @@
             </div>
           </div>
 
+          <!-- ==============================================
+               SECTION 3: PHƯƠNG THỨC THANH TOÁN & TỔNG KẾT
+               ==============================================
+               - Chọn phương thức: COD hoặc Ví T-WinPay
+               - Hiển thị tổng chi phí
+               - Nút đặt hàng
+          ============================================== -->
           <div class="checkout-section">
             <div class="payment-method">
               <div class="checkout-header" style="color: #333; margin-bottom: 10px">Phương thức thanh toán</div>
               
+              <!-- Group nút chọn phương thức -->
               <div class="payment-group">
+                <!-- T-WinPay: Thanh toán bằng ví điện tử -->
                 <button class="payment-btn" onclick="selectPayment(this, 'TWINPAY')">Ví T-WinPay</button>
+                <!-- COD: Thanh toán khi nhận hàng (mặc định) -->
                 <button class="payment-btn active" onclick="selectPayment(this, 'COD')">Thanh toán khi nhận hàng</button>
               </div>
 
+              <!-- Nội dung hiển thị khi chọn COD -->
               <div id="payment-cod-content" class="payment-content-box" style="display: block;">
                   <div style="display: flex; align-items: baseline;">
                       <span class="payment-content-label">Thanh toán khi nhận hàng</span>
                       <span class="payment-content-text">Phí thu hộ: 0₫ VNĐ. Ưu đãi về phí vận chuyển (nếu có) áp dụng cả với phí thu hộ.</span>
                   </div>
               </div>
+              
+              <!-- Nội dung hiển thị khi chọn T-WinPay -->
               <div id="payment-twinpay-content" class="payment-content-box">
+                  <!-- Option chọn ví T-WinPay -->
                   <label class="twinpay-option" id="twinpay-option-box" onclick="handleTwinPayClick(event)">
                        <input type="radio" name="payment_method_sub" class="twinpay-radio" id="twinpay-check"> 
                        <i class="fas fa-wallet" style="font-size: 30px; color: #ee4d2d; margin-right: 15px;"></i>
                        <div>
                            <div style="font-weight: 500; font-size: 1.4rem;">Số dư Ví T-WinPay</div>
+                           <!-- Hiển thị số dư ví từ API -->
                            <div style="color: #777; font-size: 1.3rem; margin-top: 4px;">
                               Số dư khả dụng: <span id="wallet-balance-display" style="color: #ee4d2d; font-weight: bold;">Đang tải...</span>
                            </div>
@@ -111,7 +239,12 @@
               </div>
             </div>
 
+            <!-- ==============================================
+                 FOOTER CHECKOUT: TỔNG TIỀN + NÚT ĐẶT HÀNG
+                 ==============================================
+            -->
             <div class="checkout-footer">
+              <!-- Bảng tổng kết chi phí -->
               <div class="bill-section">
                   <div class="bill-label">Tổng tiền hàng</div>
                   <div class="bill-value" id="sub-total">0₫</div>
@@ -123,10 +256,15 @@
                   <div class="bill-total-value" id="final-total">0₫</div>
               </div>
 
+              <!-- Nút đặt hàng -->
               <div class="order-action-section">
                   <div class="terms-text">
                       Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo <a href="#" class="terms-link">Điều khoản Shopee</a>
                   </div>
+                  <!-- 
+                    Click gọi confirmOrder() trong checkout.js
+                    Gửi request POST /orders tới server
+                  -->
                   <button class="btn-order" onclick="confirmOrder()">Đặt hàng</button>
               </div>
             </div>
@@ -134,35 +272,65 @@
         </div>
       </div>
       
+      <!-- Placeholder cho footer -->
       <div id="footer-placeholder"></div>
     </div>
-    <!-- Modal Address -->
+    
+    <!-- ==============================================
+         MODAL 1: CHỌN ĐỊA CHỈ GIAO HÀNG
+         ==============================================
+         Hiển thị danh sách địa chỉ đã lưu của user
+         Cho phép:
+         - Chọn địa chỉ để sử dụng
+         - Thêm địa chỉ mới
+    ============================================== -->
     <div class="modal" id="modal-address">
+      <!-- Overlay tối phía sau -->
       <div class="modal__overlay" onclick="closeAddressModal()"></div>
       <div class="modal__body" style="width: 600px; border-radius: 3px; overflow: hidden">
+        <!-- Tiêu đề modal -->
         <div style="padding: 20px; border-bottom: 1px solid #eee; font-size: 1.8rem; font-weight: 500;">Địa Chỉ Của Tôi</div>
+        
+        <!-- Container render danh sách địa chỉ -->
+        <!-- checkout.js sẽ fetch từ API và render vào đây -->
         <div class="address-list" id="address-list-container" style="max-height: 400px; overflow-y: auto; padding: 0 20px"></div>
+        
+        <!-- Nút thêm địa chỉ mới -->
         <div style="padding: 20px; border-top: 1px solid #eee; background: #fdfdfd">
           <button class="btn btn--normal" style="border: 1px solid #ddd; width: 100%; display: flex; align-items: center; justify-content: center;" onclick="showAddAddressForm()">
             <i class="fa-solid fa-plus" style="margin-right: 8px; color: #888"></i>Thêm Địa Chỉ Mới
           </button>
         </div>
+        
+        <!-- Nút điều khiển: Hủy + Xác nhận -->
         <div style="padding: 20px; text-align: right">
           <button class="btn btn--normal" onclick="closeAddressModal()" style="margin-right: 10px">Hủy</button>
           <button class="btn btn--primary" onclick="confirmSelectAddress()">Xác nhận</button>
         </div>
       </div>
     </div>
-    <!-- Modal Add Address -->
+    
+    <!-- ==============================================
+         MODAL 2: THÊM ĐỊA CHỈ MỚI
+         ==============================================
+         Form nhập thông tin địa chỉ mới:
+         - Họ tên + Số điện thoại
+         - Tỉnh/Thành, Quận/Huyện, Phường/Xã
+         - Địa chỉ cụ thể (số nhà, tên đường)
+         - Checkbox đặt làm mặc định
+    ============================================== -->
     <div class="modal" id="modal-add-address">
       <div class="modal__overlay" onclick="backToAddressList()"></div>
       <div class="modal__body" style="width: 500px">
         <div class="auth-form">
+          <!-- Header form -->
           <div class="auth-form__header">
               <h3 class="auth-form__heading">Địa Chỉ Mới</h3>
           </div>
           
+          <!-- Form nhập thông tin -->
           <div class="auth-form__form">
+            <!-- Row 1: Họ tên + SĐT -->
             <div style="display: flex; gap: 15px;">
                 <div class="auth-form__group" style="flex: 1;">
                     <div class="auth-form__input-wrap">
@@ -176,58 +344,92 @@
                 </div>
             </div>
 
+            <!-- Row 2: Địa chỉ tổng quát -->
             <div class="auth-form__group">
                 <div class="auth-form__input-wrap">
                     <input type="text" id="new-addr" class="auth-form__input" placeholder="Phường/Xã, Quận/Huyện, Tỉnh/Thành phố" />
                 </div>
             </div>
             
+            <!-- Row 3: Địa chỉ cụ thể -->
             <div class="auth-form__group">
                 <div class="auth-form__input-wrap">
                     <input type="text" id="new-specific" class="auth-form__input" placeholder="Địa chỉ cụ thể (Số nhà, tên đường...)" />
                 </div>
             </div>
 
+            <!-- Checkbox đặt làm địa chỉ mặc định -->
             <label class="checkbox-wrapper">
               <input type="checkbox" id="new-default" />
               Đặt làm địa chỉ mặc định
             </label>
           </div>
 
+          <!-- Nút điều khiển -->
           <div class="auth-form__controls">
             <button class="btn-back" onclick="backToAddressList()">TRỞ LẠI</button>
+            <!-- Gọi saveNewAddress() để gửi API POST /addresses -->
             <button class="btn-save" onclick="saveNewAddress()">HOÀN THÀNH</button>
           </div>
         </div>
       </div>
     </div>
-    <!-- Modal Shipping -->
+    
+    <!-- ==============================================
+         MODAL 3: CHỌN ĐƠN VỊ VẬN CHUYỂN
+         ==============================================
+         Hiển thị danh sách đơn vị vận chuyển từ API
+         Mỗi option hiển thị: Tên + Giá + Thời gian
+    ============================================== -->
     <div class="modal" id="modal-shipping">
       <div class="modal__overlay" onclick="document.getElementById('modal-shipping').style.display='none'"></div>
       <div class="modal__body" style="width: 500px; border-radius: 3px;">
+        <!-- Header -->
         <div style="padding: 20px; border-bottom: 1px solid #eaeaea;">
             <span style="font-size: 1.8rem; font-weight: 500; color: #333;">Chọn Đơn Vị Vận Chuyển</span>
         </div>
         
+        <!-- Container render danh sách shipping options -->
+        <!-- checkout.js fetch từ API /shipping-methods -->
         <div class="shipping-list" id="shipping-list-container">
             </div>
 
+        <!-- Nút điều khiển -->
         <div style="padding: 20px; text-align: right; border-top: 1px solid #eaeaea; background: #fdfdfd;">
           <button class="btn btn--normal" onclick="document.getElementById('modal-shipping').style.display='none'" style="margin-right: 8px; min-width: 120px;">Hủy</button>
           <button class="btn btn--primary" onclick="confirmSelectShipping()" style="min-width: 120px;">Xác nhận</button>
         </div>
       </div>
     </div>
-    <!-- Modal Warning -->
+    
+    <!-- ==============================================
+         MODAL 4: CẢNH BÁO / THÔNG BÁO LỖI
+         ==============================================
+         Hiển thị thông báo lỗi hoặc cảnh báo cho user
+         Ví dụ: "Vui lòng chọn địa chỉ giao hàng"
+    ============================================== -->
     <div class="modal" id="modal-warning">
       <div class="modal__overlay" onclick="closeWarningModal()"></div>
       <div class="modal__body" style="width: 500px; padding: 20px; text-align: center; border-radius: 3px;">
+         <!-- Nội dung thông báo - set bởi JavaScript -->
          <p id="warning-msg" style="font-size: 1.5rem; color: #333; line-height: 1.6; margin-bottom: 20px;">
          </p>
          <button class="btn btn--primary" onclick="closeWarningModal()" style="min-width: 100px;">OK</button>
       </div>
     </div>
 
+    <!-- ==============================================
+         JAVASCRIPT FILES
+         ==============================================
+         Thứ tự load:
+         1. validation.js - Hàm validate input
+         2. main.js - Logic chung (auth, utils)
+         3. checkout.js - Logic riêng trang checkout:
+            - loadCheckoutItems() - Đọc từ sessionStorage
+            - loadAddresses() - Fetch địa chỉ user
+            - selectPayment() - Chọn phương thức thanh toán
+            - confirmOrder() - Gửi đơn hàng lên server
+    ============================================== -->
     <script src="./assets/js/validation.js"></script>
     <script src="./assets/js/main.js"></script>
     <script src="./assets/js/checkout.js"></script>

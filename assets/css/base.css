@@ -1,103 +1,184 @@
+/* =========================================================
+   TWIN SHOP - BASE CSS
+   =========================================================
+   
+   File này chứa các STYLE CƠ BẢN dùng chung cho toàn bộ website:
+   
+   1. CSS VARIABLES (:root)
+      - Các biến màu sắc, kích thước dùng lại nhiều lần
+      - VD: --primary-color dùng cho tất cả màu cam chủ đạo
+   
+   2. RESET CSS
+      - Box-sizing, font mặc định
+   
+   3. GRID SYSTEM (Hệ thống lưới)
+      - Chia trang thành các cột (column)
+      - Tương tự Bootstrap nhưng đơn giản hơn
+   
+   4. BUTTON STYLES
+      - Các loại nút bấm: primary, normal, disable...
+   
+   5. SELECT/DROPDOWN
+      - Style cho dropdown chọn giá, danh mục...
+   
+   6. MODAL (Popup)
+      - Style cho form đăng nhập/đăng ký
+   
+   ========================================================= */
+
+/* =========================================================
+   1. CSS VARIABLES - Biến CSS dùng chung
+   =========================================================
+   
+   Cách dùng: var(--tên-biến)
+   VD: background-color: var(--primary-color);
+   
+   Lợi ích: Thay đổi 1 chỗ, cập nhật toàn bộ website
+   ========================================================= */
 :root {
+  /* Màu cơ bản */
   --white-color: #fff;
   --black-color: #000;
-  --text-color: #333;
-  --primary-color: #ee4d2d; /* Đổi về màu cam chuẩn Shopee */
-  --primary-color-rgba: rgba(238, 77, 45, 0.1);
+  --text-color: #333;           /* Màu chữ chính */
+  
+  /* Màu chủ đạo (cam Shopee) */
+  --primary-color: #ee4d2d;     /* Màu cam đậm - dùng cho nút, link */
+  --primary-color-rgba: rgba(238, 77, 45, 0.1);  /* Màu cam mờ - dùng cho hover */
 
-  --header-height: 120px;
-  --navbar-height: 33px;
+  /* Kích thước header */
+  --header-height: 120px;       /* Tổng chiều cao header */
+  --navbar-height: 33px;        /* Chiều cao thanh navbar trên cùng */
   --header-with-search-height: calc(
     var(--header-height) - var(--navbar-height)
   );
   
-  --star-gold-color: #ffce3e;
+  /* Màu đánh giá sao */
+  --star-gold-color: #ffce3e;   /* Màu vàng cho sao đánh giá */
 }
 
+/* =========================================================
+   2. RESET CSS - Chuẩn hóa style mặc định
+   ========================================================= */
+
+/* Tất cả element kế thừa box-sizing từ html */
 * {
   box-sizing: inherit;
 }
 
+/* Cấu hình gốc cho html */
 html {
-  font-size: 62.5%; /* 1rem = 10px */
+  /* 
+   * font-size: 62.5% = 10px (vì 16px * 0.625 = 10px)
+   * Giúp tính rem dễ hơn: 1.4rem = 14px, 1.6rem = 16px
+   */
+  font-size: 62.5%;
   line-height: 1.6rem;
   font-family: "Helvetica Neue", Helvetica, Arial, "Roboto", sans-serif;
+  
+  /* 
+   * box-sizing: border-box 
+   * = width/height bao gồm cả padding và border
+   * Giúp tính toán kích thước dễ dàng hơn
+   */
   box-sizing: border-box;
 }
 
 body {
-  background-color: #f5f5f5;
+  background-color: #f5f5f5;    /* Nền xám nhạt như Shopee */
 }
 
-/* ==================================
-   GRID SYSTEM (HỆ THỐNG LƯỚI)
-   ================================== */
+/* =========================================================
+   3. GRID SYSTEM - Hệ thống lưới chia cột
+   =========================================================
+   
+   Tương tự Bootstrap Grid nhưng đơn giản hơn.
+   Sử dụng Flexbox để chia cột.
+   
+   Cách dùng:
+   <div class="grid">                    <!-- Container chính, width 1200px -->
+     <div class="grid__row">             <!-- Hàng chứa các cột -->
+       <div class="grid__column-2">      <!-- Cột chiếm 2/12 -->
+       <div class="grid__column-10">     <!-- Cột chiếm 10/12 -->
+     </div>
+   </div>
+   ========================================================= */
+   
+/* Container chính - Giới hạn width 1200px và căn giữa */
 .grid {
   width: 1200px;
-  max-width: 100%;
-  margin: 0 auto;
+  max-width: 100%;              /* Không vượt quá màn hình */
+  margin: 0 auto;               /* Căn giữa trang */
 }
 
 .grid__full-width {
   width: 100%;
 }
 
+/* Hàng chứa các cột - Dùng Flexbox */
 .grid__row {
-  display: flex;
-  flex-wrap: wrap;
-  margin-left: -5px;
+  display: flex;                /* Bật Flexbox */
+  flex-wrap: wrap;              /* Cho phép xuống dòng */
+  margin-left: -5px;            /* Bù trừ padding của cột */
   margin-right: -5px;
 }
 
-/* Cột 2/12 (16.66%) */
+/* Cột 2/12 (16.66%) - Dùng cho sidebar danh mục */
 .grid__column-2 {
-  width: 16.6667%;
+  width: 16.6667%;              /* 2/12 = 16.6667% */
   padding-left: 5px;
   padding-right: 5px;
 }
 
-/* Cột 2.4/10 (20% - Dùng cho 5 sản phẩm/hàng) */
+/* Cột 2.4/10 (20%) - Dùng cho 5 sản phẩm/hàng */
 .grid__column-2-4 {
-  width: 20%;
+  width: 20%;                   /* 100% / 5 = 20% */
   padding-left: 5px;
   padding-right: 5px;
 }
 
-/* Cột 10/12 (83.33%) */
+/* Cột 10/12 (83.33%) - Dùng cho vùng sản phẩm chính */
 .grid__column-10 {
-  width: 83.3333%;
+  width: 83.3333%;              /* 10/12 = 83.3333% */
   padding-left: 5px;
   padding-right: 5px;
 }
 
-/* Cột 5/12 (41.66% - Dùng cho ảnh sản phẩm chi tiết) */
+/* Cột 5/12 (41.66%) - Dùng cho ảnh sản phẩm chi tiết */
 .grid__column-5 {
     padding-left: 5px;
     padding-right: 5px;
-    width: 41.66667%;
+    width: 41.66667%;           /* 5/12 */
     box-sizing: border-box;
 }
 
-/* Cột 7/12 (58.33% - Dùng cho thông tin sản phẩm chi tiết) */
+/* Cột 7/12 (58.33%) - Dùng cho thông tin sản phẩm chi tiết */
 .grid__column-7 {
     padding-left: 5px;
     padding-right: 5px;
-    width: 58.33333%;
+    width: 58.33333%;           /* 7/12 */
     box-sizing: border-box;
 }
 
-/* ==================================
-   BUTTON STYLES (NÚT BẤM)
-   ================================== */
+/* =========================================================
+   4. BUTTON STYLES - Các loại nút bấm
+   =========================================================
+   
+   Cách dùng:
+   <button class="btn">Normal</button>
+   <button class="btn btn--primary">Primary</button>
+   <button class="btn btn--disable">Disabled</button>
+   ========================================================= */
+
+/* Style mặc định cho tất cả nút */
 .btn {
   min-width: 124px;
   height: 34px;
-  border: none;
-  outline: none;
-  text-decoration: none;
-  border-radius: 2px;
-  font-size: 1.4rem;
-  color: var(--text-color);
+  border: none;                 /* Bỏ viền mặc định */
+  outline: none;                /* Bỏ outline khi focus */
+  text-decoration: none;        /* Bỏ gạch chân nếu là link */
+  border-radius: 2px;           /* Bo góc nhẹ */
+  font-size: 1.4rem;            /* = 14px */
+  color: var(--text-color);     /* Màu chữ */
   padding: 0 12px;
   line-height: 1.6rem;
   background-color: var(--white-color);
@@ -108,50 +189,57 @@ body {
   box-shadow: 0 1px 1px 0 rgba(0,0,0,.09);
 }
 
+/* Nút hover bình thường */
 .btn.btn--normal:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.05);  /* Xám nhạt khi hover */
 }
 
+/* Nút nhỏ hơn */
 .btn.btn--size-s {
   height: 32px;
-  font-size: 1.2rem;
+  font-size: 1.2rem;            /* = 12px */
   padding: 0 8px;
 }
 
+/* Nút Primary - Màu cam nổi bật */
 .btn.btn--primary {
-  color: var(--white-color);
-  background-color: var(--primary-color);
+  color: var(--white-color);              /* Chữ trắng */
+  background-color: var(--primary-color); /* Nền cam */
 }
 
-/* Nút Primary nhưng nhạt (Dùng cho nút Thêm giỏ hàng) */
+/* Nút Primary nhạt - Dùng cho nút "Thêm giỏ hàng" */
 .btn.btn--primary-tint {
-    background-color: rgba(255, 87, 34, 0.1);
-    color: var(--primary-color);
-    border: 1px solid var(--primary-color);
+    background-color: rgba(255, 87, 34, 0.1);  /* Nền cam rất nhạt */
+    color: var(--primary-color);               /* Chữ cam */
+    border: 1px solid var(--primary-color);    /* Viền cam */
     box-shadow: none;
 }
 .btn.btn--primary-tint:hover {
-    background-color: rgba(255, 87, 34, 0.15);
+    background-color: rgba(255, 87, 34, 0.15); /* Đậm hơn khi hover */
 }
 
+/* Nút Disable - Không thể click */
 .btn.btn--disable {
-  cursor: default;
-  background-color: #c3c3c3;
-  color: #949494;
+  cursor: default;              /* Con trỏ bình thường */
+  background-color: #c3c3c3;    /* Nền xám */
+  color: #949494;               /* Chữ xám đậm hơn */
 }
 
-/* ==================================
-   ANIMATION & UTILS
-   ================================== */
+/* =========================================================
+   5. ANIMATION - Hiệu ứng chuyển động
+   ========================================================= */
+
+/* Hiệu ứng mờ dần vào */
 @keyframes fadeIn {
   from {
-    opacity: 0;
+    opacity: 0;                 /* Bắt đầu: trong suốt */
   }
   to {
-    opacity: 1;
+    opacity: 1;                 /* Kết thúc: hiện rõ */
   }
 }
 
+/* Hiệu ứng phóng to/thu nhỏ - Dùng cho modal */
 @keyframes growth {
     from {
         transform: scale(var(--growth-from));
@@ -161,11 +249,26 @@ body {
     }
 }
 
-/* ==================================
-   SELECTION (DROP DOWN)
-   ================================== */
+/* =========================================================
+   6. SELECT/DROPDOWN - Menu xổ xuống
+   =========================================================
+   
+   Dùng cho dropdown chọn "Giá: Thấp đến cao / Cao đến thấp"
+   
+   Cấu trúc HTML:
+   <div class="select-input">
+     <span class="select-input__label">Giá</span>
+     <i class="select-input__icon fa-solid fa-angle-down"></i>
+     <ul class="select-input__list">
+       <li class="select-input__item">
+         <a class="select-input__link">Option 1</a>
+       </li>
+     </ul>
+   </div>
+   ========================================================= */
+
 .select-input {
-  position: relative;
+  position: relative;           /* Để dropdown định vị theo nó */
   min-width: 200px;
   height: 34px;
   padding: 0 12px;
@@ -178,6 +281,7 @@ body {
   box-shadow: 0 1px 1px 0 rgba(0,0,0,.09);
 }
 
+/* Icon mũi tên xuống */
 .select-input__icon {
   font-size: 1.4rem;
   color: rgb(131, 131, 131);
@@ -185,25 +289,28 @@ body {
   top: 1px;
 }
 
+/* Danh sách dropdown - Mặc định ẩn */
 .select-input__list {
-  position: absolute;
+  position: absolute;           /* Định vị tuyệt đối theo parent */
   left: 0;
   right: 0;
-  top: 25px;
+  top: 25px;                    /* Nằm dưới label */
   border-radius: 2px;
   padding: 8px 16px;
   background-color: var(--white-color);
-  list-style: none;
+  list-style: none;             /* Bỏ dấu chấm đầu dòng */
   cursor: pointer;
-  display: none;
-  z-index: 1;
+  display: none;                /* MẶC ĐỊNH ẨN */
+  z-index: 1;                   /* Nằm trên các element khác */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
+/* Hiện dropdown khi hover vào select-input */
 .select-input:hover .select-input__list {
   display: block;
 }
 
+/* Các link trong dropdown */
 .select-input__link {
   text-decoration: none;
   padding: 8px 0;
@@ -213,39 +320,50 @@ body {
 }
 
 .select-input__link:hover {
-  color: var(--primary-color);
+  color: var(--primary-color);  /* Chuyển màu cam khi hover */
 }
 
-/* ==================================
-   MODAL (LOGIN / REGISTER FORM)
-   ================================== */
+/* =========================================================
+   7. MODAL - Popup đăng nhập/đăng ký
+   =========================================================
+   
+   Modal = Cửa sổ popup phủ lên trang
+   Gồm: overlay (nền mờ) + body (nội dung)
+   
+   Mặc định ẩn (display: none)
+   Thêm class .open để hiện (display: flex)
+   ========================================================= */
+
 .modal {
-  position: fixed;
+  position: fixed;              /* Cố định vị trí */
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   display: flex;
   animation: fadeIn linear 0.1s;
-  display: none; /* Mặc định ẩn */
-  z-index: 1000;
+  display: none;                /* Mặc định ẩn */
+  z-index: 1000;                /* Nằm trên tất cả */
 }
 
+/* Khi thêm class .open, modal sẽ hiện */
 .modal.open {
-  display: flex; /* Hiện khi thêm class open */
+  display: flex;
 }
 
+/* Overlay - Nền mờ đen phía sau */
 .modal__overlay {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.4);  /* Đen mờ 40% */
 }
 
+/* Body - Khung nội dung chính */
 .modal__body {
   background-color: #fff;
-  margin: auto;
+  margin: auto;                 /* Căn giữa */
   position: relative;
-  z-index: 1;
+  z-index: 1;                   /* Nằm trên overlay */
   border-radius: 5px;
 }
