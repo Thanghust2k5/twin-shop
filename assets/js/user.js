@@ -764,7 +764,16 @@ function confirmCancelOrder() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reason: reason })
     })
-    .then((res) => res.json())
+    .then((res) => {
+        // Kiểm tra response status
+        if (!res.ok) {
+            // Lỗi từ server (400, 404, 500...)
+            return res.json().then(data => {
+                throw new Error(data.message || "Lỗi khi hủy đơn!");
+            });
+        }
+        return res.json();
+    })
     .then((data) => {
         // Đóng modal
         closeCancelModal();
@@ -778,7 +787,7 @@ function confirmCancelOrder() {
         // Quay về list view (nếu đang ở detail view)
         backToOrderList();
     })
-    .catch((err) => showToast("Lỗi khi hủy đơn!", "error"));
+    .catch((err) => showToast(err.message || "Lỗi khi hủy đơn!", "error"));
 }
 
 // =========================================================
